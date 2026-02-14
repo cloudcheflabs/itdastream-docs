@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/intro/intro/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/intro/intro/">
       
       
         <link rel="prev" href="../../architecture/architecture/">
@@ -23,7 +23,7 @@
     
     
       
-        <title>Getting Started - itdastream</title>
+        <title>Getting Started - ItdaStream</title>
       
     
     
@@ -92,7 +92,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="itdastream" class="md-header__button md-logo" aria-label="itdastream" data-md-component="logo">
+    <a href="../.." title="ItdaStream" class="md-header__button md-logo" aria-label="ItdaStream" data-md-component="logo">
       
   <img src="../../images/logo/itdastream-logo-without-name.png" alt="logo">
 
@@ -105,7 +105,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            itdastream
+            ItdaStream
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -272,12 +272,12 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="itdastream" class="md-nav__button md-logo" aria-label="itdastream" data-md-component="logo">
+    <a href="../.." title="ItdaStream" class="md-nav__button md-logo" aria-label="ItdaStream" data-md-component="logo">
       
   <img src="../../images/logo/itdastream-logo-without-name.png" alt="logo">
 
     </a>
-    itdastream
+    ItdaStream
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -507,7 +507,7 @@
   <a href="#install-itdastream-on-local" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install itdastream on Local
+        Install ItdaStream on Local
       
     </span>
   </a>
@@ -515,10 +515,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-bucket-and-credential" class="md-nav__link">
+  <a href="#run-console-producer-and-consumer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Create Bucket and Credential
+        Run Console Producer and Consumer
       
     </span>
   </a>
@@ -526,21 +526,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#upload-files-to-itdastream" class="md-nav__link">
+  <a href="#stop-servers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Upload files to itdastream
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#stop-example-servers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stop Example Servers
+        Stop Servers
       
     </span>
   </a>
@@ -581,11 +570,11 @@
 
 
 <h1 id="getting-started">Getting Started</h1>
-<p>This shows how to install itdastream on local to experience it quickly.</p>
+<p>This shows how to install ItdaStream on local to experience it quickly.</p>
 <h2 id="prerequisites">Prerequisites</h2>
-<p>Because itdastream is written in Java, Java 17 needs to be installed on local.</p>
-<h2 id="install-itdastream-on-local">Install itdastream on Local</h2>
-<p>itdastream distribution can be downloaded like this.</p>
+<p>Because ItdaStream is written in Java, Java 17 needs to be installed on local.</p>
+<h2 id="install-itdastream-on-local">Install ItdaStream on Local</h2>
+<p>ItdaStream distribution can be downloaded like this.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl -L -O https://github.com/cloudcheflabs/itdastream-pack/releases/download/itdastream-archive/itdastream-1.0.0.tar.gz
 </code></pre></div>
 <p>And untar the downloaded package.
@@ -593,70 +582,45 @@
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>cd itdastream-1.0.0;
 </code></pre></div></p>
-<p>Run the example servers which are 1 API server and 3 Data nodes with Zookeeper on local.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>export itdastream_MASTER_KEY=&quot;itdastreamMasterKey1200303003abc&quot;
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>bin/start-example-servers.sh;
+<p>Run Zookeeper.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bin/start-zk.sh
 </code></pre></div>
+<p>ItdaStream needs a S3 bucket where all the logs will be saved.
+After a bucket and the S3 credentials are created, run the broker server with replacing the following environment variables with yours.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a># master key.
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>export ITDASTREAM_MASTER_KEY=&quot;MustBeChanged01234567890123456789012345678901&quot;
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a># s3 connection info.
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>export ITDASTREAM_STORAGE_S3_ENDPOINT_URL=endpoint
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>export ITDASTREAM_STORAGE_S3_BUCKET_NAME=bucket
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>export ITDASTREAM_STORAGE_S3_REGION_ID=any-region
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>export ITDASTREAM_STORAGE_S3_ACCESS_KEY_ID=access-key
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>export ITDASTREAM_STORAGE_S3_SECRET_ACCESS_KEY=secret-key
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a># start broker.
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>bin/start-broker.sh
+</code></pre></div></p>
 <blockquote>
-<p>Environment variable <code>itdastream_MASTER_KEY</code> that must be at least 32 characters needs to be exported when running itdastream servers.</p>
+<p>Environment variable <code>ITDASTREAM_MASTER_KEY</code> that must be at least 32 characters needs to be exported when running ItdaStream broker servers.</p>
 </blockquote>
-<p>After a few seconds, visit admin page of itdastream.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>http://localhost:8888/admin
+<p>Visit admin page of ItdaStream.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>http://localhost:8080/admin
 </code></pre></div>
 <p>First initial admin user and password is <code>admin</code> / <code>admin</code>, after that you need to change the initial password.</p>
 <p><img width="1200" src="../../images/getting-started/dashboard.png"/></p>
-<h2 id="create-bucket-and-credential">Create Bucket and Credential</h2>
-<p>In order to upload files to itdastream, a bucket and a S3 credential need to be created in Admin UI.</p>
-<p>In the menu of <code>Identity Control</code>, click <code>New Keypair</code> to create a S3 credential(access key / secret key).
-After that, click the download icon in the created keypair to download access key and secret key.
-<img width="1200" src="../../images/getting-started/credential.png"/></p>
-<p>And you also need to create a bucket, go to the menu of <code>Object Store</code>, click <code>New Bucket</code>
-to create a bucket with the name of <code>test-bucket</code>.</p>
-<h2 id="upload-files-to-itdastream">Upload files to itdastream</h2>
-<p>Now, you can connect itdastream to upload files. AWS CLI will be used for this example.
-Configure a S3 profile with the S3 credential(access key and secret key) from the downloaded credential file before.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>aws configure --profile=custom-s3 set default.s3.signature_version s3v4;
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>aws configure --profile=custom-s3 set aws_access_key_id &lt;access-key&gt;;
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>aws configure --profile=custom-s3 set aws_secret_access_key &lt;secret-key&gt;;
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>aws configure --profile=custom-s3 set region us-east-1;
-</code></pre></div>
-<p>Upload a file to itdastream as below, take a note that the S3 endpoint is <code>http://localhost:8080</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a># upload file.
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>aws s3 cp ./values-dev_old.yaml s3://test-bucket/values-dev_old.yaml \
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>--profile=custom-s3 \
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>--endpoint-url http://localhost:8080 \
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>--no-verify-ssl
-</code></pre></div>
-<p>You can also test <code>ls</code>, <code>download</code>, <code>delete</code> of objects in itdastream.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a># ls.
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>aws s3 ls \
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>s3://test-bucket \
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>--profile=custom-s3 \
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>--endpoint=http://localhost:8080 \
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>--no-verify-ssl \
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>--recursive \
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>--human-readable \
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>--summarize \
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>;
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a># download.
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>aws s3 cp \
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>--profile=custom-s3 \
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>--endpoint=http://localhost:8080 \
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>s3://test-bucket/values-dev_old.yaml values-dev_downloaded.yaml \
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>;
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a># delete.
-<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>aws s3 rm \
-<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>--profile=custom-s3 \
-<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>--endpoint=http://localhost:8080 \
-<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>s3://test-bucket/values-dev_old.yaml \
-<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>;
+<h2 id="run-console-producer-and-consumer">Run Console Producer and Consumer</h2>
+<p>In order to experience to send and receive messages to/from ItdaStream, </p>
+<p>first run console consumer.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>bin/kafka-console-consumer.sh --brokers localhost:9092 --topic my-topic
 </code></pre></div></p>
-<h2 id="stop-example-servers">Stop Example Servers</h2>
-<p>In order to stop the running example servers, run this.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>bin/stop-example-servers.sh
+<p>In another terminal, run the console producer, and type some messages to send. 
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bin/kafka-console-producer.sh --brokers localhost:9092 --topic my-topic
+</code></pre></div></p>
+<p>And then, you will see the messages received in the console consumer.</p>
+<h2 id="stop-servers">Stop Servers</h2>
+<p>Stop zookeeper and broker.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>bin/stop-broker.sh 
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>bin/stop-zk.sh
 </code></pre></div>
 
 
