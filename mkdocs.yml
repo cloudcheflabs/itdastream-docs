@@ -36,6 +36,21 @@ nav:
       - "itdastream Architecture": architecture/architecture.md
   - "Getting Started":
       - "Getting Started": intro/intro.md
+  - "Features":
+      - "Full Kafka Protocol Compatibility": features/kafka-compatible.md
+      - "Disaggregated Compute-Storage Architecture": features/disaggre-architecture.md
+      - "Exactly-Once Transactional Semantics": features/tx.md
+      - "Consumer Group Coordination": features/consumer-group.md
+      - "Envelope Encryption and Key Management Service": features/kms.md
+      - "AWS IAM-Compatible Access Control": features/iam.md
+      - "SASL Authentication and TLS Encryption": features/sasl.md
+      - "High-Performance NIO Network Layer": features/network.md
+      - "Intelligent Segment Caching": features/caching.md
+      - "Log Retention and Lifecycle Management": features/retention.md
+      - "Monitoring and Metrics": features/monitoring.md
+      - "Network Compression": features/compression.md
+      - "Flexible Configuration System": features/configuration.md
+      - "Crash Recovery with Staging Store": features/staging-store.md
 
 
 extra:
