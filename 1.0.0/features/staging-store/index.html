@@ -8,27 +8,29 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/staging-store/">
       
+      
+        <link rel="prev" href="../configuration/">
       
       
       
         
       
       
-      <link rel="icon" href="images/logo/itdastream-logo-without-name.png">
+      <link rel="icon" href="../../images/logo/itdastream-logo-without-name.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>ItdaStream</title>
+        <title>Crash Recovery with Staging Store - ItdaStream</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -47,7 +49,7 @@
       
     
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -71,6 +73,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#crash-recovery-with-staging-store" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -85,9 +92,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="ItdaStream" class="md-header__button md-logo" aria-label="ItdaStream" data-md-component="logo">
+    <a href="../.." title="ItdaStream" class="md-header__button md-logo" aria-label="ItdaStream" data-md-component="logo">
       
-  <img src="images/logo/itdastream-logo-without-name.png" alt="logo">
+  <img src="../../images/logo/itdastream-logo-without-name.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -104,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Crash Recovery with Staging Store
             
           </span>
         </div>
@@ -207,7 +214,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="architecture/architecture/" class="md-tabs__link">
+        <a href="../../architecture/architecture/" class="md-tabs__link">
           
   
   
@@ -227,7 +234,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="intro/intro/" class="md-tabs__link">
+        <a href="../../intro/intro/" class="md-tabs__link">
           
   
   
@@ -243,11 +250,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="features/kafka-compatible/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../kafka-compatible/" class="md-tabs__link">
           
   
   
@@ -270,9 +279,7 @@
           
             
               
-                
-              
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
@@ -285,9 +292,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="ItdaStream" class="md-nav__button md-logo" aria-label="ItdaStream" data-md-component="logo">
+    <a href="../.." title="ItdaStream" class="md-nav__button md-logo" aria-label="ItdaStream" data-md-component="logo">
       
-  <img src="images/logo/itdastream-logo-without-name.png" alt="logo">
+  <img src="../../images/logo/itdastream-logo-without-name.png" alt="logo">
 
     </a>
     ItdaStream
@@ -354,7 +361,7 @@
   
   
     <li class="md-nav__item">
-      <a href="architecture/architecture/" class="md-nav__link">
+      <a href="../../architecture/architecture/" class="md-nav__link">
         
   
   
@@ -441,7 +448,7 @@
   
   
     <li class="md-nav__item">
-      <a href="intro/intro/" class="md-nav__link">
+      <a href="../../intro/intro/" class="md-nav__link">
         
   
   
@@ -473,26 +480,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -510,7 +522,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -528,7 +540,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/kafka-compatible/" class="md-nav__link">
+      <a href="../kafka-compatible/" class="md-nav__link">
         
   
   
@@ -556,7 +568,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/disaggre-architecture/" class="md-nav__link">
+      <a href="../disaggre-architecture/" class="md-nav__link">
         
   
   
@@ -584,7 +596,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/tx/" class="md-nav__link">
+      <a href="../tx/" class="md-nav__link">
         
   
   
@@ -612,7 +624,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/consumer-group/" class="md-nav__link">
+      <a href="../consumer-group/" class="md-nav__link">
         
   
   
@@ -640,7 +652,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/kms/" class="md-nav__link">
+      <a href="../kms/" class="md-nav__link">
         
   
   
@@ -668,7 +680,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/iam/" class="md-nav__link">
+      <a href="../iam/" class="md-nav__link">
         
   
   
@@ -696,7 +708,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/sasl/" class="md-nav__link">
+      <a href="../sasl/" class="md-nav__link">
         
   
   
@@ -724,7 +736,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/network/" class="md-nav__link">
+      <a href="../network/" class="md-nav__link">
         
   
   
@@ -752,7 +764,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/caching/" class="md-nav__link">
+      <a href="../caching/" class="md-nav__link">
         
   
   
@@ -780,7 +792,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/retention/" class="md-nav__link">
+      <a href="../retention/" class="md-nav__link">
         
   
   
@@ -808,7 +820,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/monitoring/" class="md-nav__link">
+      <a href="../monitoring/" class="md-nav__link">
         
   
   
@@ -836,7 +848,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/compression/" class="md-nav__link">
+      <a href="../compression/" class="md-nav__link">
         
   
   
@@ -864,7 +876,7 @@
   
   
     <li class="md-nav__item">
-      <a href="features/configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -889,10 +901,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="features/staging-store/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crash Recovery with Staging Store
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -908,6 +947,48 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rocksdb-staging-store" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RocksDB Staging Store
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recovery-process-on-broker-startup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recovery process (on broker startup)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -934,32 +1015,36 @@
               <article class="md-content__inner md-typeset">
                 
                   
-  
+
+
+
+<h1 id="crash-recovery-with-staging-store">Crash Recovery with Staging Store</h1>
+<p>ItdaStream's staging store provides write durability guarantees even before data is uploaded to S3, enabling automatic recovery from broker crashes.</p>
+<h2 id="rocksdb-staging-store">RocksDB Staging Store</h2>
+<ul>
+<li>All records are persisted to local RocksDB before S3 upload</li>
+<li>Key format: {topic}-{partition}:{offset}</li>
+<li>Envelope encryption (AES-256-GCM) when staging.encrypt=true</li>
+<li>Encryption format: [WrappedDEK_Len][WrappedDEK][IV][EncryptedPayload]</li>
+</ul>
+<h2 id="recovery-process-on-broker-startup">Recovery process (on broker startup)</h2>
+<ol>
+<li>Open staging store database</li>
+<li>Iterate all unflushed records via recover(BiConsumer) callback</li>
+<li>Decrypt each record using KMS (DEK unwrapped with KEK)</li>
+<li>Re-upload to S3 and register in metadata store</li>
+<li>Clean up staging entries after successful upload</li>
+</ol>
+<p>Async cleanup: After successful S3 upload, staging entries are removed asynchronously via a dedicated executor, avoiding I/O blocking on the produce path.</p>
 
 
 
 
-<h1 align="center">ItdaStream Documentation</h1>
-
-<p align="center">
-  <a href="./architecture/architecture">
-  <img width="500" src="./images/logo/itdastream-logo.png">
-  </a>
-</p>
 
 
 
 
 
-
-
-  
-  
-
-
-
-
-  
 
 
 
@@ -1007,12 +1092,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy", "header.autohide"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "2.2.0", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy", "header.autohide"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "2.2.0", "provider": "mike"}}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="javascripts/extra.js"></script>
+        <script src="../../javascripts/extra.js"></script>
       
     
   </body>
