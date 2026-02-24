@@ -635,24 +635,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Consumer Group Coordination
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -669,58 +651,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#rebalance-protocol-state-machine" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rebalance protocol state machine
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#session-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Session management
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#offset-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Offset management
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1032,25 +962,11 @@
 
 
 <h1 id="consumer-group-coordination">Consumer Group Coordination</h1>
-<p>ItdaStream implements the full Kafka consumer group rebalancing protocol, enabling automatic partition assignment across consumer instances with dynamic scaling.</p>
-<h2 id="rebalance-protocol-state-machine">Rebalance protocol state machine</h2>
+<p>ItdaStream implements the full Kafka consumer group rebalancing protocol, enabling automatic partition assignment with dynamic scaling.</p>
 <ul>
-<li>EMPTY → PREPARING_REBALANCE → COMPLETING_REBALANCE → STABLE → (member join/leave triggers new rebalance)</li>
-<li>First member joining becomes the group leader; leader computes partition assignments</li>
-<li>Generation ID incremented on each rebalance cycle for consistency</li>
-<li>Member IDs generated as clientId-UUID for uniqueness</li>
-</ul>
-<h2 id="session-management">Session management</h2>
-<ul>
-<li>Heartbeat-based liveness detection with configurable session timeout</li>
-<li>Background thread monitors expired members and triggers automatic rebalance</li>
-<li>Graceful leave with batch support (v3+) for cooperative shutdown</li>
-</ul>
-<h2 id="offset-management">Offset management</h2>
-<ul>
-<li>Per-group, per-topic-partition offset storage in ZooKeeper</li>
-<li>Leader epoch tracking for offset validation (v5+)</li>
-<li>Batch offset fetch for efficient group state retrieval</li>
+<li><strong>Rebalance protocol</strong>: EMPTY → PREPARING_REBALANCE → COMPLETING_REBALANCE → STABLE, with generation ID tracking</li>
+<li><strong>Session management</strong>: Heartbeat-based liveness detection with configurable timeout; automatic rebalance on member join/leave</li>
+<li><strong>Offset management</strong>: Per-group, per-partition offset storage in ZooKeeper with leader epoch tracking</li>
 </ul>
 
 

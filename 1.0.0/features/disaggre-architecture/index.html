@@ -579,24 +579,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Disaggregated Compute-Storage Architecture
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -613,47 +595,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#three-tier-write-path-ensures-both-performance-and-durability" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Three-tier write path ensures both performance and durability
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#s3-compatible-storage-support" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        S3-compatible storage support
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1021,20 +962,11 @@
 
 
 <h1 id="disaggregated-compute-storage-architecture">Disaggregated Compute-Storage Architecture</h1>
-<p>ItdaStream separates compute (brokers) from storage (S3-compatible object storage), enabling independent scaling and cost optimization. Brokers are stateless — all persistent data is
-stored in S3, making horizontal scaling and broker replacement straightforward.</p>
-<h2 id="three-tier-write-path-ensures-both-performance-and-durability">Three-tier write path ensures both performance and durability</h2>
-<ol>
-<li>In-memory WriteBuffer (16MB per partition, configurable): Records are accumulated in memory with automatic offset rewriting and CRC-32C recalculation for continuous sequencing</li>
-<li>RocksDB Staging Store (local disk): Before S3 upload, records are encrypted and persisted locally for crash recovery. On broker restart, unsynced data is automatically recovered and
-   uploaded</li>
-<li>S3 Object Storage (permanent): Segment and index files are uploaded when the buffer reaches max size (16MB) or a time-based flush triggers (5s interval, 5min maximum latency)</li>
-</ol>
-<h2 id="s3-compatible-storage-support">S3-compatible storage support</h2>
+<p>ItdaStream separates compute (brokers) from storage (S3-compatible object storage), enabling independent scaling and cost optimization. Brokers are stateless — all persistent data resides in S3.</p>
 <ul>
-<li>Works with AWS S3, MinIO, ShannonStore, and any S3-compatible object storage</li>
-<li>Path-style access support for non-AWS systems</li>
-<li>Configurable endpoint, region, bucket, and prefix</li>
+<li><strong>Three-tier write path</strong>: In-memory WriteBuffer (16MB/partition) → RocksDB Staging Store (local crash recovery) → S3 Object Storage (permanent)</li>
+<li><strong>S3 compatibility</strong>: Works with AWS S3, MinIO, ShannonStore, and any S3-compatible object storage</li>
+<li><strong>Flush triggers</strong>: Buffer full (16MB) or time-based flush (5s interval, 5min max latency)</li>
 </ul>
 
 

@@ -887,24 +887,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Flexible Configuration System
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -921,58 +903,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#configuration-priority-highest-to-lowest" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration priority (highest to lowest)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#property-placeholder-support" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Property placeholder support
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#major-configuration-categories" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Major configuration categories
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1033,25 +963,10 @@
 
 <h1 id="flexible-configuration-system">Flexible Configuration System</h1>
 <p>ItdaStream provides a layered configuration system with multiple override levels for deployment flexibility.</p>
-<h2 id="configuration-priority-highest-to-lowest">Configuration priority (highest to lowest)</h2>
-<ol>
-<li>System properties (-Ditdastream.*): Highest precedence, ideal for per-instance overrides</li>
-<li>Properties file (itdastream.properties): Base configuration with all settings</li>
-<li>Hardcoded defaults: Sensible production defaults for all settings</li>
-</ol>
-<h2 id="property-placeholder-support">Property placeholder support</h2>
 <ul>
-<li>Recursive substitution: ${itdastream.base.data.dir}/metadata-rocksdb</li>
-<li>Enables DRY configuration with shared base paths</li>
-</ul>
-<h2 id="major-configuration-categories">Major configuration categories</h2>
-<ul>
-<li>Service settings: ports (Kafka 9092, internal NIO 7000, Admin UI 8080), bind host, cluster ID</li>
-<li>Storage: S3 endpoint/bucket/region/credentials, segment size, buffer size, cache size</li>
-<li>Concurrency: acceptor threads, processor threads, handler threads, request queue size</li>
-<li>Security: SASL enable, SSL enable, keystore/truststore paths, KMS master key</li>
-<li>Retention: log retention period, cleanup interval, history retention</li>
-<li>ZooKeeper: connection string, timeouts, retry policy</li>
+<li><strong>Priority</strong> (highest → lowest): System properties (<code>-Ditdastream.*</code>) → Properties file (<code>itdastream.properties</code>) → Hardcoded defaults</li>
+<li><strong>Placeholder support</strong>: Recursive substitution (e.g., <code>${itdastream.base.data.dir}/metadata-rocksdb</code>)</li>
+<li><strong>Categories</strong>: Service ports, S3 storage, concurrency/threading, security (SASL/SSL/KMS), retention, ZooKeeper</li>
 </ul>
 
 

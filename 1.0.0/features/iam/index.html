@@ -691,24 +691,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    AWS IAM-Compatible Access Control
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -725,69 +707,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#policy-format-aws-iam-json-syntax" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Policy format (AWS IAM JSON syntax)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#supported-actions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supported actions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#policy-evaluation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Policy evaluation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#user-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        User management
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1043,37 +962,12 @@
 
 
 <h1 id="aws-iam-compatible-access-control">AWS IAM-Compatible Access Control</h1>
-<p>ItdaStream implements an AWS IAM-compatible policy-based authorization system with users, groups, and JSON policies. This provides fine-grained access control for all Kafka operations and
-administrative actions.</p>
-<h2 id="policy-format-aws-iam-json-syntax">Policy format (AWS IAM JSON syntax)</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>{
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>&quot;Version&quot;: &quot;2012-10-17&quot;,
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>&quot;Statement&quot;: [{
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>&quot;Effect&quot;: &quot;Allow&quot;,
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>&quot;Action&quot;: [&quot;kafka:Produce&quot;, &quot;kafka:Fetch&quot;],
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>&quot;Resource&quot;: &quot;arn:itdastream:kafka:*:topic/orders-*&quot;
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>}]
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>}
-</code></pre></div>
-<h2 id="supported-actions">Supported actions</h2>
+<p>ItdaStream implements an AWS IAM-compatible policy-based authorization system with users, groups, and JSON policies for fine-grained access control.</p>
 <ul>
-<li>Data operations: kafka:Produce, kafka:Fetch</li>
-<li>Topic management: kafka:CreateTopic, kafka:DeleteTopic</li>
-<li>IAM operations: kafka:CreateUser, kafka:DeleteUser, kafka:CreateGroup, kafka:DeleteGroup, kafka:CreatePolicy, kafka:DeletePolicy, kafka:UpdateIAM</li>
-<li>KMS operations: kafka:CreateKey, kafka:RotateKey, kafka:ListKms</li>
-</ul>
-<h2 id="policy-evaluation">Policy evaluation</h2>
-<ul>
-<li>Explicit Deny takes highest priority</li>
-<li>Explicit Allow grants access if action and resource match</li>
-<li>Implicit Deny (no matching statement) blocks access by default</li>
-<li>Wildcard support: * matches all, kafka:<em> matches all Kafka actions, arn:itdastream:kafka:</em>:* matches all resources</li>
-</ul>
-<h2 id="user-management">User management</h2>
-<ul>
-<li>Users belong to groups; groups have attached policies</li>
-<li>Access key pairs (16-char access key + 32-char secret key) with optional expiration</li>
-<li>Default setup: "admin" user in "admin-group" with "AdministratorAccess" policy (Allow *)</li>
+<li><strong>Policy format</strong>: Standard AWS IAM JSON syntax with Effect/Action/Resource statements</li>
+<li><strong>Supported actions</strong>: Data (Produce, Fetch), Topic management (Create, Delete), IAM operations, KMS operations</li>
+<li><strong>Policy evaluation</strong>: Explicit Deny &gt; Explicit Allow &gt; Implicit Deny (default block); wildcard support</li>
+<li><strong>User model</strong>: Users → Groups → Policies, with access key pairs and optional expiration</li>
 </ul>
 
 

@@ -803,24 +803,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Log Retention and Lifecycle Management
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -837,58 +819,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#retention-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Retention configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cleanup-process-controller-only" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cleanup process (controller-only)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#operational-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Operational features
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1033,26 +963,10 @@
 
 <h1 id="log-retention-and-lifecycle-management">Log Retention and Lifecycle Management</h1>
 <p>ItdaStream provides configurable time-based log retention with automatic cleanup of expired segments from S3 storage.</p>
-<h2 id="retention-configuration">Retention configuration</h2>
 <ul>
-<li>Default retention: 7 days (itdastream.storage.log.retention.ms)</li>
-<li>Cleanup check interval: 1 hour (itdastream.storage.cleanup.interval.ms)</li>
-<li>Cleanup history retention: 180 days (itdastream.storage.cleanup.history.retention.ms)</li>
-</ul>
-<h2 id="cleanup-process-controller-only">Cleanup process (controller-only)</h2>
-<ol>
-<li>Calculate cutoff time: now - retentionMs</li>
-<li>Iterate all topics and partitions</li>
-<li>For each segment: check createdTimestamp &lt; cutoffTime</li>
-<li>Delete eligible segments from S3 (both .seg and .idx files)</li>
-<li>Remove segment metadata from ZooKeeper</li>
-<li>Record cleanup job history: segments deleted, bytes freed, duration</li>
-</ol>
-<h2 id="operational-features">Operational features</h2>
-<ul>
-<li>Manual cleanup trigger via Admin API: POST /admin/maintenance/cleanup/trigger</li>
-<li>Cleanup history viewer: GET /admin/maintenance/cleanup/history (up to 50 recent jobs)</li>
-<li>RocksDB-backed history store with automatic pruning of old records</li>
+<li><strong>Defaults</strong>: 7-day retention, 1-hour cleanup interval, 180-day cleanup history</li>
+<li><strong>Cleanup process</strong>: Controller-only; deletes expired segments (.seg/.idx) from S3 and removes metadata from ZooKeeper</li>
+<li><strong>Operations</strong>: Manual trigger via Admin API (<code>POST /admin/maintenance/cleanup/trigger</code>), cleanup history viewer (<code>GET /admin/maintenance/cleanup/history</code>)</li>
 </ul>
 
 

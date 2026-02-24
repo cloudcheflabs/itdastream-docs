@@ -747,24 +747,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    High-Performance NIO Network Layer
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -781,58 +763,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#multi-reactor-pattern" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Multi-reactor pattern
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#response-ordering-guarantee" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Response ordering guarantee
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#connection-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Connection management
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1032,24 +962,11 @@
 
 
 <h1 id="high-performance-nio-network-layer">High-Performance NIO Network Layer</h1>
-<p>ItdaStream implements a custom multi-reactor NIO network layer inspired by Apache Kafka's network architecture, optimized for high-throughput, low-latency message processing.</p>
-<h2 id="multi-reactor-pattern">Multi-reactor pattern</h2>
+<p>ItdaStream implements a custom multi-reactor NIO network layer inspired by Apache Kafka's architecture, optimized for high-throughput, low-latency message processing.</p>
 <ul>
-<li>Acceptor thread: Single ServerSocketChannel with non-blocking accept, round-robin distributes connections to Processors</li>
-<li>Processor threads (default 3, configurable): Each has an independent NIO Selector; handles all I/O for assigned connections</li>
-<li>Handler threads (default 8, configurable): Execute request business logic from a shared ArrayBlockingQueue (capacity 500)</li>
-</ul>
-<h2 id="response-ordering-guarantee">Response ordering guarantee</h2>
-<ul>
-<li>TreeMap buffers responses by sequence number</li>
-<li>Only sends responses matching nextSendSequence — ensures strict FIFO ordering despite concurrent handler threads</li>
-<li>Atomic sequence increment after each send</li>
-</ul>
-<h2 id="connection-management">Connection management</h2>
-<ul>
-<li>TCP_NODELAY and KEEP_ALIVE enabled on all sockets</li>
-<li>Per-connection state in KafkaChannel: current receive, current send, transport layer</li>
-<li>Configurable max connections and backpressure via request queue</li>
+<li><strong>Multi-reactor pattern</strong>: Acceptor (connection distribution) → Processor threads (NIO I/O) → Handler threads (business logic)</li>
+<li><strong>Response ordering</strong>: TreeMap-based sequence buffering ensures strict FIFO ordering despite concurrent handlers</li>
+<li><strong>Connection management</strong>: TCP_NODELAY, KEEP_ALIVE, configurable max connections and backpressure via request queue</li>
 </ul>
 
 
