@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/sasl/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/features/sasl/">
       
       
         <link rel="prev" href="../iam/">
@@ -236,11 +236,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../intro/intro/" class="md-tabs__link">
+        <a href="../../installation/installation/" class="md-tabs__link">
           
   
   
-  Getting Started
+  Installation
 
         </a>
       </li>
@@ -421,7 +421,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Installation
   
 
     
@@ -437,11 +437,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Installation
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -719,24 +747,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    SASL Authentication and TLS Encryption
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -753,58 +763,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#saslplain-authentication" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SASL/PLAIN Authentication
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ssltls-encryption-sasl_ssl" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SSL/TLS Encryption (SASL_SSL)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#transportlayer-abstraction-apache-kafka-pattern" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TransportLayer abstraction (Apache Kafka pattern)
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1032,28 +990,11 @@
 
 
 <h1 id="sasl-authentication-and-tls-encryption">SASL Authentication and TLS Encryption</h1>
-<p>ItdaStream supports both SASL/PLAIN authentication and SSL/TLS encryption, enabling SASL_PLAINTEXT and SASL_SSL security protocols for Kafka clients.</p>
-<h2 id="saslplain-authentication">SASL/PLAIN Authentication</h2>
+<p>ItdaStream supports SASL/PLAIN authentication and SSL/TLS encryption, enabling SASL_PLAINTEXT and SASL_SSL security protocols for Kafka clients.</p>
 <ul>
-<li>Username = Access Key, Password = Secret Key (from IAM system)</li>
-<li>Standard Kafka SASL handshake protocol (SaslHandshake + SaslAuthenticate)</li>
-<li>Credential validation against RocksDB-backed AuthManager with expiration checking</li>
-<li>User identity propagated through KafkaChannel for per-request authorization</li>
-</ul>
-<h2 id="ssltls-encryption-sasl_ssl">SSL/TLS Encryption (SASL_SSL)</h2>
-<ul>
-<li>Non-blocking TLS implementation using Java SSLEngine with TransportLayer abstraction</li>
-<li>TLSv1.3 by default (configurable)</li>
-<li>JKS keystore/truststore support</li>
-<li>SSLEngine handshake state machine: NEED_WRAP → NEED_UNWRAP → NEED_TASK → FINISHED</li>
-<li>Separate encrypted network buffers and decrypted application buffers</li>
-<li>Graceful close_notify handling</li>
-</ul>
-<h2 id="transportlayer-abstraction-apache-kafka-pattern">TransportLayer abstraction (Apache Kafka pattern)</h2>
-<ul>
-<li>PlaintextTransportLayer: Direct socket I/O (no encryption overhead)</li>
-<li>SslTransportLayer: Full TLS encryption via SSLEngine</li>
-<li>Transparent to upper layers — KafkaChannel, NetworkReceive, NetworkSend work identically with both</li>
+<li><strong>SASL/PLAIN</strong>: Username = Access Key, Password = Secret Key (from IAM system); standard Kafka SASL handshake protocol</li>
+<li><strong>SSL/TLS</strong>: Non-blocking TLS via Java SSLEngine, TLSv1.3 by default, JKS keystore/truststore support</li>
+<li><strong>TransportLayer abstraction</strong>: PlaintextTransportLayer (direct I/O) and SslTransportLayer (full TLS) — transparent to upper layers</li>
 </ul>
 
 

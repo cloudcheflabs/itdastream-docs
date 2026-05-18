@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/staging-store/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/features/staging-store/">
       
       
         <link rel="prev" href="../configuration/">
@@ -234,11 +234,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../intro/intro/" class="md-tabs__link">
+        <a href="../../installation/installation/" class="md-tabs__link">
           
   
   
-  Getting Started
+  Installation
 
         </a>
       </li>
@@ -419,7 +419,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Installation
   
 
     
@@ -435,11 +435,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Installation
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -913,24 +941,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Crash Recovery with Staging Store
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -947,47 +957,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#rocksdb-staging-store" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        RocksDB Staging Store
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recovery-process-on-broker-startup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recovery process (on broker startup)
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1019,23 +988,12 @@
 
 
 <h1 id="crash-recovery-with-staging-store">Crash Recovery with Staging Store</h1>
-<p>ItdaStream's staging store provides write durability guarantees even before data is uploaded to S3, enabling automatic recovery from broker crashes.</p>
-<h2 id="rocksdb-staging-store">RocksDB Staging Store</h2>
+<p>ItdaStream's staging store provides write durability guarantees before S3 upload, enabling automatic recovery from broker crashes.</p>
 <ul>
-<li>All records are persisted to local RocksDB before S3 upload</li>
-<li>Key format: {topic}-{partition}:{offset}</li>
-<li>Envelope encryption (AES-256-GCM) when staging.encrypt=true</li>
-<li>Encryption format: [WrappedDEK_Len][WrappedDEK][IV][EncryptedPayload]</li>
+<li><strong>Staging</strong>: All records are persisted to local RocksDB before S3 upload, with optional envelope encryption (AES-256-GCM)</li>
+<li><strong>Recovery</strong>: On broker restart, unflushed records are decrypted, re-uploaded to S3, and registered in metadata store</li>
+<li><strong>Async cleanup</strong>: Staging entries are removed asynchronously after successful S3 upload, avoiding I/O blocking on the produce path</li>
 </ul>
-<h2 id="recovery-process-on-broker-startup">Recovery process (on broker startup)</h2>
-<ol>
-<li>Open staging store database</li>
-<li>Iterate all unflushed records via recover(BiConsumer) callback</li>
-<li>Decrypt each record using KMS (DEK unwrapped with KEK)</li>
-<li>Re-upload to S3 and register in metadata store</li>
-<li>Clean up staging entries after successful upload</li>
-</ol>
-<p>Async cleanup: After successful S3 upload, staging entries are removed asynchronously via a dedicated executor, avoiding I/O blocking on the produce path.</p>
 
 
 

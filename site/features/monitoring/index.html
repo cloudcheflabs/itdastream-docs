@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/monitoring/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/features/monitoring/">
       
       
         <link rel="prev" href="../retention/">
@@ -236,11 +236,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../intro/intro/" class="md-tabs__link">
+        <a href="../../installation/installation/" class="md-tabs__link">
           
   
   
-  Getting Started
+  Installation
 
         </a>
       </li>
@@ -421,7 +421,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Installation
   
 
     
@@ -437,11 +437,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Installation
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -831,24 +859,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Monitoring and Metrics
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -865,58 +875,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#metrics-collection-dropwizard-metrics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Metrics collection (Dropwizard Metrics)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#metrics-storage-and-aggregation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Metrics storage and aggregation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prometheus-integration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prometheus integration
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1033,25 +991,11 @@
 
 <h1 id="monitoring-and-metrics">Monitoring and Metrics</h1>
 <p>ItdaStream collects and exposes comprehensive system and application metrics for monitoring and alerting.</p>
-<h2 id="metrics-collection-dropwizard-metrics">Metrics collection (Dropwizard Metrics)</h2>
 <ul>
-<li>System metrics: CPU usage, memory (used/max/free/system), disk I/O</li>
-<li>Network metrics: Packet send/receive counts, byte throughput</li>
-<li>Kafka API metrics: Per-API TPS (transactions per second), request/response latency timers</li>
-<li>Storage metrics: Segment cache hit rate, S3 operation latencies</li>
-<li>JMX export: Automatic JMX Reporter for Java management tools</li>
-</ul>
-<h2 id="metrics-storage-and-aggregation">Metrics storage and aggregation</h2>
-<ul>
-<li>Time-series storage in RocksDB with binary key format: [timestamp][nodeId][metricName]</li>
-<li>Controller broker collects from all brokers every 30 seconds via HTTP</li>
-<li>7-day retention with automatic pruning (every 6 hours)</li>
-</ul>
-<h2 id="prometheus-integration">Prometheus integration</h2>
-<ul>
-<li>/metrics endpoint exports Prometheus text format</li>
-<li>Metrics grouped by broker ID and metric name</li>
-<li>Gauges (CPU%, memory), Counters (bytes sent/received), Histograms (latency percentiles)</li>
+<li><strong>Metrics collected</strong>: CPU, memory, disk I/O, network throughput, per-API TPS/latency, cache hit rate, S3 latencies</li>
+<li><strong>Storage</strong>: Time-series in RocksDB, controller aggregates from all brokers every 30s, 7-day retention</li>
+<li><strong>Prometheus</strong>: <code>/metrics</code> endpoint with Gauges, Counters, and Histograms grouped by broker ID</li>
+<li><strong>JMX</strong>: Automatic JMX Reporter for Java management tools</li>
 </ul>
 
 

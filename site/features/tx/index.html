@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/tx/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/features/tx/">
       
       
         <link rel="prev" href="../disaggre-architecture/">
@@ -236,11 +236,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../intro/intro/" class="md-tabs__link">
+        <a href="../../installation/installation/" class="md-tabs__link">
           
   
   
-  Getting Started
+  Installation
 
         </a>
       </li>
@@ -421,7 +421,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Installation
   
 
     
@@ -437,11 +437,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Installation
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -607,24 +635,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Exactly-Once Transactional Semantics
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -641,47 +651,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#transaction-lifecycle" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Transaction lifecycle
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#isolation-levels" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Isolation levels
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1021,21 +990,12 @@
 
 
 <h1 id="exactly-once-transactional-semantics">Exactly-Once Transactional Semantics</h1>
-<p>ItdaStream provides full exactly-once delivery semantics through its transaction management system, matching Apache Kafka's transactional guarantees. This enables atomic writes across
-multiple partitions and atomic offset commits within the same transaction.</p>
-<h2 id="transaction-lifecycle">Transaction lifecycle</h2>
+<p>ItdaStream provides full exactly-once delivery semantics through its transaction management system, matching Apache Kafka's transactional guarantees.</p>
 <ul>
-<li>InitProducerId: Allocates producer ID with epoch management; block-based ID allocation (1000 per block) stored in ZooKeeper</li>
-<li>AddPartitionsToTxn: Registers topic-partitions in the transaction scope</li>
-<li>AddOffsetsToTxn: Includes consumer group offset commits atomically with data writes</li>
-<li>EndTxn (Commit/Abort): Writes COMMIT or ABORT control markers to each partition; markers are immediately flushed to S3 for visibility</li>
+<li><strong>Transaction lifecycle</strong>: InitProducerId → AddPartitionsToTxn → AddOffsetsToTxn → EndTxn (Commit/Abort)</li>
+<li><strong>Isolation levels</strong>: <code>read_uncommitted</code> (all records visible, default) and <code>read_committed</code> (only committed/non-transactional records visible)</li>
+<li><strong>State machine</strong>: EMPTY → ONGOING → PREPARE_COMMIT/ABORT → COMPLETE_COMMIT/ABORT → DEAD, persisted in ZooKeeper for crash recovery</li>
 </ul>
-<h2 id="isolation-levels">Isolation levels</h2>
-<ul>
-<li>read_uncommitted: All records visible immediately (default)</li>
-<li>read_committed: Only committed records and non-transactional records visible; server-side filtering of aborted transactions during Fetch</li>
-</ul>
-<p>Transaction state machine: EMPTY → ONGOING → PREPARE_COMMIT/PREPARE_ABORT → COMPLETE_COMMIT/COMPLETE_ABORT → DEAD, persisted in ZooKeeper for crash recovery.</p>
 
 
 

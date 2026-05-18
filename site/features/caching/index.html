@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/caching/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/features/caching/">
       
       
         <link rel="prev" href="../network/">
@@ -236,11 +236,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../intro/intro/" class="md-tabs__link">
+        <a href="../../installation/installation/" class="md-tabs__link">
           
   
   
-  Getting Started
+  Installation
 
         </a>
       </li>
@@ -421,7 +421,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Installation
   
 
     
@@ -437,11 +437,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Installation
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -775,24 +803,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Intelligent Segment Caching
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -809,47 +819,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#cache-architecture" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cache architecture
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#fetch-path-with-caching" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Fetch path with caching
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1021,25 +990,12 @@
 
 
 <h1 id="intelligent-segment-caching">Intelligent Segment Caching</h1>
-<p>ItdaStream implements a weight-based LRU cache using Caffeine to minimize S3 reads and optimize consumer fetch latency.</p>
-<h2 id="cache-architecture">Cache architecture</h2>
+<p>ItdaStream uses a weight-based LRU cache (Caffeine) to minimize S3 reads and reduce consumer fetch latency.</p>
 <ul>
-<li>Library: Caffeine (high-performance Java caching)</li>
-<li>Eviction: Weight-based LRU; weight = byte array size</li>
-<li>Max size: 256MB (configurable readCacheMaxSizeBytes)</li>
-<li>Keys: S3 object keys (segment + index files)</li>
-<li>Values: Raw byte arrays</li>
+<li><strong>Eviction</strong>: Weight-based LRU with configurable max size (default 256MB)</li>
+<li><strong>Fetch path</strong>: Cache lookup → S3 fallback on miss → binary search in index → record extraction → merge with in-memory buffer</li>
+<li><strong>Immediate population</strong>: Newly flushed segments are cached right after S3 upload, keeping hot data always cache-resident</li>
 </ul>
-<h2 id="fetch-path-with-caching">Fetch path with caching</h2>
-<ol>
-<li>Look up segment metadata from MetadataStore</li>
-<li>Check cache for index file → S3 download on miss</li>
-<li>Binary search in IndexFile for target offset position</li>
-<li>Check cache for segment data → S3 download on miss</li>
-<li>Extract matching record batches from segment</li>
-<li>Merge with unflushed WriteBuffer data</li>
-</ol>
-<p>Immediate cache population: Newly flushed segments are added to the cache immediately after S3 upload, ensuring hot data is always cache-resident.</p>
 
 
 

@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/features/retention/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/installation/installation/">
       
       
-        <link rel="prev" href="../caching/">
+        <link rel="prev" href="../../architecture/architecture/">
       
       
-        <link rel="next" href="../monitoring/">
+        <link rel="next" href="../../intro/intro/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Log Retention and Lifecycle Management - ItdaStream</title>
+        <title>Installation - ItdaStream</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#log-retention-and-lifecycle-management" class="md-skip">
+        <a href="#installation" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Log Retention and Lifecycle Management
+              Installation
             
           </span>
         </div>
@@ -232,11 +232,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../installation/installation/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -252,13 +254,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../kafka-compatible/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../features/kafka-compatible/" class="md-tabs__link">
           
   
   
@@ -395,26 +395,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -432,7 +437,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -447,10 +452,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../installation/installation/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -466,6 +498,147 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#system-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-download-the-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1. Download the Distribution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-prepare-object-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2. Prepare Object Storage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-configure-the-broker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3. Configure the Broker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-start-zookeeper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4. Start ZooKeeper
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-start-the-broker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5. Start the Broker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-verify-the-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6. Verify the Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-a-multi-broker-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running a Multi-Broker Cluster
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing-with-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installing with Docker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stopping-the-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stopping the Servers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -510,31 +683,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -552,7 +720,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -570,7 +738,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kafka-compatible/" class="md-nav__link">
+      <a href="../../features/kafka-compatible/" class="md-nav__link">
         
   
   
@@ -598,7 +766,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../disaggre-architecture/" class="md-nav__link">
+      <a href="../../features/disaggre-architecture/" class="md-nav__link">
         
   
   
@@ -626,7 +794,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tx/" class="md-nav__link">
+      <a href="../../features/tx/" class="md-nav__link">
         
   
   
@@ -654,7 +822,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../consumer-group/" class="md-nav__link">
+      <a href="../../features/consumer-group/" class="md-nav__link">
         
   
   
@@ -682,7 +850,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kms/" class="md-nav__link">
+      <a href="../../features/kms/" class="md-nav__link">
         
   
   
@@ -710,7 +878,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../iam/" class="md-nav__link">
+      <a href="../../features/iam/" class="md-nav__link">
         
   
   
@@ -738,7 +906,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sasl/" class="md-nav__link">
+      <a href="../../features/sasl/" class="md-nav__link">
         
   
   
@@ -766,7 +934,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../network/" class="md-nav__link">
+      <a href="../../features/network/" class="md-nav__link">
         
   
   
@@ -794,7 +962,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../caching/" class="md-nav__link">
+      <a href="../../features/caching/" class="md-nav__link">
         
   
   
@@ -819,19 +987,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../features/retention/" class="md-nav__link">
         
   
   
@@ -847,7 +1006,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -860,7 +1018,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../monitoring/" class="md-nav__link">
+      <a href="../../features/monitoring/" class="md-nav__link">
         
   
   
@@ -888,7 +1046,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../compression/" class="md-nav__link">
+      <a href="../../features/compression/" class="md-nav__link">
         
   
   
@@ -916,7 +1074,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../../features/configuration/" class="md-nav__link">
         
   
   
@@ -944,7 +1102,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../staging-store/" class="md-nav__link">
+      <a href="../../features/staging-store/" class="md-nav__link">
         
   
   
@@ -989,12 +1147,187 @@
 
 
 
-<h1 id="log-retention-and-lifecycle-management">Log Retention and Lifecycle Management</h1>
-<p>ItdaStream provides configurable time-based log retention with automatic cleanup of expired segments from S3 storage.</p>
+<h1 id="installation">Installation</h1>
+<p>This page describes the requirements for running ItdaStream and the different
+ways to install it &mdash; on a single machine for evaluation, or as a
+multi-broker cluster for production-like workloads.</p>
+<p>If you just want to try ItdaStream as fast as possible, jump straight to the
+<a href="../../intro/intro/">Getting Started</a> guide.</p>
+<h2 id="system-requirements">System Requirements</h2>
+<p>ItdaStream is a Kafka-compatible distributed streaming platform written in
+Java. Before installing, make sure the following are available.</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Java</strong></td>
+<td>Java 17 or later (the broker is built and tested on Java 17).</td>
+</tr>
+<tr>
+<td><strong>ZooKeeper</strong></td>
+<td>Used for cluster coordination &mdash; broker membership, controller (leader) election, topic metadata, consumer group offsets. A bundled ZooKeeper is included in the distribution for local use.</td>
+</tr>
+<tr>
+<td><strong>S3-compatible storage</strong></td>
+<td>All log data is persisted to an object store. Amazon S3, MinIO, or any S3-API-compatible service works.</td>
+</tr>
+<tr>
+<td><strong>Operating system</strong></td>
+<td>Linux or macOS.</td>
+</tr>
+<tr>
+<td><strong>Memory</strong></td>
+<td>At least 2 GB of free RAM per broker for evaluation; size up for production.</td>
+</tr>
+</tbody>
+</table>
+<p>ItdaStream uses a <strong>disaggregated compute-storage architecture</strong>: brokers are
+stateless and all durable data lives in the object store. This means brokers
+can be added, removed, or restarted freely as long as ZooKeeper and the S3
+bucket are reachable.</p>
+<h2 id="step-1-download-the-distribution">Step 1. Download the Distribution</h2>
+<p>Download and extract the latest release archive.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>-O<span class="w"> </span>https://github.com/cloudcheflabs/itdastream-pack/releases/download/itdastream-archive/itdastream-1.0.0.tar.gz
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>tar<span class="w"> </span>zxvf<span class="w"> </span>itdastream-1.0.0.tar.gz
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">cd</span><span class="w"> </span>itdastream-1.0.0
+</code></pre></div>
+<p>The extracted directory has the following layout.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>itdastream-1.0.0/
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>├── bin/        # start/stop scripts and Kafka-compatible CLI tools
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>├── conf/       # configuration files
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>├── lib/        # broker and dependency JARs
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>└── logs/       # broker log output
+</code></pre></div>
+<h2 id="step-2-prepare-object-storage">Step 2. Prepare Object Storage</h2>
+<p>Create an S3 bucket that ItdaStream will use to store all topic data, along
+with a set of credentials (access key / secret key) that can read and write to
+it.</p>
+<p>You will need these five values:</p>
 <ul>
-<li><strong>Defaults</strong>: 7-day retention, 1-hour cleanup interval, 180-day cleanup history</li>
-<li><strong>Cleanup process</strong>: Controller-only; deletes expired segments (.seg/.idx) from S3 and removes metadata from ZooKeeper</li>
-<li><strong>Operations</strong>: Manual trigger via Admin API (<code>POST /admin/maintenance/cleanup/trigger</code>), cleanup history viewer (<code>GET /admin/maintenance/cleanup/history</code>)</li>
+<li>Endpoint URL</li>
+<li>Bucket name</li>
+<li>Region ID</li>
+<li>Access key ID</li>
+<li>Secret access key</li>
+</ul>
+<h2 id="step-3-configure-the-broker">Step 3. Configure the Broker</h2>
+<p>ItdaStream resolves every configuration property using the following
+precedence, from highest to lowest:</p>
+<ol>
+<li><strong>System properties</strong> &mdash; <code>-Ditdastream.*</code> JVM arguments</li>
+<li><strong>Environment variables</strong> &mdash; <code>ITDASTREAM_*</code></li>
+<li><strong>Configuration file</strong> &mdash; under <code>conf/</code></li>
+<li><strong>Built-in defaults</strong></li>
+</ol>
+<p>For a quick start, environment variables are the simplest option.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Master key used for envelope encryption. Must be at least 32 characters.</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ITDASTREAM_MASTER_KEY</span><span class="o">=</span><span class="s2">&quot;MustBeChanged01234567890123456789012345678901&quot;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># S3-compatible object storage connection info.</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ITDASTREAM_STORAGE_S3_ENDPOINT_URL</span><span class="o">=</span>endpoint
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ITDASTREAM_STORAGE_S3_BUCKET_NAME</span><span class="o">=</span>bucket
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ITDASTREAM_STORAGE_S3_REGION_ID</span><span class="o">=</span>any-region
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ITDASTREAM_STORAGE_S3_ACCESS_KEY_ID</span><span class="o">=</span>access-key
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ITDASTREAM_STORAGE_S3_SECRET_ACCESS_KEY</span><span class="o">=</span>secret-key
+</code></pre></div>
+<blockquote>
+<p>The <code>ITDASTREAM_MASTER_KEY</code> environment variable <strong>must be at least 32
+characters</strong> and must be exported before starting any broker. Keep this value
+secret and identical across every broker in a cluster &mdash; it is the root
+of the encryption key hierarchy.</p>
+</blockquote>
+<p>Commonly used properties (set as <code>itdastream.*</code> properties or the equivalent
+<code>ITDASTREAM_*</code> environment variable):</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>itdastream.kafka.port</code></td>
+<td>Port that Kafka clients connect to.</td>
+<td><code>9092</code></td>
+</tr>
+<tr>
+<td><code>itdastream.nio.port</code></td>
+<td>Internal broker-to-broker port.</td>
+<td>&mdash;</td>
+</tr>
+<tr>
+<td><code>itdastream.zookeeper.server.list</code></td>
+<td>Comma-separated <code>host:port</code> list of ZooKeeper servers.</td>
+<td><code>localhost:2181</code></td>
+</tr>
+<tr>
+<td><code>itdastream.storage.engine.type</code></td>
+<td>Storage backend type.</td>
+<td><code>s3</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="step-4-start-zookeeper">Step 4. Start ZooKeeper</h2>
+<p>For a local installation, start the bundled ZooKeeper.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>bin/start-zk.sh
+</code></pre></div>
+<p>For production, point ItdaStream at an existing, externally managed ZooKeeper
+ensemble via <code>itdastream.zookeeper.server.list</code>.</p>
+<h2 id="step-5-start-the-broker">Step 5. Start the Broker</h2>
+<p>With the environment variables exported, start the broker.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>bin/start-broker.sh
+</code></pre></div>
+<p>The broker performs its startup sequence &mdash; connecting to ZooKeeper,
+electing or joining the controller, registering itself, initializing storage,
+and opening the Kafka and admin network listeners.</p>
+<h2 id="step-6-verify-the-installation">Step 6. Verify the Installation</h2>
+<p>Open the admin UI in a browser:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>http://localhost:8080/admin
+</code></pre></div>
+<p>The default administrator credentials are <code>admin</code> / <code>admin</code>. You will be asked
+to change the password on first login.</p>
+<p><img width="1200" src="../../images/getting-started/dashboard.png"/></p>
+<p>You can also verify the broker by producing and consuming a message &mdash; see
+<a href="../../intro/intro/">Getting Started</a> for a full walkthrough.</p>
+<h2 id="running-a-multi-broker-cluster">Running a Multi-Broker Cluster</h2>
+<p>Because brokers are stateless, scaling out is straightforward:</p>
+<ol>
+<li>Point every broker at the <strong>same ZooKeeper ensemble</strong> and the <strong>same S3
+   bucket</strong>.</li>
+<li>Export the <strong>same <code>ITDASTREAM_MASTER_KEY</code></strong> on every broker.</li>
+<li>Start each broker with <code>bin/start-broker.sh</code>.</li>
+</ol>
+<p>Brokers discover one another through ZooKeeper, one is elected as the
+controller, and clients are automatically routed to partition leaders. No
+broker carries a persistent identity &mdash; a broker ID is derived from its
+IP and port.</p>
+<h2 id="installing-with-docker">Installing with Docker</h2>
+<p>A container image can be built from the source repository's <code>Dockerfile</code>.
+Run the container with the same <code>ITDASTREAM_*</code> environment variables, and
+publish the Kafka port (<code>9092</code>) and the admin port (<code>8080</code>). A reachable
+ZooKeeper and S3 endpoint are still required.</p>
+<h2 id="stopping-the-servers">Stopping the Servers</h2>
+<p>Stop the broker and ZooKeeper when finished.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bin/stop-broker.sh
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>bin/stop-zk.sh
+</code></pre></div>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li>Follow the <a href="../../intro/intro/">Getting Started</a> guide to send and receive
+  your first messages.</li>
+<li>Review the <a href="../../architecture/architecture/">Architecture</a> overview to
+  understand how ItdaStream works internally.</li>
+<li>Browse the <strong>Features</strong> section for details on transactions, encryption,
+  access control, caching, retention, and more.</li>
 </ul>
 
 
