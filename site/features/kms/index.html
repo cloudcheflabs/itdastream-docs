@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/kms/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/features/kms/">
       
       
         <link rel="prev" href="../consumer-group/">
@@ -236,11 +236,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../intro/intro/" class="md-tabs__link">
+        <a href="../../installation/installation/" class="md-tabs__link">
           
   
   
-  Getting Started
+  Installation
 
         </a>
       </li>
@@ -421,7 +421,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Installation
   
 
     
@@ -437,11 +437,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Installation
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -663,24 +691,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Envelope Encryption and Key Management Service
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -697,58 +707,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#three-layer-key-hierarchy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Three-layer key hierarchy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#encryption-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Encryption format
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-lifecycle-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key lifecycle management
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1032,23 +990,12 @@
 
 
 <h1 id="envelope-encryption-and-key-management-service-kms">Envelope Encryption and Key Management Service (KMS)</h1>
-<p>ItdaStream includes a built-in distributed Key Management Service that provides envelope encryption for data at rest and in transit between brokers.</p>
-<h2 id="three-layer-key-hierarchy">Three-layer key hierarchy</h2>
-<ol>
-<li>Master Key: Derived from environment variable using PBKDF2-SHA256 (200,000 iterations, 32-byte salt). Protects the keystore itself</li>
-<li>Key Encryption Key (KEK): AES-256, versioned, leader-managed. Used to wrap/unwrap Data Encryption Keys. Supports rotation with backward compatibility</li>
-<li>Data Encryption Key (DEK): AES-256-GCM, generated per encryption operation. Provides actual data encryption</li>
-</ol>
-<h2 id="encryption-format">Encryption format</h2>
-<p>[KEK_Version(4B)][KEK_IV(12B)][WrappedDEK_Len(4B)][WrappedDEK]
-[DEK_IV(12B)][EncryptedData]</p>
-<h2 id="key-lifecycle-management">Key lifecycle management</h2>
+<p>ItdaStream includes a built-in distributed KMS that provides envelope encryption for data at rest and in transit between brokers.</p>
 <ul>
-<li>Key states: ACTIVE → RETIRED → REVOKED</li>
-<li>Version-controlled rotation: new versions can encrypt while old versions remain available for decryption</li>
-<li>Only the controller broker can create or rotate keys</li>
-<li>Keystore changes are automatically broadcast to all followers via internal NIO protocol</li>
-<li>RocksDB-backed persistent storage, encrypted with master key</li>
+<li><strong>Three-layer key hierarchy</strong>: Master Key (PBKDF2-SHA256) → Key Encryption Key (AES-256, versioned) → Data Encryption Key (AES-256-GCM, per-operation)</li>
+<li><strong>Key lifecycle</strong>: ACTIVE → RETIRED → REVOKED, with version-controlled rotation for backward-compatible decryption</li>
+<li><strong>Management</strong>: Only the controller broker creates/rotates keys; changes are broadcast to all followers via internal NIO protocol</li>
+<li><strong>Storage</strong>: RocksDB-backed persistent keystore, encrypted with master key</li>
 </ul>
 
 

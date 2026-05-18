@@ -34,7 +34,8 @@ theme:
 nav:
   - "Architecture":
       - "itdastream Architecture": architecture/architecture.md
-  - "Getting Started":
+  - "Installation":
+      - "Installation": installation/installation.md
       - "Getting Started": intro/intro.md
   - "Features":
       - "Full Kafka Protocol Compatibility": features/kafka-compatible.md
