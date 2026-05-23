@@ -45,6 +45,7 @@ nav:
       - "Envelope Encryption and Key Management Service": features/kms.md
       - "AWS IAM-Compatible Access Control": features/iam.md
       - "IAM Policy Reference": features/iam-policy.md
+      - "Admin Password Recovery": features/admin-password-recovery.md
       - "SASL Authentication and TLS Encryption": features/sasl.md
       - "High-Performance NIO Network Layer": features/network.md
       - "Intelligent Segment Caching": features/caching.md
