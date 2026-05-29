@@ -8,13 +8,11 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/caching/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/backup/">
       
       
-        <link rel="prev" href="../network/">
+        <link rel="prev" href="../staging-store/">
       
-      
-        <link rel="next" href="../retention/">
       
       
         
@@ -25,7 +23,7 @@
     
     
       
-        <title>Intelligent Segment Caching - ItdaStream</title>
+        <title>Backup & Restore - ItdaStream</title>
       
     
     
@@ -76,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#intelligent-segment-caching" class="md-skip">
+        <a href="#backup-restore" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Intelligent Segment Caching
+              Backup & Restore
             
           </span>
         </div>
@@ -847,19 +845,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../caching/" class="md-nav__link">
         
   
   
@@ -875,7 +864,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -1025,10 +1013,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../backup/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backup & Restore
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1044,6 +1059,87 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cron-vs-interval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cron vs. Interval
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#incremental-by-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Incremental by Design
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restore
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rest-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REST Endpoints
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1073,13 +1169,77 @@
 
 
 
-<h1 id="intelligent-segment-caching">Intelligent Segment Caching</h1>
-<p>ItdaStream uses a weight-based LRU cache (Caffeine) to minimize S3 reads and reduce consumer fetch latency.</p>
+<h1 id="backup-restore">Backup &amp; Restore</h1>
+<p>ItdaStream can periodically ship its irreplaceable cluster state — the <strong>KMS keystore</strong> and the <strong>IAM</strong> snapshot — to an S3-compatible target. Backups are leader-only, incremental, opt-in, and run on either a fixed interval, a 5-field UNIX cron expression, or both at once.</p>
+<p>The Kafka log data itself is <strong>not</strong> in scope here: it already lives in the configured S3 backing store (whichever bucket the broker uses for segments), so it is a target for the same <code>aws s3 sync</code>-style data export tools you would use against any object store. What this feature backs up is the <em>control-plane</em> state without which a restored broker has no users, no encryption keys, and no audit history.</p>
+<h2 id="configuration">Configuration</h2>
+<p>The <code>Backup &amp; Restore</code> page in the admin UI exposes the full configuration:</p>
 <ul>
-<li><strong>Eviction</strong>: Weight-based LRU with configurable max size (default 256MB)</li>
-<li><strong>Fetch path</strong>: Cache lookup → S3 fallback on miss → binary search in index → record extraction → merge with in-memory buffer</li>
-<li><strong>Immediate population</strong>: Newly flushed segments are cached right after S3 upload, keeping hot data always cache-resident</li>
+<li><strong>Enabled</strong> — master switch (default: off).</li>
+<li><strong>S3 Endpoint, Region, Bucket, Prefix</strong> — destination object store.</li>
+<li><strong>Access Key / Secret Key</strong> — long-lived static credentials for the destination.</li>
+<li><strong>Path-style addressing</strong> — required for ShannonStore / MinIO destinations.</li>
+<li><strong>Interval (minutes)</strong> — how often the scheduled backup runs.</li>
+<li><strong>Cron</strong> — optional 5-field UNIX cron expression (e.g. <code>0 2 * * *</code> for daily at 02:00). Coexists with the interval rule — both can be set, whichever comes due first fires the backup.</li>
+<li><strong>Retention (days)</strong> — how long the visible history is kept.</li>
 </ul>
+<p>The same page has a <strong>Backup Now</strong> button (triggers an immediate run) and a <strong>Restore</strong> button on each row of the available-backups list.</p>
+<h3 id="cron-vs-interval">Cron vs. Interval</h3>
+<p>The two automatic rules are independent and share the same tick loop on the leader broker:</p>
+<ul>
+<li><strong>Interval</strong> is a relative "at least N minutes since the last successful backup" timer.</li>
+<li><strong>Cron</strong> is wall-clock based, evaluated in the leader's local time zone.</li>
+</ul>
+<p>The first sighting after the cron is set, or after a leader handoff, <strong>arms from "now"</strong> — ItdaStream does not back-fire missed cron times on startup. An invalid cron is rejected with HTTP 400 at config-save time.</p>
+<h2 id="incremental-by-design">Incremental by Design</h2>
+<p>Each backup writes a <code>manifest.json</code> under <code>s3://&lt;bucket&gt;/&lt;prefix&gt;/&lt;backupId&gt;/</code>, plus a content-addressed blob per snapshotted store. SHA-256 of the bytes is the key: if a store's hash matches the previous run, the manifest entry points at the prior backup id and no PUT happens for that store. A re-run with no cluster activity uploads only the new manifest.</p>
+<p>A backup id is a millisecond timestamp + short UUID — so the visible list sorts newest-first by string compare.</p>
+<h2 id="restore">Restore</h2>
+<p>The available-backups list shows every backup id present at the configured prefix, newest first. <strong>Restore</strong> is destructive — it overwrites the live KMS and IAM stores with whichever snapshot the chosen backup id points to (possibly an older backup id, per the incremental layout). The admin UI confirms before proceeding.</p>
+<p>Restore is leader-only — followers see the broadcast KMS/IAM state through the existing sync protocols.</p>
+<h2 id="rest-endpoints">REST Endpoints</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/api/backup/config</code></td>
+<td>Read current config (secret never echoed)</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/api/backup/config</code></td>
+<td>Update; sticky secret (only overwrites on non-empty)</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/api/backup/run</code></td>
+<td>Trigger an immediate backup</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/api/backup/history</code></td>
+<td>Last 100 history entries</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/admin/api/backup/list</code></td>
+<td>Backup ids in S3, newest first</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/admin/api/backup/restore</code></td>
+<td>Restore from <code>{backupId}</code></td>
+</tr>
+</tbody>
+</table>
+<p>All mutating routes are leader-only and return 401/403 without an admin token.</p>
 
 
 
