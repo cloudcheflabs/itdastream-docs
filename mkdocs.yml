@@ -54,6 +54,7 @@ nav:
       - "Network Compression": features/compression.md
       - "Flexible Configuration System": features/configuration.md
       - "Crash Recovery with Staging Store": features/staging-store.md
+      - "Backup & Restore": features/backup.md
 
 
 extra:
