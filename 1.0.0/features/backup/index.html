@@ -1239,7 +1239,8 @@
 </tr>
 </tbody>
 </table>
-<p>All mutating routes are leader-only and return 401/403 without an admin token.</p>
+<p>All mutating routes (<code>POST</code> config / run / restore) are leader-only and return 401/403 without an admin token.</p>
+<p>You can send them to <strong>any</strong> broker, though: a mutating backup request that lands on a follower is transparently proxied to the current leader (controller), executed there, and the leader's response is relayed back. So an admin UI pointed at a follower still triggers the backup on the leader rather than failing. Read routes (<code>GET</code> config / history / list) are served locally on whichever broker receives them.</p>
 
 
 
