@@ -50,4 +50,6 @@ Restore is leader-only — followers see the broadcast KMS/IAM state through the
 | `GET`  | `/admin/api/backup/list`     | Backup ids in S3, newest first |
 | `POST` | `/admin/api/backup/restore`  | Restore from `{backupId}` |
 
-All mutating routes are leader-only and return 401/403 without an admin token.
+All mutating routes (`POST` config / run / restore) are leader-only and return 401/403 without an admin token.
+
+You can send them to **any** broker, though: a mutating backup request that lands on a follower is transparently proxied to the current leader (controller), executed there, and the leader's response is relayed back. So an admin UI pointed at a follower still triggers the backup on the leader rather than failing. Read routes (`GET` config / history / list) are served locally on whichever broker receives them.
