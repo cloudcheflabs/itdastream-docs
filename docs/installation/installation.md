@@ -96,7 +96,7 @@ Commonly used properties (set as `itdastream.*` properties or the equivalent
 | Property | Description | Default |
 | --- | --- | --- |
 | `itdastream.kafka.port` | Port that Kafka clients connect to. | `9092` |
-| `itdastream.nio.port` | Internal broker-to-broker port. | &mdash; |
+| `itdastream.nio.port` | Internal broker-to-broker port. | `9000` |
 | `itdastream.zookeeper.server.list` | Comma-separated `host:port` list of ZooKeeper servers. | `localhost:2181` |
 | `itdastream.storage.engine.type` | Storage backend type. | `s3` |
 
