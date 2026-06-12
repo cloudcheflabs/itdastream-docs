@@ -36,32 +36,22 @@ monitoring, scaling, and recovery see [Operations & Tuning](streaming-operations
 
 ## Architecture
 
-```
-                         ┌──────────────────────── Controller broker (master) ───────────────────────┐
-                         │  StreamingService (master role)                                            │
-                         │   • watches /streaming/jobs, computes a {brokerId: threadCount} assignment  │
-                         │     and writes /streaming/assignments/<jobId>                               │
-                         │   • runs a CheckpointCoordinator per job (barrier triggers over NIO)        │
-                         └───────────────────────────────────────────────────────────────────────────┘
-                                   ▲ assignment (ZooKeeper)          │ checkpoint barrier (internal NIO)
-                                   │                                 ▼
-   ┌──────────── Worker broker ───────────┐        ┌──────────── Worker broker ───────────┐
-   │ StreamingService (worker role)        │        │ StreamingService (worker role)        │
-   │  reconciles running executor threads  │        │  reconciles running executor threads  │
-   │  to this broker's assignment          │        │  to this broker's assignment          │
-   │                                       │        │                                       │
-   │  StreamingJobExecutor (per thread):   │        │  StreamingJobExecutor (per thread):   │
-   │   Kafka consumer (group stream-<id>)  │        │   Kafka consumer (group stream-<id>)  │
-   │     → deserialize (JSON/Avro)         │        │     → deserialize (JSON/Avro)         │
-   │     → filter / select / map / flatMap │        │     → filter / select / map / flatMap │
-   │     → sink (Iceberg / Kafka / …)      │        │     → sink (Iceberg / Kafka / …)      │
-   └───────────────────────────────────────┘        └───────────────────────────────────────┘
-                                   │  offset snapshot (S3 ExchangeManager) + sink commit
-                                   ▼
-                         ┌───────────────────────────┐
-                         │  Iceberg table / sink      │
-                         └───────────────────────────┘
-```
+Every broker runs the same `StreamingService`, which plays one or both roles:
+
+- **Master (the controller broker).** Watches `/streaming/jobs`, computes a per-broker thread
+  assignment — a `{brokerId: threadCount}` map — and writes it to `/streaming/assignments/<jobId>`.
+  It also runs one `CheckpointCoordinator` per job, triggering checkpoint barriers to the workers
+  over the internal NIO channel.
+
+- **Worker (every broker).** Reconciles the set of running executor threads to match this broker's
+  assignment. Each thread is a `StreamingJobExecutor`: a Kafka consumer in the group
+  `stream-<jobId>` that deserializes (JSON/Avro), applies `filter` / `select` / `map` / `flatMap`,
+  and writes to the sink (Iceberg, Kafka, …).
+
+The data flows topic → executor threads → sink; in parallel, each executor snapshots its Kafka
+offsets to the S3 ExchangeManager and commits the sink at every checkpoint. So the **control
+plane** (assignments) travels through ZooKeeper, the **checkpoint barriers** through internal NIO,
+and the **data plane** is the consumer group reading partitions and writing to the sink.
 
 The control plane is **ZooKeeper-declarative**: the master writes the desired per-broker thread
 count, and each worker is a level-triggered reconciler that converges its running executor
