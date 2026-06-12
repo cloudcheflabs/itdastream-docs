@@ -494,6 +494,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#streaming-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Streaming Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#admin-ui-control-center" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -762,6 +773,90 @@
     
   
     Disaggregated Compute-Storage Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Streaming (Kafka to Iceberg / Multi-Sink)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/connections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Connection Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/streaming-sdk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Streaming SDK
   
 
     
@@ -1252,10 +1347,16 @@ storage by using S3-compatible object storage as its primary persistence layer, 
 <li>Controller Model: A designated controller node handles administrative tasks like topic creation and partition rebalancing.</li>
 <li>KMS Integration: Manages data encryption keys (DEK) derived from a Master Key, ensuring every topic can have its own encryption lifecycle.</li>
 </ul>
+<h4 id="streaming-engine">Streaming Engine</h4>
+<p>A built-in, Flink-style streaming layer that runs on the brokers themselves.</p>
+<ul>
+<li>The controller broker acts as the <strong>master</strong> (job assignment + checkpoint coordination) and every other broker acts as a <strong>worker</strong> (running consumer-thread executors).</li>
+<li>Pipelines move data from a topic to Iceberg and other sinks with exactly-once semantics for transactional sinks, configured no-code in the Admin UI or via the Java SDK. See <a href="../../features/streaming/">Streaming</a>.</li>
+</ul>
 <h4 id="admin-ui-control-center">Admin UI (Control Center)</h4>
 <p>Management console.</p>
 <ul>
-<li>Features: Real-time monitoring of TPS (Transactions Per Second), topic management, IAM (Identity and Access Management) configuration, and a built-in log browser.</li>
+<li>Features: Real-time monitoring of TPS (Transactions Per Second), topic management, IAM (Identity and Access Management) configuration, streaming jobs, connection registry, and a built-in log browser.</li>
 </ul>
 <h3 id="data-flow-architecture">Data Flow Architecture</h3>
 <p>The Write Path (Produce)</p>

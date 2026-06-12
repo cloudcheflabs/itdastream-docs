@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/admin-password-recovery/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming/">
       
       
-        <link rel="prev" href="../iam-policy/">
+        <link rel="prev" href="../disaggre-architecture/">
       
       
-        <link rel="next" href="../sasl/">
+        <link rel="next" href="../connections/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Admin Password Recovery - ItdaStream</title>
+        <title>Streaming (Kafka to Iceberg / Multi-Sink) - ItdaStream</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#admin-password-recovery" class="md-skip">
+        <a href="#streaming-kafka-iceberg-multi-sink" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Admin Password Recovery
+              Streaming (Kafka to Iceberg / Multi-Sink)
             
           </span>
         </div>
@@ -623,10 +623,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../streaming/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Streaming (Kafka to Iceberg / Multi-Sink)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -642,6 +669,120 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#key-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key properties
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#job-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Job lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exactly-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exactly-once
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-no-code-path-admin-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The no-code path (Admin UI)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-sinks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported sinks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rest-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REST API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -847,37 +988,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Admin Password Recovery
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../admin-password-recovery/" class="md-nav__link">
         
   
   
@@ -893,114 +1007,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#when-to-use" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        When to use
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How it works
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick start
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#input-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Input modes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#security-model" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Security model
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Limitations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1282,176 +1288,287 @@
 
 
 
-<h1 id="admin-password-recovery">Admin Password Recovery</h1>
-<p>itdastream ships with a built-in recovery channel that lets an operator
-reset the <code>admin</code> user's password <strong>without stopping the broker</strong>, even
-when no one remembers the current password.</p>
-<p>Recovery uses a local Unix domain socket — there is no HTTP back-door, no
-network endpoint, no recovery URL. Authentication is performed by the
-operating system: only a process that already shares the broker's
-filesystem identity can open the socket.</p>
-<h2 id="when-to-use">When to use</h2>
+<h1 id="streaming-kafka-iceberg-multi-sink">Streaming (Kafka → Iceberg / Multi-Sink)</h1>
+<p>ItdaStream includes a built-in, Flink-style streaming engine. The <strong>controller broker acts as
+the streaming master</strong> and <strong>every other broker acts as a worker</strong>, so streaming runs on the
+same cluster that stores your topics — no separate compute cluster to operate.</p>
+<p>Two ways to run a pipeline:</p>
 <ul>
-<li>The admin password was forgotten or rotated out of the password manager.</li>
-<li>An automation script needs to provision a known admin password during
-  first-time setup, without going through the web UI.</li>
-<li>A new operator is onboarded and you need to hand them an admin credential.</li>
+<li><strong>No-code</strong> — in the Admin UI pick a source topic, a parallelism, a format (JSON/Avro), a
+  target (e.g. an Iceberg table referenced through a named connection), and the records flow
+  continuously into the sink. No job to compile or deploy.</li>
+<li><strong>SDK</strong> — submit a Java job with <code>filter</code> / <code>select</code> / <code>map</code> / <code>flatMap</code> transforms to any of
+  the supported sinks. See the <a href="../streaming-sdk/">Streaming SDK</a>.</li>
 </ul>
-<p>For day-to-day password changes (the user remembers the old password and
-wants a new one), use the Admin UI's <strong>Change Password</strong> screen instead —
-that path requires the old password and does not flag the user for forced
-rotation.</p>
-<h2 id="how-it-works">How it works</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌────────────────────┐   JSON over UDS    ┌────────────────────┐
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  itdastream-cli    │ ─────────────────▶ │  Broker (running)  │
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│  iam:reset-password│                    │   AuthManager      │
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>└────────────────────┘                    │   .adminResetPwd() │
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>         ▲                                │                    │
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>         │ stdout: new password           │  saveAndBroadcast()│
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>         │ (one-time)                     │  cluster sync push │
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                                          │  audit log append  │
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                                          └────────────────────┘
+<p>Both paths produce the same job specification and run on the same engine.</p>
+<hr />
+<h2 id="key-properties">Key properties</h2>
+<ul>
+<li><strong>Exactly-once to transactional sinks</strong> (Iceberg, JDBC): the sink commit and the Kafka offset
+  commit are aligned at a checkpoint barrier, so a failure never loses or double-writes records.
+  Non-transactional sinks (Kafka, Elasticsearch, HTTP, console) are at-least-once.</li>
+<li><strong>Parallelism = consumer-group size</strong>: a job runs N consumer threads, spread across the worker
+  brokers, all in the consumer group <code>stream-&lt;jobId&gt;</code>. ItdaStream's existing group coordinator
+  distributes the topic partitions across them and rebalances on membership change.</li>
+<li><strong>Durable checkpoints on S3</strong>: each checkpoint snapshots the Kafka offsets to S3 (the
+  ExchangeManager), KMS-encrypted, so a job reassigned to a different broker resumes exactly
+  where it left off.</li>
+<li><strong>Connection registry</strong>: credentials (S3, Iceberg catalog, Kafka, Elasticsearch, JDBC,
+  NeorunBase) are registered once and referenced by <code>connectionId</code> — jobs never inline secrets.
+  See <a href="../connections/">Connections</a>.</li>
+</ul>
+<hr />
+<h2 id="architecture">Architecture</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                         ┌──────────────────────── Controller broker (master) ───────────────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                         │  StreamingService (master role)                                            │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                         │   • watches /streaming/jobs, computes a {brokerId: threadCount} assignment  │
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                         │     and writes /streaming/assignments/&lt;jobId&gt;                               │
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                         │   • runs a CheckpointCoordinator per job (barrier triggers over NIO)        │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                         └───────────────────────────────────────────────────────────────────────────┘
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                                   ▲ assignment (ZooKeeper)          │ checkpoint barrier (internal NIO)
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                                   │                                 ▼
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>   ┌──────────── Worker broker ───────────┐        ┌──────────── Worker broker ───────────┐
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>   │ StreamingService (worker role)        │        │ StreamingService (worker role)        │
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>   │  reconciles running executor threads  │        │  reconciles running executor threads  │
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>   │  to this broker&#39;s assignment          │        │  to this broker&#39;s assignment          │
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>   │                                       │        │                                       │
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>   │  StreamingJobExecutor (per thread):   │        │  StreamingJobExecutor (per thread):   │
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>   │   Kafka consumer (group stream-&lt;id&gt;)  │        │   Kafka consumer (group stream-&lt;id&gt;)  │
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>   │     → deserialize (JSON/Avro)         │        │     → deserialize (JSON/Avro)         │
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>   │     → filter / select / map / flatMap │        │     → filter / select / map / flatMap │
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>   │     → sink (Iceberg / Kafka / …)      │        │     → sink (Iceberg / Kafka / …)      │
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>   └───────────────────────────────────────┘        └───────────────────────────────────────┘
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>                                   │  offset snapshot (S3 ExchangeManager) + sink commit
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>                                   ▼
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>                         ┌───────────────────────────┐
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>                         │  Iceberg table / sink      │
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>                         └───────────────────────────┘
 </code></pre></div>
+<p>The control plane is <strong>ZooKeeper-declarative</strong>: the master writes the desired per-broker thread
+count, and each worker is a level-triggered reconciler that converges its running executor
+threads to its assignment (and heals any missed watch on a periodic tick). The runtime
+<strong>checkpoint barriers</strong> travel over the internal NIO channel, which now runs on every broker.</p>
+<h3 id="job-lifecycle">Job lifecycle</h3>
+<ol>
+<li>A job spec is written to <code>/streaming/jobs/&lt;jobId&gt;</code> (by the Admin UI or the SDK, through the
+   admin API).</li>
+<li>The controller's reconciler computes an assignment and writes
+   <code>/streaming/assignments/&lt;jobId&gt;</code> (a single <code>{brokerId: threadCount}</code> map).</li>
+<li>Each worker starts/stops <code>StreamingJobExecutor</code> threads to match its assignment. Each thread
+   is one consumer in the group <code>stream-&lt;jobId&gt;</code>.</li>
+<li>The controller's <code>CheckpointCoordinator</code> triggers checkpoint barriers on an interval; each
+   executor also runs a time-based self-checkpoint as a fallback.</li>
+<li>Deleting the job removes the spec; the reconcilers stop the executors.</li>
+</ol>
+<hr />
+<h2 id="exactly-once">Exactly-once</h2>
+<p>For a transactional sink the poll loop <strong>never advances Kafka offsets</strong>. At each checkpoint the
+executor performs, in order:</p>
+<ol>
+<li><strong>commit the sink</strong> — for Iceberg, the data files written since the last checkpoint are
+   committed as one snapshot; for JDBC, the transaction is committed;</li>
+<li><strong>snapshot the Kafka offsets</strong> to the S3 ExchangeManager under the checkpoint id;</li>
+<li><strong>commit the Kafka offsets</strong> (the commit point);</li>
+<li><strong>acknowledge</strong> the controller's coordinator.</li>
+</ol>
+<p>Because the offset only advances after the sink commit and the durable offset snapshot, a crash
+either replays from the last committed checkpoint (sink not yet committed) or resumes cleanly
+(sink committed, offsets advanced) — exactly-once. On startup the executor restores the last
+completed checkpoint's offsets from S3 and seeks the consumer there.</p>
+<p>For idempotent updates, set <strong>upsert keys</strong> on the Iceberg sink: each commit writes the data plus
+an equality-delete on the keys, so re-processed rows collapse to the latest value.</p>
+<hr />
+<h2 id="the-no-code-path-admin-ui">The no-code path (Admin UI)</h2>
+<p>Open <strong>Streaming → New Job</strong> and fill in:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source Topic</td>
+<td>the Kafka topic to consume</td>
+</tr>
+<tr>
+<td>Parallelism</td>
+<td>number of consumer threads in the job's group (spread across brokers)</td>
+</tr>
+<tr>
+<td>Format</td>
+<td><code>json</code> or <code>avro</code> (Avro uses the configured Schema Registry)</td>
+</tr>
+<tr>
+<td>Sink Type</td>
+<td>Iceberg / Kafka / JDBC / Elasticsearch / HTTP / Console / NeorunBase</td>
+</tr>
+<tr>
+<td>Connection</td>
+<td>a connection of the matching type (for Iceberg/Kafka/JDBC/ES/NeorunBase)</td>
+</tr>
+<tr>
+<td>Target</td>
+<td>Iceberg <code>namespace.table</code>, Kafka topic, JDBC/NeorunBase table, ES index, or HTTP URL</td>
+</tr>
+<tr>
+<td>Upsert Keys</td>
+<td>(Iceberg, optional) comma-separated keys for idempotent upsert</td>
+</tr>
+<tr>
+<td>Commit / Checkpoint Interval</td>
+<td>exactly-once cadence in ms</td>
+</tr>
+<tr>
+<td>Filter / Select</td>
+<td>(optional) simple transforms</td>
+</tr>
+</tbody>
+</table>
+<p>Connections are managed on the <strong>Connections</strong> page; create an Iceberg connection (catalog URI,
+warehouse, S3 credentials) before creating an Iceberg job.</p>
+<hr />
+<h2 id="supported-sinks">Supported sinks</h2>
+<table>
+<thead>
+<tr>
+<th>Sink</th>
+<th>Type</th>
+<th>Semantics</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Iceberg</td>
+<td><code>table</code></td>
+<td>exactly-once</td>
+<td>append or equality-delete upsert; REST catalog (Polaris / vanilla REST / Glue)</td>
+</tr>
+<tr>
+<td>JDBC</td>
+<td><code>jdbc</code></td>
+<td>exactly-once</td>
+<td>transactional; PostgreSQL driver bundled, others added to the classpath</td>
+</tr>
+<tr>
+<td>Kafka</td>
+<td><code>kafka</code></td>
+<td>at-least-once</td>
+<td>produce to another topic/cluster</td>
+</tr>
+<tr>
+<td>Elasticsearch</td>
+<td><code>elasticsearch</code></td>
+<td>at-least-once</td>
+<td>bulk index</td>
+</tr>
+<tr>
+<td>HTTP</td>
+<td><code>http</code></td>
+<td>at-least-once</td>
+<td>webhook POST</td>
+</tr>
+<tr>
+<td>Console</td>
+<td><code>console</code></td>
+<td>at-least-once</td>
+<td>debug</td>
+</tr>
+<tr>
+<td>NeorunBase</td>
+<td><code>neorunbase</code></td>
+<td>at-least-once</td>
+<td>REST or JDBC mode</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="rest-api">REST API</h2>
+<p>Job management is exposed under the admin API (JWT or IAM user-token auth; the admin endpoint
+forwards mutations to the controller, so any broker works):</p>
+<ul>
+<li><code>POST /admin/streaming/jobs</code> — submit a job spec, returns <code>{jobId}</code></li>
+<li><code>GET  /admin/streaming/jobs</code> — list job specs</li>
+<li><code>GET  /admin/streaming/jobs/{id}</code> — spec + per-broker status</li>
+<li><code>DELETE /admin/streaming/jobs/{id}</code> — stop and delete</li>
+</ul>
+<p>Example job spec:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;purchases-to-iceberg&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;parallelism&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;kafka&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;topic&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;events&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;json&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">&quot;operations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;FILTER&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;event_type = &#39;purchase&#39;&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SELECT&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;id,name,amount&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="nt">&quot;sink&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="nt">&quot;connectionId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;prod-iceberg&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;analytics.purchases&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="nt">&quot;upsertKeys&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">  </span><span class="nt">&quot;commitIntervalMs&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">  </span><span class="nt">&quot;checkpointIntervalMs&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="configuration">Configuration</h2>
+<p>Broker-level defaults live in <code>itdastream.properties</code> (a per-job spec overrides any value it
+sets). See <a href="../configuration/">Flexible Configuration System</a> for the resolution order.</p>
 <table>
 <thead>
 <tr>
 <th>Property</th>
-<th>Value</th>
+<th>Default</th>
+<th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Socket path</strong></td>
-<td><code>data/admin.sock</code> (mode <code>600</code>)</td>
+<td><code>itdastream.streaming.reconcile.interval.ms</code></td>
+<td>5000</td>
+<td>reconciler tick interval</td>
 </tr>
 <tr>
-<td><strong>Authentication</strong></td>
-<td>OS file permission — same user as the broker process</td>
+<td><code>itdastream.streaming.exchange.prefix</code></td>
+<td><code>streaming/exchange</code></td>
+<td>S3 prefix for checkpoint state</td>
 </tr>
 <tr>
-<td><strong>Network surface</strong></td>
-<td>none — Unix domain socket only</td>
+<td><code>itdastream.streaming.commit.interval.ms</code></td>
+<td>10000</td>
+<td>default sink commit cadence</td>
 </tr>
 <tr>
-<td><strong>Downtime</strong></td>
-<td>none — applied in-process on the live broker</td>
+<td><code>itdastream.streaming.checkpoint.interval.ms</code></td>
+<td>10000</td>
+<td>default checkpoint barrier interval</td>
 </tr>
 <tr>
-<td><strong>Cluster sync</strong></td>
-<td>automatic — IAM state fans out to peer brokers via the existing sync path</td>
+<td><code>itdastream.streaming.commit.row.threshold</code></td>
+<td>10000</td>
+<td>rows that also trigger a commit</td>
 </tr>
 <tr>
-<td><strong>Audit log</strong></td>
-<td><code>data/iam-audit/reset.log</code> (mode <code>600</code>, append-only)</td>
+<td><code>itdastream.streaming.source.poll.timeout.ms</code></td>
+<td>100</td>
+<td>Kafka poll timeout in the loop</td>
 </tr>
 <tr>
-<td><strong>Post-reset state</strong></td>
-<td><code>requirePasswordChange = true</code> (forced rotation on next login)</td>
+<td><code>itdastream.streaming.progress.log.interval.ms</code></td>
+<td>30000</td>
+<td>progress log interval</td>
 </tr>
 </tbody>
 </table>
-<h2 id="quick-start">Quick start</h2>
-<p>The simplest invocation lets the broker generate a strong 20-character
-password and print it to stdout. The new password must be changed on the
-admin's next login (the <code>requirePasswordChange</code> flag is set automatically).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Inside the broker host or container:</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
-</code></pre></div>
-<h2 id="input-modes">Input modes</h2>
-<table>
-<thead>
-<tr>
-<th>Mode</th>
-<th>Command</th>
-<th>When to use</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Broker-generated</strong></td>
-<td><code>itdastream-cli.sh iam:reset-password</code></td>
-<td>Default. Strong random password printed once on stdout.</td>
-</tr>
-<tr>
-<td><strong>Explicit</strong></td>
-<td><code>itdastream-cli.sh iam:reset-password --new-password 'My!Pass'</code></td>
-<td>Automation that knows the desired value. Beware: argv may show up in <code>ps</code>.</td>
-</tr>
-<tr>
-<td><strong>Stdin</strong></td>
-<td><code>echo 'My!Pass' \| itdastream-cli.sh iam:reset-password --new-password -</code></td>
-<td>Automation that wants to avoid argv exposure.</td>
-</tr>
-<tr>
-<td><strong>Interactive</strong></td>
-<td><code>itdastream-cli.sh iam:reset-password --interactive</code></td>
-<td>Operator at a TTY. Prompts for password twice with no echo.</td>
-</tr>
-</tbody>
-</table>
-<p>Resetting a different user is also supported:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--user<span class="w"> </span>some-user<span class="w"> </span>--new-password<span class="w"> </span><span class="s1">&#39;NewPass123&#39;</span>
-</code></pre></div>
-<h2 id="configuration">Configuration</h2>
-<p>The recovery socket is enabled by default. To disable it (for example, in a
-hardened production deployment), set the following on <code>BrokerConfig</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># broker properties / JSON config</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="na">adminSocketEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">false</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="na">adminSocketPath</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">data/admin.sock</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="na">iamAuditDir</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s">data/iam-audit</span>
-</code></pre></div>
-<p>The CLI resolves the socket path in this order:</p>
-<ol>
-<li><code>--socket /path/to/admin.sock</code> command-line flag</li>
-<li><code>ITDASTREAM_ADMIN_SOCKET</code> environment variable</li>
-<li><code>adminSocketPath</code> in the broker config</li>
-<li><code>data/admin.sock</code> fallback</li>
-</ol>
-<h2 id="security-model">Security model</h2>
-<p><strong>1. The socket is OS-gated.</strong>
-At startup the broker creates <code>data/admin.sock</code> with mode <code>600</code> (owner
-read/write only). Even other unprivileged users on the same host cannot
-connect. There is no token, no shared secret, no network listener.</p>
-<p><strong>2. The audit log records every reset.</strong>
-Every successful reset appends a JSON line to <code>data/iam-audit/reset.log</code>
-(mode <code>600</code>). The plaintext password is <strong>never</strong> logged — only the first
-8 characters of its hash, the user, whether it was broker-generated, and
-the OS user that invoked the CLI.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span><span class="nt">&quot;ts&quot;</span><span class="p">:</span><span class="s2">&quot;2026-05-23T16:00:46.922Z&quot;</span><span class="p">,</span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="s2">&quot;iam.reset-password&quot;</span><span class="p">,</span><span class="nt">&quot;user&quot;</span><span class="p">:</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span><span class="nt">&quot;generated&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">&quot;hashFp&quot;</span><span class="p">:</span><span class="s2">&quot;OYV/Ojf/&quot;</span><span class="p">,</span><span class="nt">&quot;invokedAs&quot;</span><span class="p">:</span><span class="s2">&quot;root&quot;</span><span class="p">}</span>
-</code></pre></div>
-<p><strong>3. The new password is exposed exactly once.</strong>
-For broker-generated passwords, the plaintext is returned only on the
-single CLI invocation that triggered the reset. It is not retransmitted.
-Treat scrollback and shell history accordingly — or use stdin input mode
-to avoid argv exposure entirely.</p>
-<p><strong>4. Forced rotation on next login.</strong>
-After reset, the user is flagged <code>requirePasswordChange = true</code>. The next
-successful login forces the user through the change-password flow, so a
-temporary password used by the operator is immediately replaced by a
-password only the user knows.</p>
-<p><strong>5. The broker must be running.</strong>
-Because the recovery channel is in-process, the broker must be alive for
-the CLI to connect. This is intentional: RocksDB requires an exclusive
-lock, so an offline edit would either conflict with a running broker or
-need a complex stale-lock recovery. With this design, the only way to
-reset is to be on the host <em>and</em> have the broker running <em>and</em> share its
-filesystem identity.</p>
-<h2 id="limitations">Limitations</h2>
-<ul>
-<li><strong>Broker must be running.</strong> If the broker is down, this CLI cannot help.
-  Bring the broker back up first, then run the CLI.</li>
-<li><strong>No knowledge factor.</strong> Any process that shares the broker's filesystem
-  identity can invoke the CLI. In multi-tenant or shared-shell
-  environments, restrict shell access to the broker accordingly. A future
-  enhancement may add an opt-in "recovery key" requirement for an
-  additional knowledge factor.</li>
-</ul>
-<h2 id="related">Related</h2>
-<ul>
-<li><a href="../iam/">AWS IAM-Compatible Access Control</a></li>
-<li><a href="../iam-policy/">IAM Policy Reference</a></li>
-<li><a href="../disaggre-architecture/">Disaggregated Architecture</a></li>
-</ul>
+<div class="admonition note">
+<p class="admonition-title">Off-heap Arrow</p>
+<p>The streaming engine processes records as Apache Arrow batches in off-heap memory. The
+broker launch script passes <code>--add-opens=java.base/java.nio=ALL-UNNAMED</code> so Arrow can
+allocate direct buffers; keep this flag if you customize the launcher.</p>
+</div>
 
 
 

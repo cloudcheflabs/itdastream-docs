@@ -626,6 +626,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Streaming (Kafka to Iceberg / Multi-Sink)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../connections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Connection Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../streaming-sdk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Streaming SDK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tx/" class="md-nav__link">
         
   
@@ -719,6 +803,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AWS IAM-Compatible Access Control
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -735,6 +837,36 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#programmatic-credentials-access-key-secret-key-user-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Programmatic credentials (access key / secret key / user token)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1080,8 +1212,40 @@
 <li><strong>Supported actions</strong>: Data (Produce, Fetch), Topic management (Create, Delete), IAM operations, KMS operations</li>
 <li><strong>Policy evaluation</strong>: Explicit Deny &gt; Explicit Allow &gt; Implicit Deny (default block); wildcard support</li>
 <li><strong>User model</strong>: Users → Groups → Policies, with access key pairs and optional expiration</li>
+<li><strong>Credentials</strong>: each access key carries three values — an <strong>access key</strong>, a <strong>secret key</strong>,
+  and a long-lived <strong>user token</strong> (<code>ITOK...</code>) — generated together</li>
 </ul>
 <p>For the full policy JSON schema, ARN format, action catalog, and worked examples, see the <a href="../iam-policy/">IAM Policy Reference</a>.</p>
+<h2 id="programmatic-credentials-access-key-secret-key-user-token">Programmatic credentials (access key / secret key / user token)</h2>
+<p>Creating an access key for a user (Admin UI → IAM, or <code>POST /admin/iam/keys</code>) returns three
+values at once:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;accessKey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;AKIA...&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;secretKey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;token&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ITOK...&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Credential</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>access key + secret key</td>
+<td>Kafka <strong>SASL/PLAIN</strong> authentication (producers/consumers)</td>
+</tr>
+<tr>
+<td>user token (<code>ITOK...</code>)</td>
+<td>programmatic admin/SDK auth via the <code>Authorization: Token &lt;token&gt;</code> header</td>
+</tr>
+</tbody>
+</table>
+<p>The secret key and user token are shown <strong>once</strong> (a one-time reveal in the UI, and in the
+downloadable credentials CSV) — store them securely. The user token is the recommended
+credential for the <a href="../streaming-sdk/">Streaming SDK</a> and CI:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">ItdaStreamSession</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">adminUrl</span><span class="p">(</span><span class="s">&quot;http://broker:8082&quot;</span><span class="p">).</span><span class="na">userToken</span><span class="p">(</span><span class="s">&quot;ITOK...&quot;</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+</code></pre></div>
+<p>Tokens inherit the user's group policies and honor the access key's <code>Active</code> status and optional
+expiration; deleting the access key revokes the token.</p>
 
 
 
