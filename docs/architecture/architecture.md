@@ -42,10 +42,16 @@ ItdaStream uses Apache ZooKeeper for cluster coordination and RocksDB for local 
 * KMS Integration: Manages data encryption keys (DEK) derived from a Master Key, ensuring every topic can have its own encryption lifecycle.
 
 
+#### Streaming Engine
+A built-in, Flink-style streaming layer that runs on the brokers themselves.
+
+* The controller broker acts as the **master** (job assignment + checkpoint coordination) and every other broker acts as a **worker** (running consumer-thread executors).
+* Pipelines move data from a topic to Iceberg and other sinks with exactly-once semantics for transactional sinks, configured no-code in the Admin UI or via the Java SDK. See [Streaming](../features/streaming.md).
+
 #### Admin UI (Control Center)
 Management console.
 
-* Features: Real-time monitoring of TPS (Transactions Per Second), topic management, IAM (Identity and Access Management) configuration, and a built-in log browser.
+* Features: Real-time monitoring of TPS (Transactions Per Second), topic management, IAM (Identity and Access Management) configuration, streaming jobs, connection registry, and a built-in log browser.
 
 
 
