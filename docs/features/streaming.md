@@ -6,13 +6,14 @@ same cluster that stores your topics — no separate compute cluster to operate.
 
 Two ways to run a pipeline:
 
-- **No-code** — in the Admin UI pick a source topic, a parallelism, a format (JSON/Avro), a
-  target (e.g. an Iceberg table referenced through a named connection), and the records flow
-  continuously into the sink. No job to compile or deploy.
+- **No-code** — in the Admin UI pick a source topic, a parallelism, a format (JSON/Avro), and a
+  target (e.g. an Iceberg table referenced through a named connection); records flow continuously
+  into the sink. No job to compile or deploy. See [No-Code Kafka → Iceberg](streaming-no-code.md).
 - **SDK** — submit a Java job with `filter` / `select` / `map` / `flatMap` transforms to any of
   the supported sinks. See the [Streaming SDK](streaming-sdk.md).
 
-Both paths produce the same job specification and run on the same engine.
+Both paths produce the same job specification and run on the same engine. For configuration,
+monitoring, scaling, and recovery see [Operations & Tuning](streaming-operations.md).
 
 ---
 
@@ -102,24 +103,14 @@ an equality-delete on the keys, so re-processed rows collapse to the latest valu
 
 ---
 
-## The no-code path (Admin UI)
+## The two ways to run
 
-Open **Streaming → New Job** and fill in:
+- **[No-Code Kafka → Iceberg](streaming-no-code.md)** — a step-by-step walkthrough of configuring
+  a topic-to-Iceberg pipeline entirely in the Admin UI.
+- **[Streaming SDK](streaming-sdk.md)** — submit richer Java jobs with transforms and any sink.
 
-| Field | Meaning |
-|---|---|
-| Source Topic | the Kafka topic to consume |
-| Parallelism | number of consumer threads in the job's group (spread across brokers) |
-| Format | `json` or `avro` (Avro uses the configured Schema Registry) |
-| Sink Type | Iceberg / Kafka / JDBC / Elasticsearch / HTTP / Console / NeorunBase |
-| Connection | a connection of the matching type (for Iceberg/Kafka/JDBC/ES/NeorunBase) |
-| Target | Iceberg `namespace.table`, Kafka topic, JDBC/NeorunBase table, ES index, or HTTP URL |
-| Upsert Keys | (Iceberg, optional) comma-separated keys for idempotent upsert |
-| Commit / Checkpoint Interval | exactly-once cadence in ms |
-| Filter / Select | (optional) simple transforms |
-
-Connections are managed on the **Connections** page; create an Iceberg connection (catalog URI,
-warehouse, S3 credentials) before creating an Iceberg job.
+Both reference credentials through the [Connection Registry](connections.md) and run on the same
+engine; both produce the same job spec (see the REST API below).
 
 ---
 
@@ -171,22 +162,9 @@ Example job spec:
 
 ---
 
-## Configuration
+## Configuration, monitoring, and recovery
 
-Broker-level defaults live in `itdastream.properties` (a per-job spec overrides any value it
-sets). See [Flexible Configuration System](configuration.md) for the resolution order.
-
-| Property | Default | Meaning |
-|---|---|---|
-| `itdastream.streaming.reconcile.interval.ms` | 5000 | reconciler tick interval |
-| `itdastream.streaming.exchange.prefix` | `streaming/exchange` | S3 prefix for checkpoint state |
-| `itdastream.streaming.commit.interval.ms` | 10000 | default sink commit cadence |
-| `itdastream.streaming.checkpoint.interval.ms` | 10000 | default checkpoint barrier interval |
-| `itdastream.streaming.commit.row.threshold` | 10000 | rows that also trigger a commit |
-| `itdastream.streaming.source.poll.timeout.ms` | 100 | Kafka poll timeout in the loop |
-| `itdastream.streaming.progress.log.interval.ms` | 30000 | progress log interval |
-
-!!! note "Off-heap Arrow"
-    The streaming engine processes records as Apache Arrow batches in off-heap memory. The
-    broker launch script passes `--add-opens=java.base/java.nio=ALL-UNNAMED` so Arrow can
-    allocate direct buffers; keep this flag if you customize the launcher.
+Broker-level defaults (commit/checkpoint cadence, reconcile interval, exchange prefix, …) live in
+`itdastream.properties` and are overridden per job. For the full property reference, the status
+API, scaling/rebalance behavior, failure recovery, and troubleshooting, see
+[Operations & Tuning](streaming-operations.md).
