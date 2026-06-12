@@ -32,7 +32,6 @@ theme:
 
 
 nav:
-  - "Home": index.md
   - "Architecture":
       - "itdastream Architecture": architecture/architecture.md
   - "Installation":
