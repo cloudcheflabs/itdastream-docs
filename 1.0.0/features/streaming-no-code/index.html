@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/disaggre-architecture/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming-no-code/">
       
       
-        <link rel="prev" href="../kafka-compatible/">
+        <link rel="prev" href="../streaming/">
       
       
-        <link rel="next" href="../tx/">
+        <link rel="next" href="../connections/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Disaggregated Compute-Storage Architecture - ItdaStream</title>
+        <title>No-Code Kafka to Iceberg - ItdaStream</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#disaggregated-compute-storage-architecture" class="md-skip">
+        <a href="#no-code-kafka-iceberg" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Disaggregated Compute-Storage Architecture
+              No-Code Kafka to Iceberg
             
           </span>
         </div>
@@ -271,10 +271,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../streaming/" class="md-tabs__link">
           
   
@@ -291,12 +293,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../kafka-compatible/" class="md-tabs__link">
           
   
@@ -576,26 +576,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -613,7 +618,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -656,10 +661,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../streaming-no-code/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    No-Code Kafka to Iceberg
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -675,6 +707,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-register-an-iceberg-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Register an Iceberg connection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-create-the-target-namespace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Create the target namespace
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-create-the-streaming-job" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Create the streaming job
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-produce-and-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Produce and verify
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-behaves" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it behaves
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-no-code-sinks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other no-code sinks
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -775,31 +904,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -817,7 +941,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -860,19 +984,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../disaggre-architecture/" class="md-nav__link">
         
   
   
@@ -888,7 +1003,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -1338,13 +1452,238 @@
 
 
 
-<h1 id="disaggregated-compute-storage-architecture">Disaggregated Compute-Storage Architecture</h1>
-<p>ItdaStream separates compute (brokers) from storage (S3-compatible object storage), enabling independent scaling and cost optimization. Brokers are stateless — all persistent data resides in S3.</p>
+<h1 id="no-code-kafka-iceberg">No-Code Kafka → Iceberg</h1>
+<p>The most common pipeline — <em>"messages produced to a topic land in an Iceberg table"</em> — needs no
+code at all. You configure it <strong>once</strong> in the Admin UI; from then on every message produced to the
+topic flows into the table with exactly-once semantics. This page is a full walkthrough.</p>
+<blockquote>
+<p>The basic case is exactly this: produce to an ItdaStream topic, and it goes straight into
+Iceberg. For richer transforms or multiple sinks, use the <a href="../streaming-sdk/">Streaming SDK</a>.</p>
+</blockquote>
+<hr />
+<h2 id="prerequisites">Prerequisites</h2>
 <ul>
-<li><strong>Three-tier write path</strong>: In-memory WriteBuffer (16MB/partition) → RocksDB Staging Store (local crash recovery) → S3 Object Storage (permanent)</li>
-<li><strong>S3 compatibility</strong>: Works with AWS S3, MinIO, ShannonStore, and any S3-compatible object storage</li>
-<li><strong>Flush triggers</strong>: Buffer full (16MB) or time-based flush (5s interval, 5min max latency)</li>
+<li>An Iceberg <strong>REST catalog</strong> reachable from the brokers (Apache Polaris, the <code>iceberg-rest</code>
+  image, Nessie, or AWS Glue), and an S3 bucket for the warehouse.</li>
+<li>The source <strong>topic</strong> exists (or will be created).</li>
 </ul>
+<hr />
+<h2 id="step-1-register-an-iceberg-connection">Step 1 — Register an Iceberg connection</h2>
+<p>Credentials are stored once in the <a href="../connections/">Connection Registry</a> and referenced by id —
+jobs never inline secrets. In the Admin UI open <strong>Connections → New Connection</strong>, choose type
+<strong>ICEBERG</strong>, and fill in:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Example</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connection ID</td>
+<td><code>prod-iceberg</code></td>
+<td>referenced by jobs</td>
+</tr>
+<tr>
+<td><code>catalog.rest.uri</code></td>
+<td><code>http://iceberg-rest:8181</code></td>
+<td>REST catalog endpoint</td>
+</tr>
+<tr>
+<td><code>catalog.rest.flavor</code></td>
+<td><code>rest</code></td>
+<td><code>polaris</code> (default), <code>rest</code> (vanilla iceberg-rest / Nessie), or <code>glue</code></td>
+</tr>
+<tr>
+<td><code>catalog.warehouse</code></td>
+<td><code>s3://warehouse/</code></td>
+<td>Iceberg warehouse</td>
+</tr>
+<tr>
+<td><code>catalog.rest.auth</code></td>
+<td><code>none</code></td>
+<td>or <code>oauth2</code> / <code>sigv4</code></td>
+</tr>
+<tr>
+<td><code>s3.endpoint</code> / <code>s3.region</code></td>
+<td><code>http://minio:9000</code> / <code>us-east-1</code></td>
+<td>S3 FileIO</td>
+</tr>
+<tr>
+<td><code>s3.accessKey</code> / <code>s3.secretKey</code></td>
+<td>…</td>
+<td>masked after save</td>
+</tr>
+<tr>
+<td><code>s3.pathStyle</code></td>
+<td><code>true</code></td>
+<td>for MinIO and most S3-compatible stores</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Pick the right catalog flavor</p>
+<p>A <strong>vanilla</strong> Iceberg REST catalog (the <code>iceberg-rest</code> image, Nessie) serves
+<code>/v1/namespaces/...</code> and needs <code>catalog.rest.flavor=rest</code>. The default <code>polaris</code> flavor
+addresses catalogs by a URL prefix (<code>/v1/{prefix}/namespaces/...</code>); using it against a
+vanilla catalog yields <em>"No route for request"</em>.</p>
+</div>
+<p>The same form is available over REST:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://broker:8082/admin/connections<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$JWT</span><span class="s2">&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;connectionId&quot;:&quot;prod-iceberg&quot;,&quot;type&quot;:&quot;ICEBERG&quot;,&quot;properties&quot;:{</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="s1">        &quot;catalog.rest.uri&quot;:&quot;http://iceberg-rest:8181&quot;,&quot;catalog.rest.flavor&quot;:&quot;rest&quot;,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="s1">        &quot;catalog.warehouse&quot;:&quot;s3://warehouse/&quot;,&quot;catalog.rest.auth&quot;:&quot;none&quot;,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="s1">        &quot;s3.endpoint&quot;:&quot;http://minio:9000&quot;,&quot;s3.region&quot;:&quot;us-east-1&quot;,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="s1">        &quot;s3.accessKey&quot;:&quot;...&quot;,&quot;s3.secretKey&quot;:&quot;...&quot;,&quot;s3.pathStyle&quot;:&quot;true&quot;}}&#39;</span>
+</code></pre></div>
+<hr />
+<h2 id="step-2-create-the-target-namespace">Step 2 — Create the target namespace</h2>
+<p>The streaming sink creates the <strong>table</strong> automatically (inferring the schema from the first
+batch), but the Iceberg <strong>namespace</strong> must exist. Create it once via your catalog, e.g. for a
+REST catalog:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://iceberg-rest:8181/v1/namespaces<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;namespace&quot;:[&quot;analytics&quot;]}&#39;</span>
+</code></pre></div>
+<hr />
+<h2 id="step-3-create-the-streaming-job">Step 3 — Create the streaming job</h2>
+<p>Open <strong>Streaming → New Job</strong> and fill in:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Example</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Job Name</td>
+<td><code>events-to-iceberg</code></td>
+<td>display name</td>
+</tr>
+<tr>
+<td>Source Topic</td>
+<td><code>events</code></td>
+<td>topic to consume</td>
+</tr>
+<tr>
+<td>Parallelism</td>
+<td><code>4</code></td>
+<td>consumer threads in the job's group, spread across brokers</td>
+</tr>
+<tr>
+<td>Format</td>
+<td><code>json</code></td>
+<td>or <code>avro</code> (uses the configured Schema Registry)</td>
+</tr>
+<tr>
+<td>Sink Type</td>
+<td><code>Iceberg</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Iceberg Connection</td>
+<td><code>prod-iceberg</code></td>
+<td>the connection from Step 1</td>
+</tr>
+<tr>
+<td>Target Table</td>
+<td><code>analytics.events</code></td>
+<td><code>namespace.table</code></td>
+</tr>
+<tr>
+<td>Upsert Keys</td>
+<td><code>id</code></td>
+<td><em>(optional)</em> idempotent upsert by key</td>
+</tr>
+<tr>
+<td>Commit / Checkpoint Interval</td>
+<td><code>5000</code></td>
+<td>exactly-once cadence (ms)</td>
+</tr>
+<tr>
+<td>Filter / Select</td>
+<td><em>(optional)</em></td>
+<td>simple transforms</td>
+</tr>
+</tbody>
+</table>
+<p>Click <strong>Create Job</strong>. Within a few seconds the controller assigns the job's consumer threads to
+the worker brokers and they join the consumer group <code>stream-&lt;jobId&gt;</code>.</p>
+<hr />
+<h2 id="step-4-produce-and-verify">Step 4 — Produce and verify</h2>
+<p>Produce JSON to the topic with any Kafka client:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;{&quot;id&quot;:1,&quot;name&quot;:&quot;alice&quot;,&quot;amount&quot;:120,&quot;event_type&quot;:&quot;purchase&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>kafka-console-producer.sh<span class="w"> </span>--bootstrap-server<span class="w"> </span>broker:9092<span class="w"> </span>--topic<span class="w"> </span>events
+</code></pre></div>
+<p>After one commit interval the rows are committed to the Iceberg table as a new snapshot. Query it
+with any Iceberg engine (Spark, Trino, PyIceberg), or inspect the latest snapshot via the REST
+catalog (<code>total-records</code> in the snapshot summary).</p>
+<p>The job's live status (per-broker thread counts, last completed checkpoint) is available at
+<code>GET /admin/streaming/jobs/{id}</code> and on the Streaming page.</p>
+<hr />
+<h2 id="how-it-behaves">How it behaves</h2>
+<ul>
+<li><strong>Parallelism = consumer-group size.</strong> With parallelism N, N consumer threads share the topic
+  partitions. Set N ≤ the partition count to keep every thread busy; ItdaStream's group
+  coordinator rebalances automatically when brokers join or leave.</li>
+<li><strong>Format.</strong> <code>json</code> infers columns from the message fields; <code>avro</code> decodes via the Schema
+  Registry. For a fixed target table, keep the message schema stable.</li>
+<li><strong>Append vs upsert.</strong> Without upsert keys the sink <strong>appends</strong>. With upsert keys, each commit
+  writes the data plus an equality-delete on those keys, so re-sent or updated rows collapse to
+  the latest value (idempotent) — ideal for change streams.</li>
+<li><strong>Exactly-once.</strong> The Iceberg commit and the Kafka offset commit are aligned at each checkpoint,
+  so a broker failure never loses or double-writes rows. See the
+  <a href="../streaming/#exactly-once">Overview</a> for the mechanism.</li>
+</ul>
+<hr />
+<h2 id="other-no-code-sinks">Other no-code sinks</h2>
+<p>The same flow works for the other sink types — pick the sink and a matching connection:</p>
+<table>
+<thead>
+<tr>
+<th>Sink</th>
+<th>Connection type</th>
+<th>Target field</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kafka</td>
+<td>KAFKA</td>
+<td>target topic</td>
+</tr>
+<tr>
+<td>JDBC</td>
+<td>JDBC</td>
+<td>table name</td>
+</tr>
+<tr>
+<td>Elasticsearch</td>
+<td>ELASTICSEARCH</td>
+<td>index</td>
+</tr>
+<tr>
+<td>NeorunBase</td>
+<td>NEORUNBASE</td>
+<td>table name</td>
+</tr>
+<tr>
+<td>HTTP</td>
+<td><em>(none)</em></td>
+<td>webhook URL</td>
+</tr>
+<tr>
+<td>Console</td>
+<td><em>(none)</em></td>
+<td>— (debug)</td>
+</tr>
+</tbody>
+</table>
+<p>Only Iceberg and JDBC are transactional (exactly-once); the others are at-least-once.</p>
 
 
 

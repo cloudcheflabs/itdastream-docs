@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/disaggre-architecture/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming-operations/">
       
       
-        <link rel="prev" href="../kafka-compatible/">
+        <link rel="prev" href="../streaming-sdk/">
       
       
-        <link rel="next" href="../tx/">
+        <link rel="next" href="../kafka-compatible/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Disaggregated Compute-Storage Architecture - ItdaStream</title>
+        <title>Operations & Tuning - ItdaStream</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#disaggregated-compute-storage-architecture" class="md-skip">
+        <a href="#streaming-operations-tuning" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Disaggregated Compute-Storage Architecture
+              Operations & Tuning
             
           </span>
         </div>
@@ -271,10 +271,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../streaming/" class="md-tabs__link">
           
   
@@ -291,12 +293,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../kafka-compatible/" class="md-tabs__link">
           
   
@@ -576,26 +576,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -613,7 +618,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -740,10 +745,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../streaming-operations/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations & Tuning
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -759,6 +791,92 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scaling-and-rebalancing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling and rebalancing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#failure-and-recovery-exactly-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failure and recovery (exactly-once)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#capacity-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capacity notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -775,31 +893,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -817,7 +930,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -860,19 +973,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../disaggre-architecture/" class="md-nav__link">
         
   
   
@@ -888,7 +992,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -1338,13 +1441,157 @@
 
 
 
-<h1 id="disaggregated-compute-storage-architecture">Disaggregated Compute-Storage Architecture</h1>
-<p>ItdaStream separates compute (brokers) from storage (S3-compatible object storage), enabling independent scaling and cost optimization. Brokers are stateless — all persistent data resides in S3.</p>
+<h1 id="streaming-operations-tuning">Streaming — Operations &amp; Tuning</h1>
+<p>How to run, observe, scale, and troubleshoot streaming jobs in production.</p>
+<hr />
+<h2 id="configuration">Configuration</h2>
+<p>Broker-level defaults live in <code>itdastream.properties</code>; a per-job spec (from the Admin UI or the
+SDK) overrides any value it sets explicitly. See
+<a href="../configuration/">Flexible Configuration System</a> for the resolution order (system property &gt;
+environment variable &gt; file &gt; default).</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>itdastream.streaming.reconcile.interval.ms</code></td>
+<td><code>5000</code></td>
+<td>how often the reconciler runs (assignment + executor convergence)</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.exchange.prefix</code></td>
+<td><code>streaming/exchange</code></td>
+<td>S3 prefix for durable checkpoint state</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.commit.interval.ms</code></td>
+<td><code>10000</code></td>
+<td>default sink commit cadence (exactly-once cadence for tx sinks)</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.checkpoint.interval.ms</code></td>
+<td><code>10000</code></td>
+<td>default checkpoint barrier interval</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.commit.row.threshold</code></td>
+<td><code>10000</code></td>
+<td>rows that also trigger a commit (bounds buffered rows)</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.source.poll.timeout.ms</code></td>
+<td><code>100</code></td>
+<td>Kafka poll timeout inside the loop</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.progress.log.interval.ms</code></td>
+<td><code>30000</code></td>
+<td>progress log interval</td>
+</tr>
+</tbody>
+</table>
+<p>Lower commit/checkpoint intervals reduce end-to-end latency but produce more, smaller Iceberg
+snapshots — schedule periodic Iceberg compaction accordingly.</p>
+<div class="admonition note">
+<p class="admonition-title">Arrow off-heap (required)</p>
+<p>The engine processes records as Apache Arrow batches in off-heap memory. The broker launch
+script passes <code>--add-opens=java.base/java.nio=ALL-UNNAMED</code> (and
+<code>-Dio.netty.tryReflectionSetAccessible=true</code>) so Arrow can allocate direct buffers. If you
+use a custom launcher, keep these flags or jobs fail at first allocation with
+<code>InaccessibleObjectException</code>.</p>
+</div>
+<hr />
+<h2 id="monitoring">Monitoring</h2>
 <ul>
-<li><strong>Three-tier write path</strong>: In-memory WriteBuffer (16MB/partition) → RocksDB Staging Store (local crash recovery) → S3 Object Storage (permanent)</li>
-<li><strong>S3 compatibility</strong>: Works with AWS S3, MinIO, ShannonStore, and any S3-compatible object storage</li>
-<li><strong>Flush triggers</strong>: Buffer full (16MB) or time-based flush (5s interval, 5min max latency)</li>
+<li><strong>Admin UI → Streaming</strong> lists every job with topic, parallelism, format, sink, and status.</li>
+<li><code>GET /admin/streaming/jobs</code> — all job specs.</li>
+<li><code>GET /admin/streaming/jobs/{id}</code> — the spec plus aggregated status: per-broker thread counts
+  (from the ephemeral <code>/streaming/status/&lt;jobId&gt;/&lt;brokerId&gt;</code> znodes) and the controller's last
+  globally-completed checkpoint id.</li>
+<li>Each running executor logs progress (records processed) every
+  <code>itdastream.streaming.progress.log.interval.ms</code>.</li>
+<li>The job runs as a normal consumer group <code>stream-&lt;jobId&gt;</code>, so consumer lag is visible through
+  the standard consumer-group tooling and the <strong>Consumer Groups</strong> admin view.</li>
 </ul>
+<hr />
+<h2 id="scaling-and-rebalancing">Scaling and rebalancing</h2>
+<p>Two independent mechanisms keep a job balanced:</p>
+<ol>
+<li><strong>Thread assignment (control plane).</strong> The controller computes a <code>{brokerId: threadCount}</code>
+   map distributing the job's parallelism across the live brokers, and writes it to
+   <code>/streaming/assignments/&lt;jobId&gt;</code>. Each broker's reconciler converges its running executor
+   threads to its share. On broker join/leave the controller recomputes the assignment.</li>
+<li><strong>Partition assignment (data plane).</strong> All of a job's threads are consumers in the group
+   <code>stream-&lt;jobId&gt;</code>, so ItdaStream's group coordinator distributes the topic partitions across
+   them and rebalances on membership change.</li>
+</ol>
+<p>To change parallelism, edit the job (or resubmit with a new <code>parallelism</code>); the controller
+re-spreads the threads. Keep <code>parallelism ≤ partitions</code> so every thread owns at least one
+partition.</p>
+<hr />
+<h2 id="failure-and-recovery-exactly-once">Failure and recovery (exactly-once)</h2>
+<p>At each checkpoint an executor commits the sink, snapshots the Kafka offsets to S3 (the
+ExchangeManager, under <code>streaming/exchange/&lt;jobId&gt;/</code>, KMS-encrypted), then commits the Kafka
+offsets. Because the offset only advances <strong>after</strong> the sink commit and the durable snapshot:</p>
+<ul>
+<li><strong>Worker broker dies</strong> → its partitions rebalance to other workers' consumers, which resume
+  from the last committed offset; the controller re-spreads thread assignments after a short
+  stabilization. No rows are lost; transactional sinks (Iceberg/JDBC) do not double-write.</li>
+<li><strong>Controller dies</strong> → a new controller is elected, re-reads <code>/streaming/jobs</code>, and re-publishes
+  assignments + checkpoint coordination. The data plane keeps running independently of who is
+  controller.</li>
+<li><strong>Job reassigned to a fresh broker</strong> → the executor restores the last completed checkpoint's
+  offsets from S3 and seeks the consumer there, so it picks up exactly where it left off.</li>
+</ul>
+<p>For change streams, set <strong>upsert keys</strong> so any boundary replays collapse to the latest value.</p>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause / fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Iceberg writes fail with <em>"No route for request: GET v1/iceberg/namespaces/..."</em></td>
+<td>The connection uses the default <code>polaris</code> flavor against a vanilla REST catalog. Set <code>catalog.rest.flavor=rest</code> on the Iceberg connection.</td>
+</tr>
+<tr>
+<td>Job runs, consumer lag drains, but the Iceberg table stays empty</td>
+<td>The sink commits on the checkpoint interval — wait at least one <code>commitIntervalMs</code>. Also confirm the target <strong>namespace</strong> exists (the table is auto-created, the namespace is not).</td>
+</tr>
+<tr>
+<td><code>Connection not found: &lt;id&gt;</code></td>
+<td>The job references a <code>connectionId</code> that is not registered (or not yet synced to the worker). Create it in the Connection Registry; it syncs to all brokers.</td>
+</tr>
+<tr>
+<td><code>InaccessibleObjectException</code> when a job starts</td>
+<td>The Arrow <code>--add-opens</code> JVM flag is missing from the launcher (see the note above).</td>
+</tr>
+<tr>
+<td>JDBC / NeorunBase(jdbc) sink fails with <em>"No suitable driver"</em></td>
+<td>The driver is not on the broker classpath. PostgreSQL is bundled; add other JDBC drivers to <code>lib/</code>.</td>
+</tr>
+<tr>
+<td><code>map</code>/<code>flatMap</code> job fails to start</td>
+<td>The referenced <code>MapFunction</code>/<code>FlatMapFunction</code> class is not on the broker classpath or lacks a public no-arg constructor.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="capacity-notes">Capacity notes</h2>
+<p>Each running consumer thread holds an Arrow allocator and (for Iceberg) a Parquet writer that
+buffers a row group on-heap. Size broker memory for the expected number of concurrent
+jobs × threads, and bound buffering with <code>commit.row.threshold</code> / <code>commit.interval.ms</code>. The
+data-lake libraries (Arrow, Iceberg, Parquet, Hadoop) run in the broker process, so plan heap and
+direct-memory accordingly.</p>
 
 
 
