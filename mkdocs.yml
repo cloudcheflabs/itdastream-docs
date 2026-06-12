@@ -40,6 +40,9 @@ nav:
   - "Features":
       - "Full Kafka Protocol Compatibility": features/kafka-compatible.md
       - "Disaggregated Compute-Storage Architecture": features/disaggre-architecture.md
+      - "Streaming (Kafka to Iceberg / Multi-Sink)": features/streaming.md
+      - "Connection Registry": features/connections.md
+      - "Streaming SDK": features/streaming-sdk.md
       - "Exactly-Once Transactional Semantics": features/tx.md
       - "Consumer Group Coordination": features/consumer-group.md
       - "Envelope Encryption and Key Management Service": features/kms.md
