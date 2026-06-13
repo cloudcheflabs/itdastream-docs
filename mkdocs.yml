@@ -42,6 +42,7 @@ nav:
       - "No-Code Kafka to Iceberg": features/streaming-no-code.md
       - "Connection Registry": features/connections.md
       - "Streaming SDK": features/streaming-sdk.md
+      - "Tutorial: Submit a Job (Token + Uber-JAR)": features/streaming-job-tutorial.md
       - "Operations & Tuning": features/streaming-operations.md
   - "Features":
       - "Full Kafka Protocol Compatibility": features/kafka-compatible.md
