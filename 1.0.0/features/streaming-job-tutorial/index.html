@@ -839,10 +839,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#advanced-custom-transforms-as-a-broker-jar" class="md-nav__link">
+  <a href="#advanced-custom-transforms-uploaded-with-the-job" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Advanced — custom transforms as a broker JAR
+        Advanced — custom transforms (uploaded with the job)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#submitting-from-the-shell-binsubmitsh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submitting from the shell — bin/submit.sh
       
     </span>
   </a>
@@ -1474,23 +1485,24 @@
 <li>Write a job with the <strong>Streaming SDK</strong> (Kafka → Iceberg, exactly-once).</li>
 <li>Package your submitter as an <strong>uber-JAR</strong> and run it as <code>java -jar …</code>.</li>
 <li>Verify and operate the job.</li>
-<li>(Advanced) Package a <strong>custom transform</strong> as a JAR and deploy it to the brokers.</li>
+<li>(Advanced) Package a <strong>custom transform</strong> as a JAR and <strong>upload it with the job</strong> — no broker restart.</li>
 </ol>
 <p>It complements the API reference in <a href="../streaming-sdk/">Streaming SDK</a> and the <a href="../streaming-no-code/">No-Code Kafka to Iceberg</a> path — use the SDK when you want the job in version control / CI, or when you need a custom transform.</p>
 <h2 id="how-submission-actually-works">How submission actually works</h2>
-<p>There is no jar upload step at submit time. The SDK builds a <strong>declarative job spec</strong> (source → operations → sink) and <code>POST</code>s it as JSON to <code>/admin/streaming/jobs</code> with your token. The cluster schedules and runs it. That has two consequences for packaging:</p>
+<p>The SDK builds a <strong>declarative job spec</strong> (source → operations → sink) and <code>POST</code>s it as JSON to <code>/admin/streaming/jobs</code> with your token. The cluster schedules and runs it. The spec itself carries no code — but a job <em>can</em> reference <strong>custom-transform classes</strong>, and those are uploaded alongside it. There are two kinds of JAR, with two destinations:</p>
 <ul>
 <li>The program that <em>defines and submits</em> the spec is an ordinary client — package <strong>it</strong> as an uber-JAR for convenient <code>java -jar</code> / CI runs. (Recipe in steps 2–4.)</li>
-<li>A <strong>custom transform</strong> (<code>.map(...)</code> / <code>.flatMap(...)</code>) names a class the broker instantiates with <code>Class.forName</code> from its own classpath (<code>conf:lib/*</code>). So a transform JAR is deployed to each broker's <code>lib/</code>, <strong>not</strong> uploaded with the job. (Recipe in the last section.)</li>
+<li>A <strong>custom transform</strong> (<code>.map(...)</code> / <code>.flatMap(...)</code>) names a class the broker loads at run time. You <strong>upload</strong> that transform JAR to the cluster's dependency store (<code>POST /admin/deps</code>); the broker pulls it from shared object storage and loads the class with a <strong>per-job <code>URLClassLoader</code></strong> — no broker restart, no copying to <code>lib/</code>. The SDK's <code>.jars(...)</code> and the <code>bin/submit.sh --jars</code> CLI do the upload for you. (Recipe in the last section.)</li>
 </ul>
-<p>Keep these two JARs separate in your head — they have different contents and different destinations. There's a summary table at the end.</p>
+<p>Keep these two JARs separate in your head — they have different contents, but <strong>both are delivered from your machine at submit time</strong>. There's a summary table at the end.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
 <li>A running itdastream cluster — admin API reachable (e.g. <code>http://localhost:8082</code>).</li>
 <li>A source topic (e.g. <code>events</code>).</li>
 <li>An <strong>ICEBERG connection</strong> registered in the connection registry (Admin UI → Connections, or the REST API) — the sink references it by id (e.g. <code>prod-iceberg</code>). See <a href="../connections/">Connections</a>.</li>
 <li>JDK 17+ and Gradle on the machine that submits the job.</li>
-<li>The <code>itdastream-sdk-1.0.0.jar</code> from the distribution's <code>sdk/</code> directory (and, only for custom transforms, <code>itdastream-streaming-1.0.0.jar</code> from <code>lib/</code>).</li>
+<li>The <code>itdastream-sdk-1.0.0.jar</code> from the distribution's <code>sdk/</code> directory (and, only for custom transforms, <code>itdastream-streaming-1.0.0.jar</code> from <code>lib/</code> to compile against).</li>
+<li>For the <code>bin/submit.sh</code> route: <code>bash</code>, <code>curl</code>, and <code>jq</code> on the submitting machine.</li>
 </ul>
 <h2 id="step-1-create-an-iam-user-token-itok">Step 1 — Create an IAM user token (<code>ITOK…</code>)</h2>
 <p>The user token is the recommended SDK / CI credential — it is long-lived and carries the user's group policies. Create an access key for a user (Admin UI → IAM, or the REST API); the response returns three values <strong>once</strong>:</p>
@@ -1591,7 +1603,7 @@
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">handle</span><span class="p">.</span><span class="na">cancel</span><span class="p">();</span>
 </code></pre></div>
 <p>The job also appears in the Admin UI's streaming view, and the Iceberg table <code>analytics.purchases</code> starts receiving rows on the first commit (every <code>commitInterval</code>). Query it from any Iceberg-compatible engine (Trino, Spark, …) pointed at the same catalog.</p>
-<h2 id="advanced-custom-transforms-as-a-broker-jar">Advanced — custom transforms as a broker JAR</h2>
+<h2 id="advanced-custom-transforms-uploaded-with-the-job">Advanced — custom transforms (uploaded with the job)</h2>
 <p><code>filter</code> / <code>select</code> cover projection and filtering. For arbitrary per-record logic, implement a <strong>MapFunction</strong> (or <strong>FlatMapFunction</strong>) from <code>itdastream-streaming</code> and reference it by class name.</p>
 <p><code>src/main/java/com/example/UpperName.java</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">com.example</span><span class="p">;</span>
@@ -1599,7 +1611,7 @@
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.cloudcheflabs.itdastream.streaming.udf.MapFunction</span><span class="p">;</span>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Map</span><span class="p">;</span>
 <a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UpperName</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">MapFunction</span><span class="w"> </span><span class="p">{</span><span class="w">           </span><span class="c1">// must be Serializable + no-arg ctor</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UpperName</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">MapFunction</span><span class="w"> </span><span class="p">{</span><span class="w">           </span><span class="c1">// public no-arg ctor required</span>
 <a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="nd">@Override</span>
 <a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">row</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">        </span><span class="n">Object</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">row</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">);</span>
@@ -1608,28 +1620,66 @@
 <a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="p">}</span>
 </code></pre></div>
-<p>Reference it in the job:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">.</span><span class="na">map</span><span class="p">(</span><span class="s">&quot;com.example.UpperName&quot;</span><span class="p">)</span><span class="w">     </span><span class="c1">// broker does Class.forName(&quot;com.example.UpperName&quot;)</span>
+<p>Reference it in the job, and hand the SDK the JAR(s) that contain it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">String</span><span class="w"> </span><span class="n">jobId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">        </span><span class="p">.</span><span class="na">streamSource</span><span class="p">(</span><span class="n">Source</span><span class="p">.</span><span class="na">kafka</span><span class="p">(</span><span class="s">&quot;events&quot;</span><span class="p">).</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;json&quot;</span><span class="p">))</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">        </span><span class="p">.</span><span class="na">map</span><span class="p">(</span><span class="s">&quot;com.example.UpperName&quot;</span><span class="p">)</span><span class="w">               </span><span class="c1">// broker loads this class at run time</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">        </span><span class="p">.</span><span class="na">sink</span><span class="p">(</span><span class="n">Sink</span><span class="p">.</span><span class="na">iceberg</span><span class="p">(</span><span class="s">&quot;prod-iceberg&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;analytics.events&quot;</span><span class="p">))</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">        </span><span class="p">.</span><span class="na">name</span><span class="p">(</span><span class="s">&quot;events-upper&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">        </span><span class="p">.</span><span class="na">parallelism</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">        </span><span class="p">.</span><span class="na">jars</span><span class="p">(</span><span class="s">&quot;build/libs/my-transforms-all.jar&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// ← uploaded to the cluster, loaded per-job</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">        </span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
 </code></pre></div>
-<p><strong>Why this needs a separate JAR.</strong> The broker instantiates the class from its own classpath (<code>conf:lib/*</code>) — the class is <em>not</em> shipped with the job spec. So you package the transform and deploy it to the brokers:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">// build.gradle for the transform JAR — itdastream is PROVIDED (already on the broker),</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="c1">// bundle only YOUR third-party dependencies.</span>
+<p><strong>How the class reaches the broker.</strong> There is no copy-to-<code>lib/</code> and no restart. On <code>start()</code> the SDK:</p>
+<ol>
+<li><code>GET /admin/deps</code> to see which JARs the cluster already has (dedup by file name + content), then</li>
+<li><code>POST /admin/deps</code> (header <code>X-File-Name</code>, raw jar body) for each missing JAR — the broker stores it in the shared object store under <code>deps/</code>, and</li>
+<li>submits the spec with a <code>deps: ["my-transforms-all.jar"]</code> list.</li>
+</ol>
+<p>When the controller starts the job, each broker downloads the job's deps from the object store into <code>data/deps/&lt;jobId&gt;/</code> and builds a <strong>per-job <code>URLClassLoader</code></strong> over them. <code>.map("com.example.UpperName")</code> is then resolved with <code>Class.forName(name, true, thatLoader)</code>. The JAR lives with the job: no broker-wide classpath change, no restart, and two jobs can use different versions of the same class without conflict.</p>
+<p><strong>Build the transform JAR</strong> — itdastream is <em>provided</em> (already on the broker), so bundle only your own third-party dependencies:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">// build.gradle for the transform JAR</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">plugins</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;java&#39;</span><span class="o">;</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="s1">&#39;com.gradleup.shadow&#39;</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="s1">&#39;8.3.5&#39;</span><span class="w"> </span><span class="o">}</span>
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">dependencies</span><span class="w"> </span><span class="o">{</span>
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="n">compileOnly</span><span class="w"> </span><span class="n">files</span><span class="o">(</span><span class="s1">&#39;libs/itdastream-streaming-1.0.0.jar&#39;</span><span class="o">)</span><span class="w">   </span><span class="c1">// provided by the broker</span>
 <a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="c1">// implementation &#39;com.some:helper:1.2.3&#39;                  // your own deps get shaded in</span>
 <a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="o">}</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>./gradlew<span class="w"> </span>shadowJar
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="c1"># Deploy to EVERY broker, then restart it so the class is on the classpath:</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">for</span><span class="w"> </span>host<span class="w"> </span><span class="k">in</span><span class="w"> </span>broker-1<span class="w"> </span>broker-2<span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span>scp<span class="w"> </span>build/libs/my-transforms-all.jar<span class="w">  </span><span class="nv">$host</span>:/opt/itdastream/lib/
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span>ssh<span class="w"> </span><span class="nv">$host</span><span class="w"> </span><span class="s1">&#39;/opt/itdastream/bin/stop-broker.sh &amp;&amp; /opt/itdastream/bin/start-broker.sh&#39;</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="k">done</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="c1"># → build/libs/my-transforms-all.jar   (passed to .jars(...) or --jars below)</span>
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">itdastream classes are <code>compileOnly</code> for the transform JAR</p>
-<p>Do <strong>not</strong> bundle <code>itdastream-streaming</code> (or its dependencies) into the transform JAR — those classes already exist on the broker classpath, and duplicating them causes class-loading conflicts. Mark them <code>compileOnly</code> and shade only your own third-party libraries.</p>
+<p>Do <strong>not</strong> bundle <code>itdastream-streaming</code> (or its dependencies) into the transform JAR — those classes already exist on the broker classpath, and the per-job loader delegates to it as its parent. Mark them <code>compileOnly</code> and shade only your own third-party libraries.</p>
 </div>
+<h2 id="submitting-from-the-shell-binsubmitsh">Submitting from the shell — <code>bin/submit.sh</code></h2>
+<p>The distribution ships <code>bin/submit.sh</code>, a <code>curl</code>/<code>jq</code> CLI that does the same upload-then-submit flow without writing a Java submitter. Hand it a spec JSON and any transform JARs:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>bin/submit.sh<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>--master<span class="w"> </span>localhost:8082<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span>--spec<span class="w">   </span>job.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span>--jars<span class="w">   </span>build/libs/my-transforms-all.jar<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span>--token<span class="w">  </span><span class="s2">&quot;</span><span class="nv">$ITDASTREAM_USER_TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span>--wait
+</code></pre></div>
+<p><code>job.json</code> is the declarative spec — exactly what the SDK would <code>POST</code>, minus <code>deps</code> (submit.sh injects it):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;events-upper&quot;</span><span class="p">,</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nt">&quot;parallelism&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">&quot;kafka&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;topic&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;events&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;json&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">&quot;operations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MAP&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;com.example.UpperName&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">],</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span><span class="nt">&quot;sink&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;connectionId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;prod-iceberg&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;analytics.events&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">  </span><span class="nt">&quot;commitIntervalMs&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;checkpointIntervalMs&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="p">}</span>
+</code></pre></div>
+<p>What it does, step by step:</p>
+<ol>
+<li>Collects JARs from <code>--jars a.jar,b.jar</code> and/or <code>--jar-dirs dir1,dir2</code>.</li>
+<li><code>GET /admin/deps</code> and uploads only the JARs the cluster is missing (dedup by name).</li>
+<li>Injects the uploaded names into the spec's <code>deps</code> array.</li>
+<li><code>POST /admin/streaming/jobs</code> and prints the <code>jobId</code>.</li>
+<li>With <code>--wait</code>, polls <code>GET /admin/streaming/jobs/{id}</code> until it stops (Ctrl-C just stops watching; the job keeps running).</li>
+</ol>
+<p>Auth is the same user token as the SDK — pass <code>--token ITOK…</code> or export <code>ITDASTREAM_USER_TOKEN</code>. A spec with no <code>operations</code> (or only <code>FILTER</code>/<code>SELECT</code>) needs no <code>--jars</code> at all — that is the <a href="../streaming-no-code/">no-code auto-sink</a> path, which also adds the automatic <a href="../streaming-no-code/#automatic-time-partitioning-_ingest_ts"><code>_ingest_ts</code> hourly partition</a>.</p>
 <h2 id="the-two-jars-at-a-glance">The two JARs at a glance</h2>
 <table>
 <thead>
@@ -1658,12 +1708,12 @@
 <tr>
 <td><strong>Where it runs</strong></td>
 <td>your machine / CI</td>
-<td>every broker</td>
+<td>every broker, in a per-job <code>URLClassLoader</code></td>
 </tr>
 <tr>
 <td><strong>How it's delivered</strong></td>
 <td><code>java -jar …-all.jar</code></td>
-<td>copy to each broker's <code>lib/</code>, restart</td>
+<td>uploaded to <code>/admin/deps</code> via <code>.jars(...)</code> or <code>submit.sh --jars</code> (no restart)</td>
 </tr>
 <tr>
 <td><strong>Needed when</strong></td>

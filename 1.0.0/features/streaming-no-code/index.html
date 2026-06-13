@@ -744,6 +744,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#automatic-time-partitioning-_ingest_ts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automatic time partitioning (_ingest_ts)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Automatic time partitioning (_ingest_ts)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuning-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tuning it
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#other-no-code-sinks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1621,6 +1649,71 @@ catalog (<code>total-records</code> in the snapshot summary).</p>
   so a broker failure never loses or double-writes rows. See the
   <a href="../streaming/#exactly-once">Overview</a> for the mechanism.</li>
 </ul>
+<hr />
+<h2 id="automatic-time-partitioning-_ingest_ts">Automatic time partitioning (<code>_ingest_ts</code>)</h2>
+<p>Raw Kafka messages rarely carry a clean event-time column, yet an Iceberg table with <strong>no
+partitioning</strong> quickly degrades: every query scans every file. To keep the no-code path fast out
+of the box, the auto-sink <strong>synthesises an ingestion-time column and hidden-partitions the table
+by it</strong> — you get time-pruned scans without writing a schema or a partition spec.</p>
+<p>When a no-code Iceberg job <strong>auto-creates</strong> its table, ItdaStream:</p>
+<ol>
+<li>Adds a synthetic column <strong><code>_ingest_ts</code></strong> — an Iceberg <code>timestamptz</code> (microsecond, UTC) stamped
+   with the ingestion time, one value per micro-batch. The name is chosen not to collide with your
+   own fields, and the column is <strong>additive</strong> — all your message fields are written unchanged.</li>
+<li>Creates the table <strong>hidden-partitioned by <code>hour(_ingest_ts)</code></strong>. Iceberg stores the partition
+   value (the hour bucket) without adding a visible column; the hidden partition field is named
+   <code>_ingest_ts_hour</code>.</li>
+</ol>
+<p>So a stream of <code>{"id":1,"name":"alice","amount":120}</code> lands as a table with columns
+<code>id, name, amount, _ingest_ts</code>, transparently partitioned by the hour. A reader can prune by time:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- Trino: only the matching hour-partitions are scanned</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">analytics</span><span class="p">.</span><span class="n">events</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">_ingest_ts</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="s1">&#39;2026-06-13 12:00:00 UTC&#39;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">_ingest_ts</span><span class="w"> </span><span class="o">&lt;</span><span class="w">  </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="s1">&#39;2026-06-13 13:00:00 UTC&#39;</span><span class="p">;</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1">-- inspect the hidden partitions</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">partition</span><span class="p">,</span><span class="w"> </span><span class="n">record_count</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">analytics</span><span class="p">.</span><span class="ss">&quot;events$partitions&quot;</span><span class="p">;</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1">-- → {_ingest_ts_hour=494820}  30</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">No-code path only — custom jobs are never touched</p>
+<p>This injection happens <strong>only</strong> on the no-code auto-sink path (a pure topic→Iceberg job with no
+<code>MAP</code>/<code>FLATMAP</code> user code). A <a href="../streaming-sdk/">Streaming SDK</a> job with a custom transform
+follows <strong>your</strong> code exactly — its schema and partitioning are whatever your job and target
+table define. The injection is also skipped for <strong>upsert</strong> sinks, which require an
+unpartitioned target.</p>
+</div>
+<h3 id="tuning-it">Tuning it</h3>
+<p>Three broker-level properties control the behaviour (per-job spec values override them). Defaults
+suit most pipelines; change them in <code>conf/itdastream.properties</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>itdastream.streaming.autosink.ingest.ts.enabled</code></td>
+<td><code>true</code></td>
+<td>Inject the column + hidden partition. Set <code>false</code> to write data columns as-is, unpartitioned.</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.autosink.ingest.ts.column</code></td>
+<td><code>_ingest_ts</code></td>
+<td>Name of the synthetic ingestion-time column.</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.autosink.ingest.ts.partition</code></td>
+<td><code>hour</code></td>
+<td>Partition transform — one of <code>hour</code>, <code>day</code>, <code>month</code>, <code>year</code>. The hidden field is named <code>&lt;column&gt;_&lt;transform&gt;</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>For example, set <code>...partition=day</code> for a high-retention table where hourly partitions would be too
+fine, or <code>...enabled=false</code> if a downstream job re-partitions the data itself.</p>
 <hr />
 <h2 id="other-no-code-sinks">Other no-code sinks</h2>
 <p>The same flow works for the other sink types — pick the sink and a matching connection:</p>
