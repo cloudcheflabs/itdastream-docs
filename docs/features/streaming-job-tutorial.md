@@ -6,18 +6,18 @@ This tutorial walks the full path of running a real streaming job on itdastream:
 2. Write a job with the **Streaming SDK** (Kafka → Iceberg, exactly-once).
 3. Package your submitter as an **uber-JAR** and run it as `java -jar …`.
 4. Verify and operate the job.
-5. (Advanced) Package a **custom transform** as a JAR and deploy it to the brokers.
+5. (Advanced) Package a **custom transform** as a JAR and **upload it with the job** — no broker restart.
 
 It complements the API reference in [Streaming SDK](streaming-sdk.md) and the [No-Code Kafka to Iceberg](streaming-no-code.md) path — use the SDK when you want the job in version control / CI, or when you need a custom transform.
 
 ## How submission actually works
 
-There is no jar upload step at submit time. The SDK builds a **declarative job spec** (source → operations → sink) and `POST`s it as JSON to `/admin/streaming/jobs` with your token. The cluster schedules and runs it. That has two consequences for packaging:
+The SDK builds a **declarative job spec** (source → operations → sink) and `POST`s it as JSON to `/admin/streaming/jobs` with your token. The cluster schedules and runs it. The spec itself carries no code — but a job *can* reference **custom-transform classes**, and those are uploaded alongside it. There are two kinds of JAR, with two destinations:
 
 - The program that *defines and submits* the spec is an ordinary client — package **it** as an uber-JAR for convenient `java -jar` / CI runs. (Recipe in steps 2–4.)
-- A **custom transform** (`.map(...)` / `.flatMap(...)`) names a class the broker instantiates with `Class.forName` from its own classpath (`conf:lib/*`). So a transform JAR is deployed to each broker's `lib/`, **not** uploaded with the job. (Recipe in the last section.)
+- A **custom transform** (`.map(...)` / `.flatMap(...)`) names a class the broker loads at run time. You **upload** that transform JAR to the cluster's dependency store (`POST /admin/deps`); the broker pulls it from shared object storage and loads the class with a **per-job `URLClassLoader`** — no broker restart, no copying to `lib/`. The SDK's `.jars(...)` and the `bin/submit.sh --jars` CLI do the upload for you. (Recipe in the last section.)
 
-Keep these two JARs separate in your head — they have different contents and different destinations. There's a summary table at the end.
+Keep these two JARs separate in your head — they have different contents, but **both are delivered from your machine at submit time**. There's a summary table at the end.
 
 ## Prerequisites
 
@@ -25,7 +25,8 @@ Keep these two JARs separate in your head — they have different contents and d
 - A source topic (e.g. `events`).
 - An **ICEBERG connection** registered in the connection registry (Admin UI → Connections, or the REST API) — the sink references it by id (e.g. `prod-iceberg`). See [Connections](connections.md).
 - JDK 17+ and Gradle on the machine that submits the job.
-- The `itdastream-sdk-1.0.0.jar` from the distribution's `sdk/` directory (and, only for custom transforms, `itdastream-streaming-1.0.0.jar` from `lib/`).
+- The `itdastream-sdk-1.0.0.jar` from the distribution's `sdk/` directory (and, only for custom transforms, `itdastream-streaming-1.0.0.jar` from `lib/` to compile against).
+- For the `bin/submit.sh` route: `bash`, `curl`, and `jq` on the submitting machine.
 
 ## Step 1 — Create an IAM user token (`ITOK…`)
 
@@ -157,7 +158,7 @@ handle.cancel();
 
 The job also appears in the Admin UI's streaming view, and the Iceberg table `analytics.purchases` starts receiving rows on the first commit (every `commitInterval`). Query it from any Iceberg-compatible engine (Trino, Spark, …) pointed at the same catalog.
 
-## Advanced — custom transforms as a broker JAR
+## Advanced — custom transforms (uploaded with the job)
 
 `filter` / `select` cover projection and filtering. For arbitrary per-record logic, implement a **MapFunction** (or **FlatMapFunction**) from `itdastream-streaming` and reference it by class name.
 
@@ -169,7 +170,7 @@ package com.example;
 import com.cloudcheflabs.itdastream.streaming.udf.MapFunction;
 import java.util.Map;
 
-public class UpperName implements MapFunction {           // must be Serializable + no-arg ctor
+public class UpperName implements MapFunction {           // public no-arg ctor required
     @Override
     public Map<String, Object> apply(Map<String, Object> row) {
         Object name = row.get("name");
@@ -179,17 +180,32 @@ public class UpperName implements MapFunction {           // must be Serializabl
 }
 ```
 
-Reference it in the job:
+Reference it in the job, and hand the SDK the JAR(s) that contain it:
 
 ```java
-.map("com.example.UpperName")     // broker does Class.forName("com.example.UpperName")
+String jobId = session
+        .streamSource(Source.kafka("events").format("json"))
+        .map("com.example.UpperName")               // broker loads this class at run time
+        .sink(Sink.iceberg("prod-iceberg", "analytics.events"))
+        .name("events-upper")
+        .parallelism(4)
+        .jars("build/libs/my-transforms-all.jar")   // ← uploaded to the cluster, loaded per-job
+        .start();
 ```
 
-**Why this needs a separate JAR.** The broker instantiates the class from its own classpath (`conf:lib/*`) — the class is *not* shipped with the job spec. So you package the transform and deploy it to the brokers:
+**How the class reaches the broker.** There is no copy-to-`lib/` and no restart. On `start()` the SDK:
+
+1. `GET /admin/deps` to see which JARs the cluster already has (dedup by file name + content), then
+2. `POST /admin/deps` (header `X-File-Name`, raw jar body) for each missing JAR — the broker stores it in the shared object store under `deps/`, and
+3. submits the spec with a `deps: ["my-transforms-all.jar"]` list.
+
+When the controller starts the job, each broker downloads the job's deps from the object store into `data/deps/<jobId>/` and builds a **per-job `URLClassLoader`** over them. `.map("com.example.UpperName")` is then resolved with `Class.forName(name, true, thatLoader)`. The JAR lives with the job: no broker-wide classpath change, no restart, and two jobs can use different versions of the same class without conflict.
+
+**Build the transform JAR** — itdastream is *provided* (already on the broker), so bundle only your own third-party dependencies:
 
 ```groovy
-// build.gradle for the transform JAR — itdastream is PROVIDED (already on the broker),
-// bundle only YOUR third-party dependencies.
+// build.gradle for the transform JAR
+plugins { id 'java'; id 'com.gradleup.shadow' version '8.3.5' }
 dependencies {
     compileOnly files('libs/itdastream-streaming-1.0.0.jar')   // provided by the broker
     // implementation 'com.some:helper:1.2.3'                  // your own deps get shaded in
@@ -198,15 +214,47 @@ dependencies {
 
 ```bash
 ./gradlew shadowJar
-# Deploy to EVERY broker, then restart it so the class is on the classpath:
-for host in broker-1 broker-2; do
-  scp build/libs/my-transforms-all.jar  $host:/opt/itdastream/lib/
-  ssh $host '/opt/itdastream/bin/stop-broker.sh && /opt/itdastream/bin/start-broker.sh'
-done
+# → build/libs/my-transforms-all.jar   (passed to .jars(...) or --jars below)
 ```
 
 !!! warning "itdastream classes are `compileOnly` for the transform JAR"
-    Do **not** bundle `itdastream-streaming` (or its dependencies) into the transform JAR — those classes already exist on the broker classpath, and duplicating them causes class-loading conflicts. Mark them `compileOnly` and shade only your own third-party libraries.
+    Do **not** bundle `itdastream-streaming` (or its dependencies) into the transform JAR — those classes already exist on the broker classpath, and the per-job loader delegates to it as its parent. Mark them `compileOnly` and shade only your own third-party libraries.
+
+## Submitting from the shell — `bin/submit.sh`
+
+The distribution ships `bin/submit.sh`, a `curl`/`jq` CLI that does the same upload-then-submit flow without writing a Java submitter. Hand it a spec JSON and any transform JARs:
+
+```bash
+bin/submit.sh \
+  --master localhost:8082 \
+  --spec   job.json \
+  --jars   build/libs/my-transforms-all.jar \
+  --token  "$ITDASTREAM_USER_TOKEN" \
+  --wait
+```
+
+`job.json` is the declarative spec — exactly what the SDK would `POST`, minus `deps` (submit.sh injects it):
+
+```json
+{
+  "name": "events-upper",
+  "parallelism": 4,
+  "kafka": { "topic": "events", "format": "json" },
+  "operations": [ { "type": "MAP", "value": "com.example.UpperName" } ],
+  "sink": { "type": "table", "connectionId": "prod-iceberg", "table": "analytics.events" },
+  "commitIntervalMs": 5000, "checkpointIntervalMs": 5000
+}
+```
+
+What it does, step by step:
+
+1. Collects JARs from `--jars a.jar,b.jar` and/or `--jar-dirs dir1,dir2`.
+2. `GET /admin/deps` and uploads only the JARs the cluster is missing (dedup by name).
+3. Injects the uploaded names into the spec's `deps` array.
+4. `POST /admin/streaming/jobs` and prints the `jobId`.
+5. With `--wait`, polls `GET /admin/streaming/jobs/{id}` until it stops (Ctrl-C just stops watching; the job keeps running).
+
+Auth is the same user token as the SDK — pass `--token ITOK…` or export `ITDASTREAM_USER_TOKEN`. A spec with no `operations` (or only `FILTER`/`SELECT`) needs no `--jars` at all — that is the [no-code auto-sink](streaming-no-code.md) path, which also adds the automatic [`_ingest_ts` hourly partition](streaming-no-code.md#automatic-time-partitioning-_ingest_ts).
 
 ## The two JARs at a glance
 
@@ -215,8 +263,8 @@ done
 | **Purpose** | Run the client that builds + `POST`s the job spec | Provide the `MAP` / `FLATMAP` classes the broker loads |
 | **Contents** | your `main` + `itdastream-sdk` + Jackson (+ your deps) | your `MapFunction` classes + your third-party deps |
 | **itdastream deps** | `implementation` (bundled) | `compileOnly` / provided (already on broker) |
-| **Where it runs** | your machine / CI | every broker |
-| **How it's delivered** | `java -jar …-all.jar` | copy to each broker's `lib/`, restart |
+| **Where it runs** | your machine / CI | every broker, in a per-job `URLClassLoader` |
+| **How it's delivered** | `java -jar …-all.jar` | uploaded to `/admin/deps` via `.jars(...)` or `submit.sh --jars` (no restart) |
 | **Needed when** | always (to submit) | only for `.map(...)` / `.flatMap(...)` |
 
 ## See also
