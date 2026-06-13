@@ -14,7 +14,7 @@
         <link rel="prev" href="../../architecture/architecture/">
       
       
-        <link rel="next" href="../../intro/intro/">
+        <link rel="next" href="../../features/streaming/">
       
       
         
@@ -235,18 +235,17 @@
     
   
   
-    
-    
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
-          
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
   
+  
+    
   
   Installation
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -419,63 +418,6 @@
   
   
   
-    
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Installation
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -612,6 +554,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#step-7-produce-and-consume-your-first-message" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7. Produce and Consume Your First Message
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#running-a-multi-broker-cluster" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -658,42 +611,6 @@
     </ul>
   
 </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../intro/intro/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Getting Started
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -1482,8 +1399,9 @@
 <p>This page describes the requirements for running ItdaStream and the different
 ways to install it &mdash; on a single machine for evaluation, or as a
 multi-broker cluster for production-like workloads.</p>
-<p>If you just want to try ItdaStream as fast as possible, jump straight to the
-<a href="../../intro/intro/">Getting Started</a> guide.</p>
+<p>This is the single entry point for getting ItdaStream running &mdash; follow it
+top to bottom to go from downloading the distribution to producing and consuming
+your first message.</p>
 <h2 id="system-requirements">System Requirements</h2>
 <p>ItdaStream is a Kafka-compatible distributed streaming platform written in
 Java. Before installing, make sure the following are available.</p>
@@ -1627,8 +1545,20 @@ and opening the Kafka and admin network listeners.</p>
 <p>The default administrator credentials are <code>admin</code> / <code>admin</code>. You will be asked
 to change the password on first login.</p>
 <p><img width="1200" src="../../images/getting-started/dashboard.png"/></p>
-<p>You can also verify the broker by producing and consuming a message &mdash; see
-<a href="../../intro/intro/">Getting Started</a> for a full walkthrough.</p>
+<h2 id="step-7-produce-and-consume-your-first-message">Step 7. Produce and Consume Your First Message</h2>
+<p>To confirm the broker is fully working end to end, send and receive a message
+with the bundled, Kafka-compatible console tools.</p>
+<p>In one terminal, start the console <strong>consumer</strong> on a topic (it is created on
+first use):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bin/kafka-console-consumer.sh<span class="w"> </span>--brokers<span class="w"> </span>localhost:9092<span class="w"> </span>--topic<span class="w"> </span>my-topic
+</code></pre></div>
+<p>In another terminal, start the console <strong>producer</strong> on the same topic, then type
+a few lines and press Enter to send each one:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>bin/kafka-console-producer.sh<span class="w"> </span>--brokers<span class="w"> </span>localhost:9092<span class="w"> </span>--topic<span class="w"> </span>my-topic
+</code></pre></div>
+<p>The messages you type into the producer appear in the consumer terminal &mdash;
+the round trip confirms the broker, ZooKeeper coordination, and the S3 storage
+path are all working.</p>
 <h2 id="running-a-multi-broker-cluster">Running a Multi-Broker Cluster</h2>
 <p>Because brokers are stateless, scaling out is straightforward:</p>
 <ol>
@@ -1648,13 +1578,12 @@ publish the Kafka port (<code>9092</code>) and the admin port (<code>8080</code>
 ZooKeeper and S3 endpoint are still required.</p>
 <h2 id="stopping-the-servers">Stopping the Servers</h2>
 <p>Stop the broker and ZooKeeper when finished.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bin/stop-broker.sh
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>bin/stop-zk.sh
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>bin/stop-broker.sh
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>bin/stop-zk.sh
 </code></pre></div>
 <h2 id="next-steps">Next Steps</h2>
 <ul>
-<li>Follow the <a href="../../intro/intro/">Getting Started</a> guide to send and receive
-  your first messages.</li>
+<li>Set up your first pipeline with <a href="../../features/streaming-no-code/">No-Code Kafka to Iceberg</a>.</li>
 <li>Review the <a href="../../architecture/architecture/">Architecture</a> overview to
   understand how ItdaStream works internally.</li>
 <li>Browse the <strong>Features</strong> section for details on transactions, encryption,
