@@ -10,6 +10,9 @@ jar ships under `sdk/` in the distribution.
 itdastream-sdk-1.0.0.jar
 ```
 
+!!! tip "Want the end-to-end recipe?"
+    For a step-by-step walkthrough — create an `ITOK` token, write the job, build an **uber-JAR**, run it as `java -jar`, and deploy a custom transform to the brokers — see [Tutorial: Submit a Job (Token + Uber-JAR)](streaming-job-tutorial.md). This page is the API reference.
+
 ---
 
 ## Authentication
@@ -71,6 +74,8 @@ public class EnrichFn implements MapFunction {
     }
 }
 ```
+
+The broker resolves the class with `Class.forName` from its own classpath (`conf:lib/*`) — it is **not** shipped with the job spec. Package your transform classes as a JAR (with `itdastream-streaming` marked `compileOnly`) and drop it into each broker's `lib/`, then restart. The full packaging + deployment recipe is in [Tutorial: Submit a Job (Token + Uber-JAR)](streaming-job-tutorial.md#advanced-custom-transforms-as-a-broker-jar).
 
 ### Sinks
 
