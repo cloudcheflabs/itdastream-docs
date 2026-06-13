@@ -7,6 +7,11 @@ topic flows into the table with exactly-once semantics. This page is a full walk
 > The basic case is exactly this: produce to an ItdaStream topic, and it goes straight into
 > Iceberg. For richer transforms or multiple sinks, use the [Streaming SDK](streaming-sdk.md).
 
+!!! tip "Configuring many topics → many tables"
+    To map **many topics to many Iceberg tables at once**, use the Admin UI **Iceberg Sinks** page:
+    one screen creates a no-code auto-sink job per topic→table row, and manages them (live logs,
+    kill) as a table. See [Job Logs, Kill & Iceberg Sinks](streaming-job-logs.md#iceberg-sinks-page-configure-many-topics-many-tables).
+
 ---
 
 ## Prerequisites
@@ -111,7 +116,10 @@ The job's live status (per-broker thread counts, last completed checkpoint) is a
 
 - **Parallelism = consumer-group size.** With parallelism N, N consumer threads share the topic
   partitions. Set N ≤ the partition count to keep every thread busy; ItdaStream's group
-  coordinator rebalances automatically when brokers join or leave.
+  coordinator rebalances automatically when brokers join or leave. For an **append-only** table the
+  brokers do not each commit — the controller does one commit per checkpoint aggregating every
+  broker's files ([single-committer](streaming-operations.md#single-committer-append-only-iceberg)),
+  so parallelism > 1 never causes Iceberg commit conflicts.
 - **Format.** `json` infers columns from the message fields; `avro` decodes via the Schema
   Registry. For a fixed target table, keep the message schema stable.
 - **Append vs upsert.** Without upsert keys the sink **appends**. With upsert keys, each commit

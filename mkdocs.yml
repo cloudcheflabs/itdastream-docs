@@ -41,6 +41,7 @@ nav:
       - "Connection Registry": features/connections.md
       - "Streaming SDK": features/streaming-sdk.md
       - "Tutorial: Submit a Job (Token + Uber-JAR)": features/streaming-job-tutorial.md
+      - "Job Logs, Kill & Iceberg Sinks": features/streaming-job-logs.md
       - "Operations & Tuning": features/streaming-operations.md
   - "Features":
       - "Full Kafka Protocol Compatibility": features/kafka-compatible.md

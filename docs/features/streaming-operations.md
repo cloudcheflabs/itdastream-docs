@@ -20,9 +20,33 @@ environment variable > file > default).
 | `itdastream.streaming.commit.row.threshold` | `10000` | rows that also trigger a commit (bounds buffered rows) |
 | `itdastream.streaming.source.poll.timeout.ms` | `100` | Kafka poll timeout inside the loop |
 | `itdastream.streaming.progress.log.interval.ms` | `30000` | progress log interval |
+| `itdastream.streaming.iceberg.coordinated.commit.enabled` | `true` | single-committer for append-only Iceberg sinks (see [below](#single-committer-append-only-iceberg)) |
+| `itdastream.streaming.autosink.ingest.ts.enabled` | `true` | auto-add an ingestion-time column on the no-code Iceberg sink (see [No-Code Kafka → Iceberg](streaming-no-code.md#automatic-time-partitioning-_ingest_ts)) |
+| `itdastream.streaming.autosink.ingest.ts.column` | `_ingest_ts` | name of that synthetic column |
+| `itdastream.streaming.autosink.ingest.ts.partition` | `hour` | hidden-partition transform for it (`hour`/`day`/`month`/`year`) |
+| `itdastream.streaming.joblogs.enabled` | `true` | capture + flush per-job logs for the admin log viewer (see [Job Logs & Lifecycle](streaming-job-logs.md)) |
+| `itdastream.streaming.joblogs.prefix` | `jobLogs` | object-store key prefix for per-job logs |
+| `itdastream.streaming.joblogs.flush.interval.ms` | `3000` | how often each broker flushes a job's logs to the object store |
+| `itdastream.streaming.joblogs.max.lines` | `5000` | in-memory log ring-buffer size per job per broker |
 
 Lower commit/checkpoint intervals reduce end-to-end latency but produce more, smaller Iceberg
 snapshots — schedule periodic Iceberg compaction accordingly.
+
+### Single-committer (append-only Iceberg) {#single-committer-append-only-iceberg}
+
+When a job writes to an **append-only** Iceberg table (no upsert keys) with parallelism > 1, the
+brokers do **not** each commit to the table. Instead every broker only **writes and drains its
+Parquet data files** at the checkpoint barrier, and the **controller performs ONE atomic Iceberg
+commit per checkpoint** aggregating every broker's files. Because only the controller commits a
+given table, concurrent writers can never collide — there is no
+`CommitFailedException`/"concurrently modified" at any parallelism.
+
+- Enabled by default (`itdastream.streaming.iceberg.coordinated.commit.enabled=true`). Set `false`
+  to fall back to per-broker self-commit (each broker commits its own files; can conflict at high
+  parallelism). **Upsert** sinks always use the per-broker path (their equality-delete files are
+  per-writer).
+- One commit per checkpoint → one Iceberg snapshot per checkpoint interval regardless of
+  parallelism (fewer, larger snapshots than per-broker commit).
 
 !!! note "Arrow off-heap (required)"
     The engine processes records as Apache Arrow batches in off-heap memory. The broker launch
