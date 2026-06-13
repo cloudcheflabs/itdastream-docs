@@ -4,8 +4,9 @@ This page describes the requirements for running ItdaStream and the different
 ways to install it &mdash; on a single machine for evaluation, or as a
 multi-broker cluster for production-like workloads.
 
-If you just want to try ItdaStream as fast as possible, jump straight to the
-[Getting Started](../intro/intro.md) guide.
+This is the single entry point for getting ItdaStream running &mdash; follow it
+top to bottom to go from downloading the distribution to producing and consuming
+your first message.
 
 ## System Requirements
 
@@ -136,8 +137,28 @@ to change the password on first login.
 
 <img width="1200" src="../../images/getting-started/dashboard.png"/>
 
-You can also verify the broker by producing and consuming a message &mdash; see
-[Getting Started](../intro/intro.md) for a full walkthrough.
+## Step 7. Produce and Consume Your First Message
+
+To confirm the broker is fully working end to end, send and receive a message
+with the bundled, Kafka-compatible console tools.
+
+In one terminal, start the console **consumer** on a topic (it is created on
+first use):
+
+```bash
+bin/kafka-console-consumer.sh --brokers localhost:9092 --topic my-topic
+```
+
+In another terminal, start the console **producer** on the same topic, then type
+a few lines and press Enter to send each one:
+
+```bash
+bin/kafka-console-producer.sh --brokers localhost:9092 --topic my-topic
+```
+
+The messages you type into the producer appear in the consumer terminal &mdash;
+the round trip confirms the broker, ZooKeeper coordination, and the S3 storage
+path are all working.
 
 ## Running a Multi-Broker Cluster
 
@@ -171,8 +192,7 @@ bin/stop-zk.sh
 
 ## Next Steps
 
-- Follow the [Getting Started](../intro/intro.md) guide to send and receive
-  your first messages.
+- Set up your first pipeline with [No-Code Kafka to Iceberg](../features/streaming-no-code.md).
 - Review the [Architecture](../architecture/architecture.md) overview to
   understand how ItdaStream works internally.
 - Browse the **Features** section for details on transactions, encryption,
