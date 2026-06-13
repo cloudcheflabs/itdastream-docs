@@ -1492,11 +1492,11 @@ given table, concurrent writers can never collide — there is no
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Arrow off-heap (required)</p>
-<p>The engine processes records as Apache Arrow batches in off-heap memory. The broker launch
-script passes <code>--add-opens=java.base/java.nio=ALL-UNNAMED</code> (and
-<code>-Dio.netty.tryReflectionSetAccessible=true</code>) so Arrow can allocate direct buffers. If you
-use a custom launcher, keep these flags or jobs fail at first allocation with
-<code>InaccessibleObjectException</code>.</p>
+<p>The engine processes records as Apache Arrow batches in off-heap memory, which needs
+<code>--add-opens=java.base/java.nio=ALL-UNNAMED</code> and <code>-Dio.netty.tryReflectionSetAccessible=true</code>.
+These ship as <strong>defaults in <code>conf/jvm.conf</code></strong>, so a stock broker just works. Keep them if you
+edit <code>conf/jvm.conf</code> (or pass equivalents from a custom launcher) — without them the broker
+boots fine but a streaming job fails at first Arrow allocation with <code>InaccessibleObjectException</code>.</p>
 </div>
 <hr />
 <h2 id="monitoring">Monitoring</h2>
