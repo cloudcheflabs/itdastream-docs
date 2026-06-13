@@ -793,6 +793,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../streaming-job-logs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Job Logs, Kill & Iceberg Sinks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../streaming-operations/" class="md-nav__link">
         
   
@@ -1381,6 +1409,12 @@ topic flows into the table with exactly-once semantics. This page is a full walk
 <p>The basic case is exactly this: produce to an ItdaStream topic, and it goes straight into
 Iceberg. For richer transforms or multiple sinks, use the <a href="../streaming-sdk/">Streaming SDK</a>.</p>
 </blockquote>
+<div class="admonition tip">
+<p class="admonition-title">Configuring many topics → many tables</p>
+<p>To map <strong>many topics to many Iceberg tables at once</strong>, use the Admin UI <strong>Iceberg Sinks</strong> page:
+one screen creates a no-code auto-sink job per topic→table row, and manages them (live logs,
+kill) as a table. See <a href="../streaming-job-logs/#iceberg-sinks-page-configure-many-topics-many-tables">Job Logs, Kill &amp; Iceberg Sinks</a>.</p>
+</div>
 <hr />
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
@@ -1550,7 +1584,10 @@ catalog (<code>total-records</code> in the snapshot summary).</p>
 <ul>
 <li><strong>Parallelism = consumer-group size.</strong> With parallelism N, N consumer threads share the topic
   partitions. Set N ≤ the partition count to keep every thread busy; ItdaStream's group
-  coordinator rebalances automatically when brokers join or leave.</li>
+  coordinator rebalances automatically when brokers join or leave. For an <strong>append-only</strong> table the
+  brokers do not each commit — the controller does one commit per checkpoint aggregating every
+  broker's files (<a href="../streaming-operations/#single-committer-append-only-iceberg">single-committer</a>),
+  so parallelism &gt; 1 never causes Iceberg commit conflicts.</li>
 <li><strong>Format.</strong> <code>json</code> infers columns from the message fields; <code>avro</code> decodes via the Schema
   Registry. For a fixed target table, keep the message schema stable.</li>
 <li><strong>Append vs upsert.</strong> Without upsert keys the sink <strong>appends</strong>. With upsert keys, each commit

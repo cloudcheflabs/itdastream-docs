@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming-operations/">
       
       
-        <link rel="prev" href="../streaming-job-tutorial/">
+        <link rel="prev" href="../streaming-job-logs/">
       
       
         <link rel="next" href="../kafka-compatible/">
@@ -638,6 +638,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../streaming-job-logs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Job Logs, Kill & Iceberg Sinks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -708,6 +736,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-committer-append-only-iceberg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single-committer (append-only Iceberg)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1386,10 +1431,65 @@ environment variable &gt; file &gt; default).</p>
 <td><code>30000</code></td>
 <td>progress log interval</td>
 </tr>
+<tr>
+<td><code>itdastream.streaming.iceberg.coordinated.commit.enabled</code></td>
+<td><code>true</code></td>
+<td>single-committer for append-only Iceberg sinks (see <a href="#single-committer-append-only-iceberg">below</a>)</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.autosink.ingest.ts.enabled</code></td>
+<td><code>true</code></td>
+<td>auto-add an ingestion-time column on the no-code Iceberg sink (see <a href="../streaming-no-code/#automatic-time-partitioning-_ingest_ts">No-Code Kafka → Iceberg</a>)</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.autosink.ingest.ts.column</code></td>
+<td><code>_ingest_ts</code></td>
+<td>name of that synthetic column</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.autosink.ingest.ts.partition</code></td>
+<td><code>hour</code></td>
+<td>hidden-partition transform for it (<code>hour</code>/<code>day</code>/<code>month</code>/<code>year</code>)</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.joblogs.enabled</code></td>
+<td><code>true</code></td>
+<td>capture + flush per-job logs for the admin log viewer (see <a href="../streaming-job-logs/">Job Logs &amp; Lifecycle</a>)</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.joblogs.prefix</code></td>
+<td><code>jobLogs</code></td>
+<td>object-store key prefix for per-job logs</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.joblogs.flush.interval.ms</code></td>
+<td><code>3000</code></td>
+<td>how often each broker flushes a job's logs to the object store</td>
+</tr>
+<tr>
+<td><code>itdastream.streaming.joblogs.max.lines</code></td>
+<td><code>5000</code></td>
+<td>in-memory log ring-buffer size per job per broker</td>
+</tr>
 </tbody>
 </table>
 <p>Lower commit/checkpoint intervals reduce end-to-end latency but produce more, smaller Iceberg
 snapshots — schedule periodic Iceberg compaction accordingly.</p>
+<h3 id="single-committer-append-only-iceberg">Single-committer (append-only Iceberg)</h3>
+<p>When a job writes to an <strong>append-only</strong> Iceberg table (no upsert keys) with parallelism &gt; 1, the
+brokers do <strong>not</strong> each commit to the table. Instead every broker only <strong>writes and drains its
+Parquet data files</strong> at the checkpoint barrier, and the <strong>controller performs ONE atomic Iceberg
+commit per checkpoint</strong> aggregating every broker's files. Because only the controller commits a
+given table, concurrent writers can never collide — there is no
+<code>CommitFailedException</code>/"concurrently modified" at any parallelism.</p>
+<ul>
+<li>Enabled by default (<code>itdastream.streaming.iceberg.coordinated.commit.enabled=true</code>). Set <code>false</code>
+  to fall back to per-broker self-commit (each broker commits its own files; can conflict at high
+  parallelism). <strong>Upsert</strong> sinks always use the per-broker path (their equality-delete files are
+  per-writer).</li>
+<li>One commit per checkpoint → one Iceberg snapshot per checkpoint interval regardless of
+  parallelism (fewer, larger snapshots than per-broker commit).</li>
+</ul>
 <div class="admonition note">
 <p class="admonition-title">Arrow off-heap (required)</p>
 <p>The engine processes records as Apache Arrow batches in off-heap memory. The broker launch
