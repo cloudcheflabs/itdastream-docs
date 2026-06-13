@@ -123,6 +123,59 @@ The job's live status (per-broker thread counts, last completed checkpoint) is a
 
 ---
 
+## Automatic time partitioning (`_ingest_ts`)
+
+Raw Kafka messages rarely carry a clean event-time column, yet an Iceberg table with **no
+partitioning** quickly degrades: every query scans every file. To keep the no-code path fast out
+of the box, the auto-sink **synthesises an ingestion-time column and hidden-partitions the table
+by it** — you get time-pruned scans without writing a schema or a partition spec.
+
+When a no-code Iceberg job **auto-creates** its table, ItdaStream:
+
+1. Adds a synthetic column **`_ingest_ts`** — an Iceberg `timestamptz` (microsecond, UTC) stamped
+   with the ingestion time, one value per micro-batch. The name is chosen not to collide with your
+   own fields, and the column is **additive** — all your message fields are written unchanged.
+2. Creates the table **hidden-partitioned by `hour(_ingest_ts)`**. Iceberg stores the partition
+   value (the hour bucket) without adding a visible column; the hidden partition field is named
+   `_ingest_ts_hour`.
+
+So a stream of `{"id":1,"name":"alice","amount":120}` lands as a table with columns
+`id, name, amount, _ingest_ts`, transparently partitioned by the hour. A reader can prune by time:
+
+```sql
+-- Trino: only the matching hour-partitions are scanned
+SELECT count(*) FROM analytics.events
+WHERE _ingest_ts >= TIMESTAMP '2026-06-13 12:00:00 UTC'
+  AND _ingest_ts <  TIMESTAMP '2026-06-13 13:00:00 UTC';
+
+-- inspect the hidden partitions
+SELECT partition, record_count FROM analytics."events$partitions";
+-- → {_ingest_ts_hour=494820}  30
+```
+
+!!! note "No-code path only — custom jobs are never touched"
+    This injection happens **only** on the no-code auto-sink path (a pure topic→Iceberg job with no
+    `MAP`/`FLATMAP` user code). A [Streaming SDK](streaming-sdk.md) job with a custom transform
+    follows **your** code exactly — its schema and partitioning are whatever your job and target
+    table define. The injection is also skipped for **upsert** sinks, which require an
+    unpartitioned target.
+
+### Tuning it
+
+Three broker-level properties control the behaviour (per-job spec values override them). Defaults
+suit most pipelines; change them in `conf/itdastream.properties`:
+
+| Property | Default | Meaning |
+|---|---|---|
+| `itdastream.streaming.autosink.ingest.ts.enabled` | `true` | Inject the column + hidden partition. Set `false` to write data columns as-is, unpartitioned. |
+| `itdastream.streaming.autosink.ingest.ts.column` | `_ingest_ts` | Name of the synthetic ingestion-time column. |
+| `itdastream.streaming.autosink.ingest.ts.partition` | `hour` | Partition transform — one of `hour`, `day`, `month`, `year`. The hidden field is named `<column>_<transform>`. |
+
+For example, set `...partition=day` for a high-retention table where hourly partitions would be too
+fine, or `...enabled=false` if a downstream job re-partitions the data itself.
+
+---
+
 ## Other no-code sinks
 
 The same flow works for the other sink types — pick the sink and a matching connection:

@@ -11,7 +11,7 @@ itdastream-sdk-1.0.0.jar
 ```
 
 !!! tip "Want the end-to-end recipe?"
-    For a step-by-step walkthrough — create an `ITOK` token, write the job, build an **uber-JAR**, run it as `java -jar`, and deploy a custom transform to the brokers — see [Tutorial: Submit a Job (Token + Uber-JAR)](streaming-job-tutorial.md). This page is the API reference.
+    For a step-by-step walkthrough — create an `ITOK` token, write the job, build an **uber-JAR**, run it as `java -jar`, and upload a custom transform with the job — see [Tutorial: Submit a Job (Token + Uber-JAR)](streaming-job-tutorial.md). This page is the API reference.
 
 ---
 
@@ -44,6 +44,7 @@ String jobId = session.streamSource(Source.kafka("events").format("json"))
     .name("purchases-to-iceberg")
     .parallelism(4)
     .commitInterval(5_000)
+    .jars("build/libs/my-transforms-all.jar")   // upload the JAR with EnrichFn (omit if no .map/.flatMap)
     .start();
 ```
 
@@ -63,8 +64,7 @@ ItdaStream cluster itself, so only the topic and format are required.
 
 `map` / `flatMap` reference a class by fully-qualified name that implements
 `com.cloudcheflabs.itdastream.streaming.udf.MapFunction` /
-`...udf.FlatMapFunction`. The class must be on the **broker** classpath with a public no-arg
-constructor:
+`...udf.FlatMapFunction`, with a public no-arg constructor:
 
 ```java
 public class EnrichFn implements MapFunction {
@@ -75,7 +75,10 @@ public class EnrichFn implements MapFunction {
 }
 ```
 
-The broker resolves the class with `Class.forName` from its own classpath (`conf:lib/*`) — it is **not** shipped with the job spec. Package your transform classes as a JAR (with `itdastream-streaming` marked `compileOnly`) and drop it into each broker's `lib/`, then restart. The full packaging + deployment recipe is in [Tutorial: Submit a Job (Token + Uber-JAR)](streaming-job-tutorial.md#advanced-custom-transforms-as-a-broker-jar).
+You ship the class **with the job**: list its JAR(s) via `.jars("path/to/transforms.jar", …)` (or `.jarDirs(...)`). On `start()` the SDK uploads them to the cluster dependency store (`POST /admin/deps`, deduped by name), and each broker loads the class from a **per-job `URLClassLoader`** over those JARs — no copy to `lib/`, no restart. Mark `itdastream-streaming` `compileOnly` when building the JAR (it is provided by the broker). The full packaging recipe is in [Tutorial: Submit a Job (Token + Uber-JAR)](streaming-job-tutorial.md#advanced-custom-transforms-uploaded-with-the-job).
+
+!!! tip "No transforms? No JARs."
+    A job with only `.filter(...)` / `.select(...)` (or none) needs no `.jars(...)` — it is the [no-code auto-sink](streaming-no-code.md) path and runs entirely from the declarative spec.
 
 ### Sinks
 
@@ -139,12 +142,13 @@ public class PurchasesPipeline {
                               .property("auto.offset.reset", "earliest"))
                 .filter("event_type = 'purchase'")          // keep purchases only
                 .select("id", "user_name", "amount", "ts")  // project columns
-                .map("com.example.EnrichFn")                // 1->1 user transform (on broker classpath)
+                .map("com.example.EnrichFn")                // 1->1 user transform (uploaded with the job)
                 .sink(Sink.iceberg("prod-iceberg", "analytics.purchases")
                           .upsertKeys("id"))                // idempotent upsert by id
                 .name("purchases-to-iceberg")
                 .parallelism(4)                             // 4 consumer threads across the cluster
                 .commitInterval(5_000)                      // exactly-once checkpoint cadence (ms)
+                .jars("build/libs/my-transforms-all.jar")   // ship EnrichFn to the cluster
                 .submit();                                  // returns a JobHandle
 
         System.out.println("submitted jobId=" + job.jobId());
@@ -158,7 +162,7 @@ public class PurchasesPipeline {
 }
 ```
 
-The `map` step references a user class on the **broker** classpath:
+The `map` step references a user class that the SDK uploads with the job (via `.jars(...)`) and the broker loads per-job:
 
 ```java
 package com.example;
