@@ -49,11 +49,11 @@ given table, concurrent writers can never collide — there is no
   parallelism (fewer, larger snapshots than per-broker commit).
 
 !!! note "Arrow off-heap (required)"
-    The engine processes records as Apache Arrow batches in off-heap memory. The broker launch
-    script passes `--add-opens=java.base/java.nio=ALL-UNNAMED` (and
-    `-Dio.netty.tryReflectionSetAccessible=true`) so Arrow can allocate direct buffers. If you
-    use a custom launcher, keep these flags or jobs fail at first allocation with
-    `InaccessibleObjectException`.
+    The engine processes records as Apache Arrow batches in off-heap memory, which needs
+    `--add-opens=java.base/java.nio=ALL-UNNAMED` and `-Dio.netty.tryReflectionSetAccessible=true`.
+    These ship as **defaults in `conf/jvm.conf`**, so a stock broker just works. Keep them if you
+    edit `conf/jvm.conf` (or pass equivalents from a custom launcher) — without them the broker
+    boots fine but a streaming job fails at first Arrow allocation with `InaccessibleObjectException`.
 
 ---
 
