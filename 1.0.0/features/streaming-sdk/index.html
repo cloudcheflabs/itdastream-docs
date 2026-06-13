@@ -14,7 +14,7 @@
         <link rel="prev" href="../connections/">
       
       
-        <link rel="next" href="../streaming-operations/">
+        <link rel="next" href="../streaming-job-tutorial/">
       
       
         
@@ -871,6 +871,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../streaming-job-tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial: Submit a Job (Token + Uber-JAR)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../streaming-operations/" class="md-nav__link">
         
   
@@ -1459,6 +1487,10 @@ jar ships under <code>sdk/</code> in the distribution.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="cm">&lt;!-- or depend on the published jar --&gt;</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>itdastream-sdk-1.0.0.jar
 </code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Want the end-to-end recipe?</p>
+<p>For a step-by-step walkthrough — create an <code>ITOK</code> token, write the job, build an <strong>uber-JAR</strong>, run it as <code>java -jar</code>, and deploy a custom transform to the brokers — see <a href="../streaming-job-tutorial/">Tutorial: Submit a Job (Token + Uber-JAR)</a>. This page is the API reference.</p>
+</div>
 <hr />
 <h2 id="authentication">Authentication</h2>
 <p>Prefer a long-lived <strong>IAM user token</strong> (see <a href="../iam/">IAM</a>) for SDK / CI usage:</p>
@@ -1528,6 +1560,7 @@ constructor:</p>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">}</span>
 </code></pre></div>
+<p>The broker resolves the class with <code>Class.forName</code> from its own classpath (<code>conf:lib/*</code>) — it is <strong>not</strong> shipped with the job spec. Package your transform classes as a JAR (with <code>itdastream-streaming</code> marked <code>compileOnly</code>) and drop it into each broker's <code>lib/</code>, then restart. The full packaging + deployment recipe is in <a href="../streaming-job-tutorial/#advanced-custom-transforms-as-a-broker-jar">Tutorial: Submit a Job (Token + Uber-JAR)</a>.</p>
 <h3 id="sinks">Sinks</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Sink</span><span class="p">.</span><span class="na">iceberg</span><span class="p">(</span><span class="s">&quot;conn&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ns.table&quot;</span><span class="p">).</span><span class="na">upsertKeys</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// exactly-once</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">Sink</span><span class="p">.</span><span class="na">jdbc</span><span class="p">(</span><span class="s">&quot;conn&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;table&quot;</span><span class="p">)</span><span class="w">                            </span><span class="c1">// exactly-once</span>
