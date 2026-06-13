@@ -34,9 +34,7 @@ theme:
 nav:
   - "Architecture":
       - "itdastream Architecture": architecture/architecture.md
-  - "Installation":
-      - "Installation": installation/installation.md
-      - "Getting Started": intro/intro.md
+  - "Installation": installation/installation.md
   - "Streaming":
       - "Overview": features/streaming.md
       - "No-Code Kafka to Iceberg": features/streaming-no-code.md
