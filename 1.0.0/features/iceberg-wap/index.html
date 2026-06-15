@@ -828,17 +828,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#end-to-end-test" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        End-to-end test
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1608,29 +1597,48 @@ submits the job with the WAP branch set on the sink and then issues the <code>fa
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">     </span>http://localhost:8082<span class="w"> </span>ITOK...usertoken...
 </code></pre></div>
 <h3 id="python-requests">Python (<code>requests</code>)</h3>
-<p><a href="https://github.com/cloudcheflabs/itdastream/blob/master/examples/python/iceberg_wap_streaming_example.py"><code>examples/python/iceberg_wap_streaming_example.py</code></a>
-logs in, creates the WAP job, polls the REST catalog to show the <code>audit</code> branch accruing records
-while <code>main</code> stays empty, then publishes and shows <code>main</code> catching up:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pip<span class="w"> </span>install<span class="w"> </span>requests
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nv">ADMIN_URL</span><span class="o">=</span>http://localhost:8082<span class="w"> </span><span class="nv">REST_URL</span><span class="o">=</span>http://localhost:8181<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>python<span class="w"> </span>examples/python/iceberg_wap_streaming_example.py
+<p>Drive the same loop over the admin REST API — create the job with the WAP branch on the sink,
+audit the <code>audit</code> branch via the Iceberg REST catalog (it accrues records while <code>main</code> stays
+empty), then publish:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">ADMIN_URL</span>  <span class="o">=</span> <span class="s2">&quot;http://localhost:8082&quot;</span>   <span class="c1"># broker admin API</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">REST_URL</span>   <span class="o">=</span> <span class="s2">&quot;http://localhost:8181&quot;</span>   <span class="c1"># Iceberg REST catalog</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">WAP_BRANCH</span> <span class="o">=</span> <span class="s2">&quot;audit&quot;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">headers</span>    <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer &quot;</span> <span class="o">+</span> <span class="n">token</span><span class="p">,</span> <span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">}</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="c1"># 1. WRITE — create the streaming job; the sink stages every record on the &#39;audit&#39; branch</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">spec</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;wap-demo&quot;</span><span class="p">,</span> <span class="s2">&quot;parallelism&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>    <span class="s2">&quot;kafka&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span><span class="p">},</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    <span class="s2">&quot;sink&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;table&quot;</span><span class="p">,</span> <span class="s2">&quot;connectionId&quot;</span><span class="p">:</span> <span class="s2">&quot;ice&quot;</span><span class="p">,</span> <span class="s2">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;db.events&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>        <span class="s2">&quot;itdastream.iceberg.wap.branch&quot;</span><span class="p">:</span> <span class="n">WAP_BRANCH</span><span class="p">,</span>   <span class="c1"># &lt;- writes go to &#39;audit&#39;, not main</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>    <span class="p">},</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>    <span class="s2">&quot;commitIntervalMs&quot;</span><span class="p">:</span> <span class="mi">5000</span><span class="p">,</span> <span class="s2">&quot;checkpointIntervalMs&quot;</span><span class="p">:</span> <span class="mi">5000</span><span class="p">,</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="p">}</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="n">job_id</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ADMIN_URL</span><span class="si">}</span><span class="s2">/admin/streaming/jobs&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">spec</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;jobId&quot;</span><span class="p">]</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="c1"># 2. AUDIT — read table metadata from the Iceberg REST catalog: the &#39;audit&#39; branch ref</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="c1">#    accrues records while main&#39;s current snapshot stays empty.</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="n">meta</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">REST_URL</span><span class="si">}</span><span class="s2">/v1/namespaces/db/tables/events&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;metadata&quot;</span><span class="p">]</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="n">audit_snap</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;refs&quot;</span><span class="p">][</span><span class="n">WAP_BRANCH</span><span class="p">][</span><span class="s2">&quot;snapshot-id&quot;</span><span class="p">]</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="n">branch_records</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">&quot;summary&quot;</span><span class="p">][</span><span class="s2">&quot;total-records&quot;</span><span class="p">])</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>                      <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;snapshots&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;snapshot-id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">audit_snap</span><span class="p">)</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;audit branch records =&quot;</span><span class="p">,</span> <span class="n">branch_records</span><span class="p">,</span> <span class="s2">&quot; main =&quot;</span><span class="p">,</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;current-snapshot-id&quot;</span><span class="p">))</span>
+<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a>
+<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="c1"># 3. PUBLISH — fast-forward main to the audited branch</span>
+<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ADMIN_URL</span><span class="si">}</span><span class="s2">/admin/iceberg/publish&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a>    <span class="s2">&quot;operation&quot;</span><span class="p">:</span> <span class="s2">&quot;fast_forward&quot;</span><span class="p">,</span> <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="s2">&quot;db&quot;</span><span class="p">,</span> <span class="s2">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;events&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a>    <span class="s2">&quot;branch&quot;</span><span class="p">:</span> <span class="s2">&quot;main&quot;</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">:</span> <span class="n">WAP_BRANCH</span><span class="p">,</span> <span class="s2">&quot;connectionId&quot;</span><span class="p">:</span> <span class="s2">&quot;ice&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a><span class="p">})</span>
+<a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;publish:&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>   <span class="c1"># {&quot;status&quot;:&quot;ok&quot;,&quot;result&quot;:&quot;Fast-forwarded branch &#39;main&#39; to &#39;audit&#39; ...&quot;}</span>
 </code></pre></div>
-<hr />
-<h2 id="end-to-end-test">End-to-end test</h2>
-<p><a href="https://github.com/cloudcheflabs/itdastream/blob/master/tests/streaming-iceberg-wap-e2e.sh"><code>tests/streaming-iceberg-wap-e2e.sh</code></a>
-spins up the full stack (MinIO + iceberg-rest + ZooKeeper + 2 brokers), registers the connection,
-creates the WAP job, produces messages, and <strong>asserts</strong>:</p>
-<ol>
-<li>the <code>audit</code> branch reaches <em>N</em> records while <code>main</code> stays at <strong>0</strong> (audit isolation), then</li>
-<li>after <code>POST /admin/iceberg/publish</code> (<code>fast_forward</code>), <code>main</code> has <em>N</em> records.</li>
-</ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>tests/streaming-iceberg-wap-e2e.sh
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="c1"># KEEP=1 tests/streaming-iceberg-wap-e2e.sh         # leave the stack up</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1"># SKIP_PACKAGE=1 tests/streaming-iceberg-wap-e2e.sh # reuse the existing tarball</span>
-</code></pre></div>
-<p>It reuses <code>tests/docker-compose-streaming-e2e.yml</code>; bring the stack up/down manually with:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>tests/docker-compose-streaming-e2e.yml<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>tests/docker-compose-streaming-e2e.yml<span class="w"> </span>down<span class="w"> </span>-v
+<p>The full runnable script (login, optional connection registration, record polling) is
+<a href="https://github.com/cloudcheflabs/itdastream/blob/master/examples/python/iceberg_wap_streaming_example.py"><code>examples/python/iceberg_wap_streaming_example.py</code></a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>pip<span class="w"> </span>install<span class="w"> </span>requests
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nv">ADMIN_URL</span><span class="o">=</span>http://localhost:8082<span class="w"> </span><span class="nv">REST_URL</span><span class="o">=</span>http://localhost:8181<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span>python<span class="w"> </span>examples/python/iceberg_wap_streaming_example.py
 </code></pre></div>
 
 
