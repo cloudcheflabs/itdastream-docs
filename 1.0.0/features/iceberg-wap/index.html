@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming-operations/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/iceberg-wap/">
       
       
-        <link rel="prev" href="../iceberg-wap/">
+        <link rel="prev" href="../streaming-job-logs/">
       
       
-        <link rel="next" href="../kafka-compatible/">
+        <link rel="next" href="../streaming-operations/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Operations & Tuning - ItdaStream</title>
+        <title>Iceberg Write-Audit-Publish (WAP) - ItdaStream</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#streaming-operations-tuning" class="md-skip">
+        <a href="#iceberg-write-audit-publish-wap" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Operations & Tuning
+              Iceberg Write-Audit-Publish (WAP)
             
           </span>
         </div>
@@ -666,34 +666,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../iceberg-wap/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Iceberg Write-Audit-Publish (WAP)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -713,7 +685,7 @@
   <span class="md-ellipsis">
     
   
-    Operations & Tuning
+    Iceberg Write-Audit-Publish (WAP)
   
 
     
@@ -731,7 +703,7 @@
   <span class="md-ellipsis">
     
   
-    Operations & Tuning
+    Iceberg Write-Audit-Publish (WAP)
   
 
     
@@ -757,22 +729,55 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#enabling-wap-the-itdastreamicebergwapbranch-sink-key" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration
+        Enabling WAP — the itdastream.iceberg.wap.branch sink key
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configuration">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#auditing-the-branch-via-the-iceberg-rest-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auditing the branch via the Iceberg REST catalog
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#publishing-post-adminicebergpublish" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Publishing — POST /admin/iceberg/publish
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Publishing — POST /admin/iceberg/publish">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#single-committer-append-only-iceberg" class="md-nav__link">
+  <a href="#fast_forward" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Single-committer (append-only Iceberg)
+        fast_forward
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cherrypick" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cherrypick
       
     </span>
   </a>
@@ -785,54 +790,49 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#monitoring" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Monitoring
+        Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#java-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Java (SDK)
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#scaling-and-rebalancing" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#python-requests" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Scaling and rebalancing
+        Python (requests)
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#failure-and-recovery-exactly-once" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Failure and recovery (exactly-once)
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
+  <a href="#end-to-end-test" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Troubleshooting
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#capacity-notes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Capacity notes
+        End-to-end test
       
     </span>
   </a>
@@ -843,6 +843,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../streaming-operations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations & Tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1407,212 +1435,203 @@
 
 
 
-<h1 id="streaming-operations-tuning">Streaming — Operations &amp; Tuning</h1>
-<p>How to run, observe, scale, and troubleshoot streaming jobs in production.</p>
+<h1 id="iceberg-write-audit-publish-wap">Iceberg Write-Audit-Publish (WAP)</h1>
+<p><strong>Write-Audit-Publish</strong> is a data-quality pattern for Iceberg tables: instead of writing streamed
+records straight to the table's <code>main</code> branch, the job stages them on an isolated <strong>audit branch</strong>.
+Downstream readers — querying <code>main</code> — see nothing while the data is being staged. You then <strong>audit</strong>
+the staged snapshot (row counts, schema, business checks) and, only when it passes, <strong>publish</strong> it
+onto <code>main</code> in a single atomic ref move.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Kafka ──stream──▶  Iceberg `audit` branch     (Write)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                          │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                          ▼   inspect via REST catalog
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                       Audit                  (validate the staged snapshot)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                          │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                          ▼   POST /admin/iceberg/publish (fast_forward)
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                   Iceberg `main` branch       (Publish — now visible to readers)
+</code></pre></div>
+<p>Because the audit branch and <code>main</code> are separate Iceberg refs over the same table, audit isolation
+is guaranteed: a reader on <code>main</code> never observes an unaudited snapshot.</p>
 <hr />
-<h2 id="configuration">Configuration</h2>
-<p>Broker-level defaults live in <code>itdastream.properties</code>; a per-job spec (from the Admin UI or the
-SDK) overrides any value it sets explicitly. See
-<a href="../configuration/">Flexible Configuration System</a> for the resolution order (system property &gt;
-environment variable &gt; file &gt; default).</p>
+<h2 id="enabling-wap-the-itdastreamicebergwapbranch-sink-key">Enabling WAP — the <code>itdastream.iceberg.wap.branch</code> sink key</h2>
+<p>Add the sink property <code>itdastream.iceberg.wap.branch</code> to any Kafka → Iceberg streaming job. Its value
+is the branch name the sink commits to (commonly <code>audit</code> or <code>staging</code>). All commits the job makes go
+to that branch; <code>main</code> is untouched until you publish.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wap-demo&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;parallelism&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;kafka&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;topic&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;events&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;json&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">&quot;sink&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="nt">&quot;connectionId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ice&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;db.events&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nt">&quot;itdastream.iceberg.wap.branch&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;audit&quot;</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="nt">&quot;commitIntervalMs&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span><span class="nt">&quot;checkpointIntervalMs&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="p">}</span>
+</code></pre></div>
+<p>Submit it like any other streaming job:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://broker:8082/admin/streaming/jobs<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$JWT</span><span class="s2">&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>-d<span class="w"> </span>@wap-demo.json
+</code></pre></div>
+<blockquote>
+<p>Without the WAP key, the same job writes directly to <code>main</code> (the standard
+<a href="../streaming-no-code/">No-Code Kafka → Iceberg</a> behaviour). WAP is purely additive: set the
+branch and the write path becomes audited.</p>
+</blockquote>
+<hr />
+<h2 id="auditing-the-branch-via-the-iceberg-rest-catalog">Auditing the branch via the Iceberg REST catalog</h2>
+<p>While the job runs, query the table through the Iceberg REST catalog to watch the audit branch fill
+up while <code>main</code> stays empty:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:8181/v1/namespaces/db/tables/events<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="s1">  refs: .metadata.refs,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="s1">  current: .metadata.&quot;current-snapshot-id&quot;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="s1">}&#39;</span>
+</code></pre></div>
+<ul>
+<li><code>.metadata.refs.audit."snapshot-id"</code> is the snapshot the audit branch points at.</li>
+<li><code>.metadata.refs.main</code> (or <code>.metadata."current-snapshot-id"</code>) is what readers on <code>main</code> see.</li>
+<li>The row count for any snapshot is its summary's <code>total-records</code>:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">META</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:8181/v1/namespaces/db/tables/events<span class="k">)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nv">AUDIT_SID</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$META</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.metadata.refs.audit.&quot;snapshot-id&quot;&#39;</span><span class="k">)</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$META</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span>--arg<span class="w"> </span>s<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AUDIT_SID</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="s1">&#39;.metadata.snapshots[] | select((.&quot;snapshot-id&quot;|tostring)==$s) | .summary.&quot;total-records&quot;&#39;</span>
+</code></pre></div>
+<p>This is your audit gate — run whatever validation you need against the audited snapshot before
+publishing.</p>
+<hr />
+<h2 id="publishing-post-adminicebergpublish">Publishing — <code>POST /admin/iceberg/publish</code></h2>
+<p>Once the audit branch passes, publish it onto <code>main</code>. The endpoint supports two operations.</p>
+<h3 id="fast_forward">fast_forward</h3>
+<p>Move <code>main</code> up to the tip of the audit branch (the common case — append-only staging).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://broker:8082/admin/iceberg/publish<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$JWT</span><span class="s2">&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="s1">    &quot;operation&quot;:&quot;fast_forward&quot;,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="s1">    &quot;schema&quot;:&quot;db&quot;,</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="s1">    &quot;table&quot;:&quot;events&quot;,</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="s1">    &quot;branch&quot;:&quot;main&quot;,</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="s1">    &quot;to&quot;:&quot;audit&quot;,</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="s1">    &quot;connectionId&quot;:&quot;ice&quot;</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="s1">  }&#39;</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="c1"># -&gt; {&quot;status&quot;:&quot;ok&quot;,&quot;result&quot;:&quot;...&quot;}</span>
+</code></pre></div>
+<h3 id="cherrypick">cherrypick</h3>
+<p>Apply a single audited snapshot onto <code>main</code> (useful when you want one specific snapshot rather than
+the whole branch tip):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://broker:8082/admin/iceberg/publish<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$JWT</span><span class="s2">&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="s1">    &quot;operation&quot;:&quot;cherrypick&quot;,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="s1">    &quot;schema&quot;:&quot;db&quot;,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="s1">    &quot;table&quot;:&quot;events&quot;,</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="s1">    &quot;branch&quot;:&quot;main&quot;,</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="s1">    &quot;snapshotId&quot;: 1234567890123456789,</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="s1">    &quot;connectionId&quot;:&quot;ice&quot;</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="s1">  }&#39;</span>
+</code></pre></div>
 <table>
 <thead>
 <tr>
-<th>Property</th>
-<th>Default</th>
+<th>Field</th>
+<th>fast_forward</th>
+<th>cherrypick</th>
 <th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>itdastream.streaming.reconcile.interval.ms</code></td>
-<td><code>5000</code></td>
-<td>how often the reconciler runs (assignment + executor convergence)</td>
+<td><code>operation</code></td>
+<td><code>fast_forward</code></td>
+<td><code>cherrypick</code></td>
+<td>publish strategy</td>
 </tr>
 <tr>
-<td><code>itdastream.streaming.exchange.prefix</code></td>
-<td><code>streaming/exchange</code></td>
-<td>S3 prefix for durable checkpoint state</td>
+<td><code>schema</code></td>
+<td>✓</td>
+<td>✓</td>
+<td>Iceberg namespace</td>
 </tr>
 <tr>
-<td><code>itdastream.streaming.commit.interval.ms</code></td>
-<td><code>10000</code></td>
-<td>default sink commit cadence (exactly-once cadence for tx sinks)</td>
+<td><code>table</code></td>
+<td>✓</td>
+<td>✓</td>
+<td>table name</td>
 </tr>
 <tr>
-<td><code>itdastream.streaming.checkpoint.interval.ms</code></td>
-<td><code>10000</code></td>
-<td>default checkpoint barrier interval</td>
+<td><code>branch</code></td>
+<td>✓</td>
+<td>✓</td>
+<td>target branch (usually <code>main</code>)</td>
 </tr>
 <tr>
-<td><code>itdastream.streaming.commit.row.threshold</code></td>
-<td><code>10000</code></td>
-<td>rows that also trigger a commit (bounds buffered rows)</td>
+<td><code>to</code></td>
+<td>✓</td>
+<td>—</td>
+<td>source branch to fast-forward from (e.g. <code>audit</code>)</td>
 </tr>
 <tr>
-<td><code>itdastream.streaming.source.poll.timeout.ms</code></td>
-<td><code>100</code></td>
-<td>Kafka poll timeout inside the loop</td>
+<td><code>snapshotId</code></td>
+<td>—</td>
+<td>✓</td>
+<td>the snapshot to cherry-pick</td>
 </tr>
 <tr>
-<td><code>itdastream.streaming.progress.log.interval.ms</code></td>
-<td><code>30000</code></td>
-<td>progress log interval</td>
-</tr>
-<tr>
-<td><code>itdastream.streaming.iceberg.coordinated.commit.enabled</code></td>
-<td><code>true</code></td>
-<td>single-committer for append-only Iceberg sinks (see <a href="#single-committer-append-only-iceberg">below</a>)</td>
-</tr>
-<tr>
-<td><code>itdastream.streaming.autosink.ingest.ts.enabled</code></td>
-<td><code>true</code></td>
-<td>auto-add an ingestion-time column on the no-code Iceberg sink (see <a href="../streaming-no-code/#automatic-time-partitioning-_ingest_ts">No-Code Kafka → Iceberg</a>)</td>
-</tr>
-<tr>
-<td><code>itdastream.streaming.autosink.ingest.ts.column</code></td>
-<td><code>_ingest_ts</code></td>
-<td>name of that synthetic column</td>
-</tr>
-<tr>
-<td><code>itdastream.streaming.autosink.ingest.ts.partition</code></td>
-<td><code>hour</code></td>
-<td>hidden-partition transform for it (<code>hour</code>/<code>day</code>/<code>month</code>/<code>year</code>)</td>
-</tr>
-<tr>
-<td><code>itdastream.streaming.joblogs.enabled</code></td>
-<td><code>true</code></td>
-<td>capture + flush per-job logs for the admin log viewer (see <a href="../streaming-job-logs/">Job Logs &amp; Lifecycle</a>)</td>
-</tr>
-<tr>
-<td><code>itdastream.streaming.joblogs.prefix</code></td>
-<td><code>jobLogs</code></td>
-<td>object-store key prefix for per-job logs</td>
-</tr>
-<tr>
-<td><code>itdastream.streaming.joblogs.flush.interval.ms</code></td>
-<td><code>3000</code></td>
-<td>how often each broker flushes a job's logs to the object store</td>
-</tr>
-<tr>
-<td><code>itdastream.streaming.joblogs.max.lines</code></td>
-<td><code>5000</code></td>
-<td>in-memory log ring-buffer size per job per broker</td>
+<td><code>connectionId</code></td>
+<td>✓</td>
+<td>✓</td>
+<td>the registered ICEBERG connection</td>
 </tr>
 </tbody>
 </table>
-<p>Lower commit/checkpoint intervals reduce end-to-end latency but produce more, smaller Iceberg
-snapshots — schedule periodic Iceberg compaction accordingly.</p>
-<h3 id="single-committer-append-only-iceberg">Single-committer (append-only Iceberg)</h3>
-<p>When a job writes to an <strong>append-only</strong> Iceberg table (no upsert keys) with parallelism &gt; 1, the
-brokers do <strong>not</strong> each commit to the table. Instead every broker only <strong>writes and drains its
-Parquet data files</strong> at the checkpoint barrier, and the <strong>controller performs ONE atomic Iceberg
-commit per checkpoint</strong> aggregating every broker's files. Because only the controller commits a
-given table, concurrent writers can never collide — there is no
-<code>CommitFailedException</code>/"concurrently modified" at any parallelism.</p>
-<ul>
-<li>Enabled by default (<code>itdastream.streaming.iceberg.coordinated.commit.enabled=true</code>). Set <code>false</code>
-  to fall back to per-broker self-commit (each broker commits its own files; can conflict at high
-  parallelism). <strong>Upsert</strong> sinks always use the per-broker path (their equality-delete files are
-  per-writer).</li>
-<li>One commit per checkpoint → one Iceberg snapshot per checkpoint interval regardless of
-  parallelism (fewer, larger snapshots than per-broker commit).</li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Arrow off-heap (required)</p>
-<p>The engine processes records as Apache Arrow batches in off-heap memory, which needs
-<code>--add-opens=java.base/java.nio=ALL-UNNAMED</code> and <code>-Dio.netty.tryReflectionSetAccessible=true</code>.
-These ship as <strong>defaults in <code>conf/jvm.conf</code></strong>, so a stock broker just works. Keep them if you
-edit <code>conf/jvm.conf</code> (or pass equivalents from a custom launcher) — without them the broker
-boots fine but a streaming job fails at first Arrow allocation with <code>InaccessibleObjectException</code>.</p>
-</div>
+<p>After publishing, re-query the REST catalog — <code>main</code> now points at the audited snapshot and the rows
+are visible to readers.</p>
 <hr />
-<h2 id="monitoring">Monitoring</h2>
-<ul>
-<li><strong>Admin UI → Streaming</strong> lists every job with topic, parallelism, format, sink, and status.</li>
-<li><code>GET /admin/streaming/jobs</code> — all job specs.</li>
-<li><code>GET /admin/streaming/jobs/{id}</code> — the spec plus aggregated status: per-broker thread counts
-  (from the ephemeral <code>/streaming/status/&lt;jobId&gt;/&lt;brokerId&gt;</code> znodes) and the controller's last
-  globally-completed checkpoint id.</li>
-<li>Each running executor logs progress (records processed) every
-  <code>itdastream.streaming.progress.log.interval.ms</code>.</li>
-<li>The job runs as a normal consumer group <code>stream-&lt;jobId&gt;</code>, so consumer lag is visible through
-  the standard consumer-group tooling and the <strong>Consumer Groups</strong> admin view.</li>
-</ul>
+<h2 id="examples">Examples</h2>
+<h3 id="java-sdk">Java (SDK)</h3>
+<p><a href="https://github.com/cloudcheflabs/itdastream/blob/master/itdastream-sdk/src/main/java/com/cloudcheflabs/itdastream/sdk/examples/IcebergWapStreamingExample.java"><code>IcebergWapStreamingExample.java</code></a>
+submits the job with the WAP branch set on the sink and then issues the <code>fast_forward</code> publish:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">String</span><span class="w"> </span><span class="n">jobId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">streamSource</span><span class="p">(</span><span class="n">Source</span><span class="p">.</span><span class="na">kafka</span><span class="p">(</span><span class="s">&quot;events&quot;</span><span class="p">).</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;json&quot;</span><span class="p">))</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">        </span><span class="p">.</span><span class="na">sink</span><span class="p">(</span><span class="n">Sink</span><span class="p">.</span><span class="na">iceberg</span><span class="p">(</span><span class="s">&quot;ice&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;db.events&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">                </span><span class="p">.</span><span class="na">property</span><span class="p">(</span><span class="s">&quot;itdastream.iceberg.wap.branch&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;audit&quot;</span><span class="p">))</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">        </span><span class="p">.</span><span class="na">name</span><span class="p">(</span><span class="s">&quot;wap-demo&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">        </span><span class="p">.</span><span class="na">parallelism</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">        </span><span class="p">.</span><span class="na">commitInterval</span><span class="p">(</span><span class="mi">5_000</span><span class="p">)</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">        </span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="c1">// ... audit the branch, then POST /admin/iceberg/publish (fast_forward main &lt;- audit)</span>
+</code></pre></div>
+<p>Run it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>java<span class="w"> </span>-cp<span class="w"> </span>itdastream-sdk-*.jar:jackson-databind-*.jar:jackson-core-*.jar:jackson-annotations-*.jar<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">     </span>com.cloudcheflabs.itdastream.sdk.examples.IcebergWapStreamingExample<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">     </span>http://localhost:8082<span class="w"> </span>ITOK...usertoken...
+</code></pre></div>
+<h3 id="python-requests">Python (<code>requests</code>)</h3>
+<p><a href="https://github.com/cloudcheflabs/itdastream/blob/master/examples/python/iceberg_wap_streaming_example.py"><code>examples/python/iceberg_wap_streaming_example.py</code></a>
+logs in, creates the WAP job, polls the REST catalog to show the <code>audit</code> branch accruing records
+while <code>main</code> stays empty, then publishes and shows <code>main</code> catching up:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pip<span class="w"> </span>install<span class="w"> </span>requests
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nv">ADMIN_URL</span><span class="o">=</span>http://localhost:8082<span class="w"> </span><span class="nv">REST_URL</span><span class="o">=</span>http://localhost:8181<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>python<span class="w"> </span>examples/python/iceberg_wap_streaming_example.py
+</code></pre></div>
 <hr />
-<h2 id="scaling-and-rebalancing">Scaling and rebalancing</h2>
-<p>Two independent mechanisms keep a job balanced:</p>
+<h2 id="end-to-end-test">End-to-end test</h2>
+<p><a href="https://github.com/cloudcheflabs/itdastream/blob/master/tests/streaming-iceberg-wap-e2e.sh"><code>tests/streaming-iceberg-wap-e2e.sh</code></a>
+spins up the full stack (MinIO + iceberg-rest + ZooKeeper + 2 brokers), registers the connection,
+creates the WAP job, produces messages, and <strong>asserts</strong>:</p>
 <ol>
-<li><strong>Thread assignment (control plane).</strong> The controller computes a <code>{brokerId: threadCount}</code>
-   map distributing the job's parallelism across the live brokers, and writes it to
-   <code>/streaming/assignments/&lt;jobId&gt;</code>. Each broker's reconciler converges its running executor
-   threads to its share. On broker join/leave the controller recomputes the assignment.</li>
-<li><strong>Partition assignment (data plane).</strong> All of a job's threads are consumers in the group
-   <code>stream-&lt;jobId&gt;</code>, so ItdaStream's group coordinator distributes the topic partitions across
-   them and rebalances on membership change.</li>
+<li>the <code>audit</code> branch reaches <em>N</em> records while <code>main</code> stays at <strong>0</strong> (audit isolation), then</li>
+<li>after <code>POST /admin/iceberg/publish</code> (<code>fast_forward</code>), <code>main</code> has <em>N</em> records.</li>
 </ol>
-<p>To change parallelism, edit the job (or resubmit with a new <code>parallelism</code>); the controller
-re-spreads the threads. Keep <code>parallelism ≤ partitions</code> so every thread owns at least one
-partition.</p>
-<hr />
-<h2 id="failure-and-recovery-exactly-once">Failure and recovery (exactly-once)</h2>
-<p>At each checkpoint an executor commits the sink, snapshots the Kafka offsets to S3 (the
-ExchangeManager, under <code>streaming/exchange/&lt;jobId&gt;/</code>, KMS-encrypted), then commits the Kafka
-offsets. Because the offset only advances <strong>after</strong> the sink commit and the durable snapshot:</p>
-<ul>
-<li><strong>Worker broker dies</strong> → its partitions rebalance to other workers' consumers, which resume
-  from the last committed offset; the controller re-spreads thread assignments after a short
-  stabilization. No rows are lost; transactional sinks (Iceberg/JDBC) do not double-write.</li>
-<li><strong>Controller dies</strong> → a new controller is elected, re-reads <code>/streaming/jobs</code>, and re-publishes
-  assignments + checkpoint coordination. The data plane keeps running independently of who is
-  controller.</li>
-<li><strong>Job reassigned to a fresh broker</strong> → the executor restores the last completed checkpoint's
-  offsets from S3 and seeks the consumer there, so it picks up exactly where it left off.</li>
-</ul>
-<p>For change streams, set <strong>upsert keys</strong> so any boundary replays collapse to the latest value.</p>
-<hr />
-<h2 id="troubleshooting">Troubleshooting</h2>
-<table>
-<thead>
-<tr>
-<th>Symptom</th>
-<th>Cause / fix</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Iceberg writes fail with <em>"No route for request: GET v1/iceberg/namespaces/..."</em></td>
-<td>The connection uses the default <code>polaris</code> flavor against a vanilla REST catalog. Set <code>catalog.rest.flavor=rest</code> on the Iceberg connection.</td>
-</tr>
-<tr>
-<td>Job runs, consumer lag drains, but the Iceberg table stays empty</td>
-<td>The sink commits on the checkpoint interval — wait at least one <code>commitIntervalMs</code>. Also confirm the target <strong>namespace</strong> exists (the table is auto-created, the namespace is not).</td>
-</tr>
-<tr>
-<td><code>Connection not found: &lt;id&gt;</code></td>
-<td>The job references a <code>connectionId</code> that is not registered (or not yet synced to the worker). Create it in the Connection Registry; it syncs to all brokers.</td>
-</tr>
-<tr>
-<td><code>InaccessibleObjectException</code> when a job starts</td>
-<td>The Arrow <code>--add-opens</code> JVM flag is missing from the launcher (see the note above).</td>
-</tr>
-<tr>
-<td>JDBC / NeorunBase(jdbc) sink fails with <em>"No suitable driver"</em></td>
-<td>The driver is not on the broker classpath. PostgreSQL is bundled; add other JDBC drivers to <code>lib/</code>.</td>
-</tr>
-<tr>
-<td><code>map</code>/<code>flatMap</code> job fails to start</td>
-<td>The referenced <code>MapFunction</code>/<code>FlatMapFunction</code> class is not on the broker classpath or lacks a public no-arg constructor.</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="capacity-notes">Capacity notes</h2>
-<p>Each running consumer thread holds an Arrow allocator and (for Iceberg) a Parquet writer that
-buffers a row group on-heap. Size broker memory for the expected number of concurrent
-jobs × threads, and bound buffering with <code>commit.row.threshold</code> / <code>commit.interval.ms</code>. The
-data-lake libraries (Arrow, Iceberg, Parquet, Hadoop) run in the broker process, so plan heap and
-direct-memory accordingly.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>tests/streaming-iceberg-wap-e2e.sh
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="c1"># KEEP=1 tests/streaming-iceberg-wap-e2e.sh         # leave the stack up</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1"># SKIP_PACKAGE=1 tests/streaming-iceberg-wap-e2e.sh # reuse the existing tarball</span>
+</code></pre></div>
+<p>It reuses <code>tests/docker-compose-streaming-e2e.yml</code>; bring the stack up/down manually with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>tests/docker-compose-streaming-e2e.yml<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>tests/docker-compose-streaming-e2e.yml<span class="w"> </span>down<span class="w"> </span>-v
+</code></pre></div>
 
 
 
