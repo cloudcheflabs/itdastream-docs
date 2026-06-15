@@ -168,36 +168,51 @@ java -cp itdastream-sdk-*.jar:jackson-databind-*.jar:jackson-core-*.jar:jackson-
 
 ### Python (`requests`)
 
-[`examples/python/iceberg_wap_streaming_example.py`](https://github.com/cloudcheflabs/itdastream/blob/master/examples/python/iceberg_wap_streaming_example.py)
-logs in, creates the WAP job, polls the REST catalog to show the `audit` branch accruing records
-while `main` stays empty, then publishes and shows `main` catching up:
+Drive the same loop over the admin REST API — create the job with the WAP branch on the sink,
+audit the `audit` branch via the Iceberg REST catalog (it accrues records while `main` stays
+empty), then publish:
+
+```python
+import requests
+
+ADMIN_URL  = "http://localhost:8082"   # broker admin API
+REST_URL   = "http://localhost:8181"   # Iceberg REST catalog
+WAP_BRANCH = "audit"
+headers    = {"Authorization": "Bearer " + token, "Content-Type": "application/json"}
+
+# 1. WRITE — create the streaming job; the sink stages every record on the 'audit' branch
+spec = {
+    "name": "wap-demo", "parallelism": 2,
+    "kafka": {"topic": "events", "format": "json"},
+    "sink": {
+        "type": "table", "connectionId": "ice", "table": "db.events",
+        "itdastream.iceberg.wap.branch": WAP_BRANCH,   # <- writes go to 'audit', not main
+    },
+    "commitIntervalMs": 5000, "checkpointIntervalMs": 5000,
+}
+job_id = requests.post(f"{ADMIN_URL}/admin/streaming/jobs", headers=headers, json=spec).json()["jobId"]
+
+# 2. AUDIT — read table metadata from the Iceberg REST catalog: the 'audit' branch ref
+#    accrues records while main's current snapshot stays empty.
+meta = requests.get(f"{REST_URL}/v1/namespaces/db/tables/events").json()["metadata"]
+audit_snap = meta["refs"][WAP_BRANCH]["snapshot-id"]
+branch_records = next(int(s["summary"]["total-records"])
+                      for s in meta["snapshots"] if s["snapshot-id"] == audit_snap)
+print("audit branch records =", branch_records, " main =", meta.get("current-snapshot-id"))
+
+# 3. PUBLISH — fast-forward main to the audited branch
+resp = requests.post(f"{ADMIN_URL}/admin/iceberg/publish", headers=headers, json={
+    "operation": "fast_forward", "schema": "db", "table": "events",
+    "branch": "main", "to": WAP_BRANCH, "connectionId": "ice",
+})
+print("publish:", resp.json())   # {"status":"ok","result":"Fast-forwarded branch 'main' to 'audit' ..."}
+```
+
+The full runnable script (login, optional connection registration, record polling) is
+[`examples/python/iceberg_wap_streaming_example.py`](https://github.com/cloudcheflabs/itdastream/blob/master/examples/python/iceberg_wap_streaming_example.py):
 
 ```bash
 pip install requests
 ADMIN_URL=http://localhost:8082 REST_URL=http://localhost:8181 \
   python examples/python/iceberg_wap_streaming_example.py
-```
-
----
-
-## End-to-end test
-
-[`tests/streaming-iceberg-wap-e2e.sh`](https://github.com/cloudcheflabs/itdastream/blob/master/tests/streaming-iceberg-wap-e2e.sh)
-spins up the full stack (MinIO + iceberg-rest + ZooKeeper + 2 brokers), registers the connection,
-creates the WAP job, produces messages, and **asserts**:
-
-1. the `audit` branch reaches *N* records while `main` stays at **0** (audit isolation), then
-2. after `POST /admin/iceberg/publish` (`fast_forward`), `main` has *N* records.
-
-```bash
-tests/streaming-iceberg-wap-e2e.sh
-# KEEP=1 tests/streaming-iceberg-wap-e2e.sh         # leave the stack up
-# SKIP_PACKAGE=1 tests/streaming-iceberg-wap-e2e.sh # reuse the existing tarball
-```
-
-It reuses `tests/docker-compose-streaming-e2e.yml`; bring the stack up/down manually with:
-
-```bash
-docker compose -f tests/docker-compose-streaming-e2e.yml up -d --build
-docker compose -f tests/docker-compose-streaming-e2e.yml down -v
 ```
