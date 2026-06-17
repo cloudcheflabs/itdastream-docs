@@ -47,6 +47,14 @@ given table, concurrent writers can never collide — there is no
   per-writer).
 - One commit per checkpoint → one Iceberg snapshot per checkpoint interval regardless of
   parallelism (fewer, larger snapshots than per-broker commit).
+- **Exactly-once across restart.** Each commit stamps two things into that same snapshot, atomically
+  with the data files: a **checkpoint watermark** (`itdastream.max-committed-checkpoint-id` +
+  `itdastream.job-id`) and the **Kafka source offsets** (`itdastream.kafka.offsets`). The controller
+  commits checkpoints in strict id order and, on (re)start, seeds its checkpoint sequence from the
+  committed watermark — so a checkpoint already committed in a prior run is detected and **skipped**
+  rather than double-applied. Each source restores its offsets from the latest committed snapshot and
+  seeks there, so it never re-reads already-committed records. The Iceberg commit is therefore the
+  single source of truth for both *what data is committed* and *how far the source was consumed*.
 
 !!! note "Arrow off-heap (required)"
     The engine processes records as Apache Arrow batches in off-heap memory, which needs
@@ -91,18 +99,28 @@ partition.
 
 ## Failure and recovery (exactly-once)
 
-At each checkpoint an executor commits the sink, snapshots the Kafka offsets to S3 (the
-ExchangeManager, under `streaming/exchange/<jobId>/`, KMS-encrypted), then commits the Kafka
-offsets. Because the offset only advances **after** the sink commit and the durable snapshot:
+For a **coordinated Iceberg sink** (the default append-only path above), the Iceberg snapshot is the
+authoritative recovery point: each per-checkpoint commit stamps the checkpoint watermark **and** the
+Kafka offsets into the snapshot, atomically with the data. On recovery the controller seeds its
+checkpoint sequence from the watermark (skipping already-committed checkpoints) and each source
+restores its offsets from the latest snapshot. For other (standalone) sinks, the executor instead
+snapshots the Kafka offsets to S3 (the ExchangeManager, under `streaming/exchange/<jobId>/`,
+KMS-encrypted) and commits the consumer-group offset after the sink commit.
 
 - **Worker broker dies** → its partitions rebalance to other workers' consumers, which resume
-  from the last committed offset; the controller re-spreads thread assignments after a short
-  stabilization. No rows are lost; transactional sinks (Iceberg/JDBC) do not double-write.
-- **Controller dies** → a new controller is elected, re-reads `/streaming/jobs`, and re-publishes
-  assignments + checkpoint coordination. The data plane keeps running independently of who is
-  controller.
-- **Job reassigned to a fresh broker** → the executor restores the last completed checkpoint's
-  offsets from S3 and seeks the consumer there, so it picks up exactly where it left off.
+  from the committed position; the controller re-spreads thread assignments after a short
+  stabilization. No rows are lost; the committed watermark keeps the Iceberg commit idempotent so a
+  replayed checkpoint is never double-applied.
+- **Controller dies** → a new controller is elected, re-reads `/streaming/jobs`, re-publishes
+  assignments, and **re-seeds the checkpoint coordinator from the committed watermark**, resuming
+  commits exactly past the last durable checkpoint. The data plane keeps running independently of
+  who is controller.
+- **Job reassigned to a fresh broker** → for coordinated Iceberg sinks the source restores its
+  offsets from the latest committed Iceberg snapshot and seeks there; for standalone sinks it
+  restores from the S3 exchange. Either way it picks up exactly where it left off.
+
+This holds across a rolling restart of the whole cluster (verified end-to-end: produce → commit →
+restart all brokers → produce more yields the exact row count, no duplicates, no loss).
 
 For change streams, set **upsert keys** so any boundary replays collapse to the latest value.
 
