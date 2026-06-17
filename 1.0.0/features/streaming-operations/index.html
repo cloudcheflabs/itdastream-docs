@@ -1517,6 +1517,14 @@ given table, concurrent writers can never collide — there is no
   per-writer).</li>
 <li>One commit per checkpoint → one Iceberg snapshot per checkpoint interval regardless of
   parallelism (fewer, larger snapshots than per-broker commit).</li>
+<li><strong>Exactly-once across restart.</strong> Each commit stamps two things into that same snapshot, atomically
+  with the data files: a <strong>checkpoint watermark</strong> (<code>itdastream.max-committed-checkpoint-id</code> +
+  <code>itdastream.job-id</code>) and the <strong>Kafka source offsets</strong> (<code>itdastream.kafka.offsets</code>). The controller
+  commits checkpoints in strict id order and, on (re)start, seeds its checkpoint sequence from the
+  committed watermark — so a checkpoint already committed in a prior run is detected and <strong>skipped</strong>
+  rather than double-applied. Each source restores its offsets from the latest committed snapshot and
+  seeks there, so it never re-reads already-committed records. The Iceberg commit is therefore the
+  single source of truth for both <em>what data is committed</em> and <em>how far the source was consumed</em>.</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Arrow off-heap (required)</p>
@@ -1556,19 +1564,28 @@ re-spreads the threads. Keep <code>parallelism ≤ partitions</code> so every th
 partition.</p>
 <hr />
 <h2 id="failure-and-recovery-exactly-once">Failure and recovery (exactly-once)</h2>
-<p>At each checkpoint an executor commits the sink, snapshots the Kafka offsets to S3 (the
-ExchangeManager, under <code>streaming/exchange/&lt;jobId&gt;/</code>, KMS-encrypted), then commits the Kafka
-offsets. Because the offset only advances <strong>after</strong> the sink commit and the durable snapshot:</p>
+<p>For a <strong>coordinated Iceberg sink</strong> (the default append-only path above), the Iceberg snapshot is the
+authoritative recovery point: each per-checkpoint commit stamps the checkpoint watermark <strong>and</strong> the
+Kafka offsets into the snapshot, atomically with the data. On recovery the controller seeds its
+checkpoint sequence from the watermark (skipping already-committed checkpoints) and each source
+restores its offsets from the latest snapshot. For other (standalone) sinks, the executor instead
+snapshots the Kafka offsets to S3 (the ExchangeManager, under <code>streaming/exchange/&lt;jobId&gt;/</code>,
+KMS-encrypted) and commits the consumer-group offset after the sink commit.</p>
 <ul>
 <li><strong>Worker broker dies</strong> → its partitions rebalance to other workers' consumers, which resume
-  from the last committed offset; the controller re-spreads thread assignments after a short
-  stabilization. No rows are lost; transactional sinks (Iceberg/JDBC) do not double-write.</li>
-<li><strong>Controller dies</strong> → a new controller is elected, re-reads <code>/streaming/jobs</code>, and re-publishes
-  assignments + checkpoint coordination. The data plane keeps running independently of who is
-  controller.</li>
-<li><strong>Job reassigned to a fresh broker</strong> → the executor restores the last completed checkpoint's
-  offsets from S3 and seeks the consumer there, so it picks up exactly where it left off.</li>
+  from the committed position; the controller re-spreads thread assignments after a short
+  stabilization. No rows are lost; the committed watermark keeps the Iceberg commit idempotent so a
+  replayed checkpoint is never double-applied.</li>
+<li><strong>Controller dies</strong> → a new controller is elected, re-reads <code>/streaming/jobs</code>, re-publishes
+  assignments, and <strong>re-seeds the checkpoint coordinator from the committed watermark</strong>, resuming
+  commits exactly past the last durable checkpoint. The data plane keeps running independently of
+  who is controller.</li>
+<li><strong>Job reassigned to a fresh broker</strong> → for coordinated Iceberg sinks the source restores its
+  offsets from the latest committed Iceberg snapshot and seeks there; for standalone sinks it
+  restores from the S3 exchange. Either way it picks up exactly where it left off.</li>
 </ul>
+<p>This holds across a rolling restart of the whole cluster (verified end-to-end: produce → commit →
+restart all brokers → produce more yields the exact row count, no duplicates, no loss).</p>
 <p>For change streams, set <strong>upsert keys</strong> so any boundary replays collapse to the latest value.</p>
 <hr />
 <h2 id="troubleshooting">Troubleshooting</h2>
