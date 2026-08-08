@@ -209,7 +209,7 @@ Tuning for the Admin UI / REST HTTP server.
 | --- | --- | --- |
 | `itdastream.admin.executor.threads` | `16` | Thread-pool size for executing admin request handler logic. |
 | `itdastream.admin.net.worker.threads` | `4` | Number of network (Netty) worker threads handling admin HTTP I/O. |
-| `itdastream.admin.http.max.content.length` | `65536` | Maximum accepted HTTP request body size (bytes, 64 KiB) for admin endpoints; larger requests are rejected. |
+| `itdastream.admin.http.max.content.length` | `67108864` | Maximum accepted HTTP request body size (bytes, 64 MiB) for admin endpoints; larger requests are rejected. Sized to accept streaming-job dependency JAR uploads (`POST /admin/deps`); the Netty aggregator only buffers bytes actually sent, so a large cap is free for small requests. |
 | `itdastream.admin.cors.max.age.seconds` | `86400` | Value (seconds, 24h) sent in the CORS `Access-Control-Max-Age` header, telling browsers how long to cache a preflight result. |
 | `itdastream.admin.cleanup.history.max.records` | `50` | Maximum number of cleanup-history records returned/retained for display by admin cleanup-history endpoints. |
 | `itdastream.admin.monitoring.default.window.ms` | `3600000` | Default time window (ms, 1 hour) used by admin monitoring endpoints when a caller does not specify one. |

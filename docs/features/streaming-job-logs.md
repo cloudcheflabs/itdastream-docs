@@ -23,7 +23,7 @@ so a distributed job's logs from every broker appear merged in one view, in time
 
 ```bash
 # tail one job's logs (merged across all brokers)
-curl -s "http://broker:8082/admin/streaming/jobs/<jobId>/log" \
+curl -s "http://broker:8080/admin/streaming/jobs/<jobId>/log" \
   -H "Authorization: Bearer $JWT" | jq -r '.lines[]'
 # → {"jobId":"...","totalLines":740,"from":0,"lines":["[b152456] 2026-... committed 200 rows", ...]}
 ```
@@ -53,7 +53,7 @@ with the brokers it ran on, size, and last-modified time); click one to open the
 **REST**:
 
 ```bash
-curl -s "http://broker:8082/admin/streaming/joblogs" -H "Authorization: Bearer $JWT" | jq
+curl -s "http://broker:8080/admin/streaming/joblogs" -H "Authorization: Bearer $JWT" | jq
 # → [{"jobId":"...","size":266450,"lastModified":...,"brokers":[152456,202732,781607],"active":true}]
 ```
 
@@ -73,7 +73,7 @@ the last checkpoint may be lost).
 **REST**:
 
 ```bash
-curl -s -X DELETE "http://broker:8082/admin/streaming/jobs/<jobId>" \
+curl -s -X DELETE "http://broker:8080/admin/streaming/jobs/<jobId>" \
   -H "Authorization: Token $ITOK"
 ```
 

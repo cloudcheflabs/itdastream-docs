@@ -70,4 +70,4 @@ The test hammers the surviving master's admin endpoint while one peer is paused.
 
 - **Defaults are conservative**. 10 seconds is far below any realistic peer-to-peer round trip on a healthy cluster but above the worst-case TCP retransmit on a busy network. If you run with very low-latency expectations, tighten the deadlines via the JVM flags above.
 - **No backwards-compatible setting reverts to the old blocking behaviour**. There is no safe value here — the old behaviour was always a hang.
-- The fix changes only the *internal* RPC plane. External clients (Arrow Flight, Postgres wire, S3 wire, HTTP admin, etc.) keep their existing transport-specific timeouts.
+- The fix changes only the *internal* broker-to-broker RPC plane (`itdastream.nio.port`). External-facing transports — the Kafka wire-protocol listener and the admin HTTP server — keep their existing transport-specific timeouts, as does the S3 object-storage client.

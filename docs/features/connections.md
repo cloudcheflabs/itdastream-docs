@@ -100,7 +100,7 @@ JWT or IAM user-token auth; mutations are forwarded to the controller.
 - `DELETE /admin/connections/{id}` — delete
 
 ```bash
-curl -X POST http://broker:8082/admin/connections \
+curl -X POST http://broker:8080/admin/connections \
   -H "Authorization: Bearer $JWT" -H 'Content-Type: application/json' \
   -d '{
     "connectionId":"prod-iceberg","type":"ICEBERG",
