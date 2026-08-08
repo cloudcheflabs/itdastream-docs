@@ -37,8 +37,9 @@ rotation.
 
 | Property | Value |
 |---|---|
-| **Socket path** | `data/admin.sock` (mode `600`) |
+| **Socket path** | `${itdastream.base.data.dir}/admin.sock` by default, mode `600` — the live value is published to `bin/broker.socket` |
 | **Authentication** | OS file permission — same user as the broker process |
+| **Socket path marker** | `bin/broker.socket` — written when the socket binds, removed on shutdown |
 | **Network surface** | none — Unix domain socket only |
 | **Downtime** | none — applied in-process on the live broker |
 | **Cluster sync** | automatic — IAM state fans out to peer brokers via the existing sync path |
@@ -73,22 +74,110 @@ bin/itdastream-cli.sh iam:reset-password --user some-user --new-password 'NewPas
 
 ## Configuration
 
-The recovery socket is enabled by default. To disable it (for example, in a
-hardened production deployment), set the following on `BrokerConfig`:
+The recovery socket is enabled by default. Every key below lives in
+`conf/itdastream.properties` and is read at broker startup:
 
 ```properties
-# broker properties / JSON config
-adminSocketEnabled = false
-adminSocketPath    = data/admin.sock
-iamAuditDir        = data/iam-audit
+# conf/itdastream.properties
+# Set false to remove the local recovery path entirely.
+itdastream.admin.socket.enabled      = true
+itdastream.admin.socket.path         = ${itdastream.base.data.dir}/admin.sock
+# Name of the file under <itdastream.home>/bin that receives the socket path the
+# broker actually bound to (see "How the CLI finds the socket" below).
+itdastream.admin.socket.marker.file  = broker.socket
+# Append-only audit trail of socket operations.
+itdastream.iam.audit.dir = ${itdastream.base.data.dir}/iam-audit
 ```
 
-The CLI resolves the socket path in this order:
+The socket follows `itdastream.base.data.dir`. If you launch the broker with
+`-Ditdastream.base.data.dir=/var/lib/itdastream` the socket moves to
+`/var/lib/itdastream/admin.sock` — you do not have to restate it.
 
-1. `--socket /path/to/admin.sock` command-line flag
-2. `ITDASTREAM_ADMIN_SOCKET` environment variable
-3. `adminSocketPath` in the broker config
-4. `data/admin.sock` fallback
+### How the CLI finds the socket
+
+Re-deriving the socket path from `conf/itdastream.properties` is not reliable on its own:
+`itdastream.base.data.dir` can be overridden with `-D` at launch or edited after
+startup, and the file does not record which value the live process used. So the
+broker **publishes the path it actually bound to** into
+`<install dir>/bin/broker.socket` when the socket comes up, and removes that file on
+shutdown. `bin/itdastream-cli.sh` prefers it.
+
+Full resolution order, highest priority first:
+
+1. `--socket /path/to/admin.sock` — read by the Java CLI, always wins.
+2. `$ITDASTREAM_ADMIN_SOCKET` — if already exported in the caller's shell.
+3. `<install dir>/bin/broker.socket` — the path published by the running broker.
+   Used only when the file exists *and* the path in it is a live socket.
+4. `itdastream.admin.socket.path` from `conf/itdastream.properties`, with
+   `${itdastream.base.data.dir}` expanded. A value that still contains a
+   `${...}` placeholder is rejected rather than used literally.
+5. `<install dir>/data/admin.sock`, then `/data/admin.sock`.
+
+Step 3 is what makes a moved data dir work: with the socket at
+`/data/admin.sock` and the properties file still saying `./data`, only the marker
+knows where to connect.
+
+To rename the marker, change one key — both ends read it:
+
+```bash
+# conf/itdastream.properties
+itdastream.admin.socket.marker.file = itdastream-recovery.socket
+```
+
+Restart the broker; it publishes `bin/itdastream-recovery.socket`, and the CLI
+picks the new name up from the same properties file.
+
+### The master key is for the broker, not the CLI
+
+`ITDASTREAM_MASTER_KEY` must be exported for the broker process. `bin/start-broker.sh` checks it up front and refuses to start when it is unset or shorter than 32 characters.
+The variable name itself is configurable — `itdastream.kms.master.key.env` in
+`conf/itdastream.properties` names the variable the broker reads:
+
+```bash
+export ITDASTREAM_MASTER_KEY='replace-with-a-32-char-or-longer-secret'
+bin/start-broker.sh
+```
+
+`bin/itdastream-cli.sh` does **not** need it. The CLI only opens the Unix socket and
+hands the request to the running broker, which already holds the unsealed key,
+so this works with the variable unset:
+
+```bash
+unset ITDASTREAM_MASTER_KEY
+bin/itdastream-cli.sh ping
+# pong
+```
+
+If a CLI invocation complains about the key rather than the socket, you are
+running a start script, not the CLI.
+
+### Worked examples
+
+```bash
+# 1. On the host, as the same OS user that runs the broker:
+cd /opt/itdastream
+bin/itdastream-cli.sh ping
+bin/itdastream-cli.sh iam:reset-password
+
+# 2. The broker runs as a service account and you are root:
+sudo -u itdastream /opt/itdastream/bin/itdastream-cli.sh iam:reset-password
+
+# 3. Inside a container:
+docker exec -it itdastream-broker-1 /app/bin/itdastream-cli.sh iam:reset-password
+
+# 4. Data dir was relocated at launch — no extra flags needed, the CLI
+#    reads the published marker:
+cat /opt/itdastream/bin/broker.socket
+# /var/lib/itdastream/admin.sock
+bin/itdastream-cli.sh ping
+
+# 5. Socket in a non-standard place and no marker (the broker is stopped,
+#    or you are on a host where the marker was cleaned up):
+bin/itdastream-cli.sh --socket /var/lib/itdastream/admin.sock iam:reset-password
+
+# 6. Non-interactive automation, password from stdin so it never reaches argv:
+echo 'S0me!Strong!Pass' | bin/itdastream-cli.sh iam:reset-password --new-password -
+```
 
 ## Security model
 
