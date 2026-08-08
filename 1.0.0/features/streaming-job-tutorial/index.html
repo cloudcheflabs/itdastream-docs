@@ -1421,6 +1421,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nic-fail-safety/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NIC Silent-Fail Safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../schema-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schema Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1464,7 +1520,7 @@
 <p>Keep these two JARs separate in your head — they have different contents, but <strong>both are delivered from your machine at submit time</strong>. There's a summary table at the end.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
-<li>A running itdastream cluster — admin API reachable (e.g. <code>http://localhost:8082</code>).</li>
+<li>A running itdastream cluster — admin API reachable (e.g. <code>http://localhost:8080</code>).</li>
 <li>A source topic (e.g. <code>events</code>).</li>
 <li>An <strong>ICEBERG connection</strong> registered in the connection registry (Admin UI → Connections, or the REST API) — the sink references it by id (e.g. <code>prod-iceberg</code>). See <a href="../connections/">Connections</a>.</li>
 <li>JDK 17+ and Gradle on the machine that submits the job.</li>
@@ -1473,7 +1529,7 @@
 </ul>
 <h2 id="step-1-create-an-iam-user-token-itok">Step 1 — Create an IAM user token (<code>ITOK…</code>)</h2>
 <p>The user token is the recommended SDK / CI credential — it is long-lived and carries the user's group policies. Create an access key for a user (Admin UI → IAM, or the REST API); the response returns three values <strong>once</strong>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8082/admin/iam/keys<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8080/admin/iam/keys<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$ADMIN_JWT</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;username&quot;: &quot;pipeline-bot&quot;}&#39;</span>
@@ -1519,7 +1575,7 @@
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">PurchasesToIceberg</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">        </span><span class="c1">// args: &lt;adminUrl&gt; [userToken]   (token also read from ITDASTREAM_USER_TOKEN)</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">adminUrl</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">args</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">&quot;http://localhost:8082&quot;</span><span class="p">;</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">adminUrl</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">args</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">&quot;http://localhost:8080&quot;</span><span class="p">;</span>
 <a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">userToken</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">args</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">getenv</span><span class="p">(</span><span class="s">&quot;ITDASTREAM_USER_TOKEN&quot;</span><span class="p">);</span>
 <a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
 <a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">        </span><span class="n">ItdaStreamSession</span><span class="w"> </span><span class="n">session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ItdaStreamSession</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
@@ -1550,24 +1606,24 @@
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1"># → build/libs/&lt;project&gt;-all.jar</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>java<span class="w"> </span>-jar<span class="w"> </span>build/libs/purchases-to-iceberg-all.jar<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">     </span>http://localhost:8082<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ITDASTREAM_USER_TOKEN</span><span class="s2">&quot;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">     </span>http://localhost:8080<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ITDASTREAM_USER_TOKEN</span><span class="s2">&quot;</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="c1"># → Submitted streaming job: job-3f2a...</span>
 </code></pre></div>
 <p>That single command authenticates, builds the spec, and submits it. The same jar drops straight into a CI step or a scheduler — the token is the only secret it needs.</p>
 <h2 id="step-5-verify-and-operate">Step 5 — Verify and operate</h2>
 <p>Check status, list jobs, or cancel — with the same token:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># status of one job</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:8082/admin/streaming/jobs/&lt;jobId&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:8080/admin/streaming/jobs/&lt;jobId&gt;<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Token </span><span class="nv">$ITDASTREAM_USER_TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1"># cancel</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span>http://localhost:8082/admin/streaming/jobs/&lt;jobId&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span>http://localhost:8080/admin/streaming/jobs/&lt;jobId&gt;<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Token </span><span class="nv">$ITDASTREAM_USER_TOKEN</span><span class="s2">&quot;</span>
 </code></pre></div>
 <p>Or use the <strong>SDK handle</strong> instead of plain REST:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">var</span><span class="w"> </span><span class="n">handle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">session</span><span class="p">.</span><span class="na">streamSource</span><span class="p">(...).</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">.</span><span class="na">submit</span><span class="p">();</span><span class="w">  </span><span class="c1">// returns a handle</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">handle</span><span class="p">.</span><span class="na">status</span><span class="p">());</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">handle</span><span class="p">.</span><span class="na">cancel</span><span class="p">();</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">handle</span><span class="p">.</span><span class="na">stop</span><span class="p">();</span><span class="w">   </span><span class="c1">// stop and delete the job (DELETE /admin/streaming/jobs/{id})</span>
 </code></pre></div>
 <p>The job also appears in the Admin UI's streaming view, and the Iceberg table <code>analytics.purchases</code> starts receiving rows on the first commit (every <code>commitInterval</code>). Query it from any Iceberg-compatible engine (Trino, Spark, …) pointed at the same catalog.</p>
 <h2 id="advanced-custom-transforms-uploaded-with-the-job">Advanced — custom transforms (uploaded with the job)</h2>
@@ -1622,7 +1678,7 @@
 <h2 id="submitting-from-the-shell-binsubmitsh">Submitting from the shell — <code>bin/submit.sh</code></h2>
 <p>The distribution ships <code>bin/submit.sh</code>, a <code>curl</code>/<code>jq</code> CLI that does the same upload-then-submit flow without writing a Java submitter. Hand it a spec JSON and any transform JARs:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>bin/submit.sh<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>--master<span class="w"> </span>localhost:8082<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>--master<span class="w"> </span>localhost:8080<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span>--spec<span class="w">   </span>job.json<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span>--jars<span class="w">   </span>build/libs/my-transforms-all.jar<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span>--token<span class="w">  </span><span class="s2">&quot;</span><span class="nv">$ITDASTREAM_USER_TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
@@ -1733,7 +1789,7 @@
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>      - "NIC Silent-Fail Safety": features/nic-fail-safety.md
+      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>
 
     </div>
   

@@ -1263,6 +1263,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nic-fail-safety/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NIC Silent-Fail Safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../schema-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schema Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1292,7 +1348,7 @@
 <ul>
 <li><strong>Transaction lifecycle</strong>: InitProducerId → AddPartitionsToTxn → AddOffsetsToTxn → EndTxn (Commit/Abort)</li>
 <li><strong>Isolation levels</strong>: <code>read_uncommitted</code> (all records visible, default) and <code>read_committed</code> (only committed/non-transactional records visible)</li>
-<li><strong>State machine</strong>: EMPTY → ONGOING → PREPARE_COMMIT/ABORT → COMPLETE_COMMIT/ABORT → DEAD, persisted in ZooKeeper for crash recovery</li>
+<li><strong>State machine</strong>: EMPTY → ONGOING → PREPARE_COMMIT/PREPARE_ABORT → COMPLETE_COMMIT/COMPLETE_ABORT, persisted in ZooKeeper for crash recovery</li>
 </ul>
 
 
@@ -1331,7 +1387,7 @@
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>      - "NIC Silent-Fail Safety": features/nic-fail-safety.md
+      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>
 
     </div>
   

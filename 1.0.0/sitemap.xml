@@ -2,118 +2,122 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/architecture/architecture/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/admin-password-recovery/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/backup/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/caching/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/compression/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/configuration/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/connections/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/consumer-group/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/disaggre-architecture/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/iam-policy/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/iam/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/iceberg-wap/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/kafka-compatible/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/kms/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/monitoring/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/network/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/nic-fail-safety/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/retention/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/sasl/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
+    </url>
+    <url>
+         <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/schema-registry/</loc>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/staging-store/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming-job-logs/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming-job-tutorial/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming-no-code/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming-operations/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming-sdk/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/tx/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
     <url>
          <loc>https://cloudcheflabs.github.io/itdastream-docs/1.0.0/installation/installation/</loc>
-         <lastmod>2026-06-17</lastmod>
+         <lastmod>2026-08-08</lastmod>
     </url>
 </urlset>

@@ -1263,6 +1263,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nic-fail-safety/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NIC Silent-Fail Safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../schema-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schema Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1290,13 +1346,15 @@
 <h1 id="full-kafka-protocol-compatibility">Full Kafka Protocol Compatibility</h1>
 <p>ItdaStream implements 24 standard Apache Kafka APIs with multi-version support (Kafka 2.x/3.x wire protocol). Applications can connect using any standard Kafka client library without code changes — simply point <code>bootstrap.servers</code> to the ItdaStream cluster.</p>
 <ul>
-<li><strong>Producer/Consumer</strong>: Produce (v0-v9), Fetch (v0-v12) with isolation levels</li>
+<li><strong>Producer/Consumer</strong>: Produce, Fetch (with isolation levels), ListOffsets</li>
 <li><strong>Metadata &amp; Offsets</strong>: Metadata, OffsetCommit, OffsetFetch</li>
 <li><strong>Consumer Groups</strong>: JoinGroup, SyncGroup, Heartbeat, LeaveGroup, FindCoordinator, DescribeGroups, ListGroups</li>
 <li><strong>Topic Management</strong>: CreateTopics, DeleteTopics with optional auto-creation</li>
-<li><strong>Transactions</strong>: InitProducerId, AddPartitionsToTxn, AddOffsetsToTxn, EndTxn (full exactly-once semantics)</li>
+<li><strong>Transactions</strong>: InitProducerId, AddPartitionsToTxn, AddOffsetsToTxn, EndTxn, TxnOffsetCommit (full exactly-once semantics)</li>
+<li><strong>Cluster &amp; Config</strong>: ApiVersions, DescribeConfigs</li>
 <li><strong>Authentication</strong>: SaslHandshake, SaslAuthenticate (SASL/PLAIN, SASL_SSL)</li>
 </ul>
+<p>The 24 APIs are the request handlers registered in <code>RequestDispatcher</code> plus <code>SaslAuthenticate</code> (processed inline by the network auth layer). Standard client operations — producing, consuming, consumer-group membership, topic administration, and transactions — all work against these handlers.</p>
 
 
 
@@ -1334,7 +1392,7 @@
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>      - "NIC Silent-Fail Safety": features/nic-fail-safety.md
+      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>
 
     </div>
   

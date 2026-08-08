@@ -1555,6 +1555,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nic-fail-safety/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NIC Silent-Fail Safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../schema-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schema Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2134,8 +2190,8 @@ subdirectory under <code>itdastream.base.data.dir</code>, for example:</p>
 </tr>
 <tr>
 <td><code>itdastream.admin.http.max.content.length</code></td>
-<td><code>65536</code></td>
-<td>Maximum accepted HTTP request body size (bytes, 64 KiB) for admin endpoints; larger requests are rejected.</td>
+<td><code>67108864</code></td>
+<td>Maximum accepted HTTP request body size (bytes, 64 MiB) for admin endpoints; larger requests are rejected. Sized to accept streaming-job dependency JAR uploads (<code>POST /admin/deps</code>); the Netty aggregator only buffers bytes actually sent, so a large cap is free for small requests.</td>
 </tr>
 <tr>
 <td><code>itdastream.admin.cors.max.age.seconds</code></td>
@@ -2379,7 +2435,7 @@ subdirectory under <code>itdastream.base.data.dir</code>, for example:</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>      - "NIC Silent-Fail Safety": features/nic-fail-safety.md
+      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>
 
     </div>
   

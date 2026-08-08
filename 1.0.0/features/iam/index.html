@@ -1311,6 +1311,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nic-fail-safety/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NIC Silent-Fail Safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../schema-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schema Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1372,7 +1428,7 @@ values at once:</p>
 <p>The secret key and user token are shown <strong>once</strong> (a one-time reveal in the UI, and in the
 downloadable credentials CSV) — store them securely. The user token is the recommended
 credential for the <a href="../streaming-sdk/">Streaming SDK</a> and CI:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">ItdaStreamSession</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">adminUrl</span><span class="p">(</span><span class="s">&quot;http://broker:8082&quot;</span><span class="p">).</span><span class="na">userToken</span><span class="p">(</span><span class="s">&quot;ITOK...&quot;</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">ItdaStreamSession</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">adminUrl</span><span class="p">(</span><span class="s">&quot;http://broker:8080&quot;</span><span class="p">).</span><span class="na">userToken</span><span class="p">(</span><span class="s">&quot;ITOK...&quot;</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
 </code></pre></div>
 <p>Tokens inherit the user's group policies and honor the access key's <code>Active</code> status and optional
 expiration; deleting the access key revokes the token.</p>
@@ -1413,7 +1469,7 @@ expiration; deleting the access key revokes the token.</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>      - "NIC Silent-Fail Safety": features/nic-fail-safety.md
+      © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>
 
     </div>
   
