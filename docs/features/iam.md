@@ -30,7 +30,7 @@ downloadable credentials CSV) — store them securely. The user token is the rec
 credential for the [Streaming SDK](streaming-sdk.md) and CI:
 
 ```java
-ItdaStreamSession.builder().adminUrl("http://broker:8082").userToken("ITOK...").build();
+ItdaStreamSession.builder().adminUrl("http://broker:8080").userToken("ITOK...").build();
 ```
 
 Tokens inherit the user's group policies and honor the access key's `Active` status and optional

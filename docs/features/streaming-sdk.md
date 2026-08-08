@@ -21,7 +21,7 @@ Prefer a long-lived **IAM user token** (see [IAM](iam.md)) for SDK / CI usage:
 
 ```java
 ItdaStreamSession session = ItdaStreamSession.builder()
-    .adminUrl("http://broker:8082")
+    .adminUrl("http://broker:8080")
     .userToken("ITOK...")          // Authorization: Token ITOK...
     .build();
 ```
@@ -75,7 +75,7 @@ public class EnrichFn implements MapFunction {
 }
 ```
 
-You ship the class **with the job**: list its JAR(s) via `.jars("path/to/transforms.jar", …)` (or `.jarDirs(...)`). On `start()` the SDK uploads them to the cluster dependency store (`POST /admin/deps`, deduped by name), and each broker loads the class from a **per-job `URLClassLoader`** over those JARs — no copy to `lib/`, no restart. Mark `itdastream-streaming` `compileOnly` when building the JAR (it is provided by the broker). The full packaging recipe is in [Tutorial: Submit a Job (Token + Uber-JAR)](streaming-job-tutorial.md#advanced-custom-transforms-uploaded-with-the-job).
+You ship the class **with the job**: list its JAR(s) via `.jars("path/to/transforms.jar", …)`. On `start()` the SDK uploads them to the cluster dependency store (`POST /admin/deps`, deduped by name), and each broker loads the class from a **per-job `URLClassLoader`** over those JARs — no copy to `lib/`, no restart. Mark `itdastream-streaming` `compileOnly` when building the JAR (it is provided by the broker). The full packaging recipe is in [Tutorial: Submit a Job (Token + Uber-JAR)](streaming-job-tutorial.md#advanced-custom-transforms-uploaded-with-the-job).
 
 !!! tip "No transforms? No JARs."
     A job with only `.filter(...)` / `.select(...)` (or none) needs no `.jars(...)` — it is the [no-code auto-sink](streaming-no-code.md) path and runs entirely from the declarative spec.
@@ -126,7 +126,7 @@ import com.cloudcheflabs.itdastream.sdk.Source;
 public class PurchasesPipeline {
     public static void main(String[] args) throws Exception {
         // args: <adminUrl> <userToken>
-        String adminUrl  = args.length > 0 ? args[0] : "http://localhost:8082";
+        String adminUrl  = args.length > 0 ? args[0] : "http://localhost:8080";
         String userToken = args.length > 1 ? args[1] : System.getenv("ITDASTREAM_USER_TOKEN");
 
         // 1) Open a session. Prefer a long-lived IAM user token for SDK / CI.
@@ -186,7 +186,7 @@ Compile and run against the SDK jar (bundled under `sdk/` in the distribution):
 ```bash
 javac -cp "itdastream-sdk-1.0.0.jar" -d out com/example/PurchasesPipeline.java
 java  -cp "out:itdastream-sdk-1.0.0.jar:jackson-databind.jar:jackson-core.jar:jackson-annotations.jar" \
-      com.example.PurchasesPipeline http://broker:8082 "$ITDASTREAM_USER_TOKEN"
+      com.example.PurchasesPipeline http://broker:8080 "$ITDASTREAM_USER_TOKEN"
 ```
 
 ### Variations by sink
@@ -220,7 +220,7 @@ jobs:
 
 ```java
 ItdaStreamSession session = ItdaStreamSession.builder()
-        .adminUrl("http://broker:8082").userToken(token).build();
+        .adminUrl("http://broker:8080").userToken(token).build();
 
 for (String topic : List.of("events", "clicks", "orders")) {
     String id = session.streamSource(Source.kafka(topic).format("json"))

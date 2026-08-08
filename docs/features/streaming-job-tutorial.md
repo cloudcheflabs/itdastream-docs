@@ -21,7 +21,7 @@ Keep these two JARs separate in your head — they have different contents, but 
 
 ## Prerequisites
 
-- A running itdastream cluster — admin API reachable (e.g. `http://localhost:8082`).
+- A running itdastream cluster — admin API reachable (e.g. `http://localhost:8080`).
 - A source topic (e.g. `events`).
 - An **ICEBERG connection** registered in the connection registry (Admin UI → Connections, or the REST API) — the sink references it by id (e.g. `prod-iceberg`). See [Connections](connections.md).
 - JDK 17+ and Gradle on the machine that submits the job.
@@ -33,7 +33,7 @@ Keep these two JARs separate in your head — they have different contents, but 
 The user token is the recommended SDK / CI credential — it is long-lived and carries the user's group policies. Create an access key for a user (Admin UI → IAM, or the REST API); the response returns three values **once**:
 
 ```bash
-curl -s -X POST http://localhost:8082/admin/iam/keys \
+curl -s -X POST http://localhost:8080/admin/iam/keys \
   -H "Authorization: Bearer $ADMIN_JWT" \
   -H 'Content-Type: application/json' \
   -d '{"username": "pipeline-bot"}'
@@ -92,7 +92,7 @@ import com.cloudcheflabs.itdastream.sdk.Source;
 public class PurchasesToIceberg {
     public static void main(String[] args) {
         // args: <adminUrl> [userToken]   (token also read from ITDASTREAM_USER_TOKEN)
-        String adminUrl   = args.length > 0 ? args[0] : "http://localhost:8082";
+        String adminUrl   = args.length > 0 ? args[0] : "http://localhost:8080";
         String userToken  = args.length > 1 ? args[1] : System.getenv("ITDASTREAM_USER_TOKEN");
 
         ItdaStreamSession session = ItdaStreamSession.builder()
@@ -128,7 +128,7 @@ Build a single self-contained jar (your `main` + the SDK + Jackson), then run it
 # → build/libs/<project>-all.jar
 
 java -jar build/libs/purchases-to-iceberg-all.jar \
-     http://localhost:8082 "$ITDASTREAM_USER_TOKEN"
+     http://localhost:8080 "$ITDASTREAM_USER_TOKEN"
 # → Submitted streaming job: job-3f2a...
 ```
 
@@ -140,11 +140,11 @@ Check status, list jobs, or cancel — with the same token:
 
 ```bash
 # status of one job
-curl -s http://localhost:8082/admin/streaming/jobs/<jobId> \
+curl -s http://localhost:8080/admin/streaming/jobs/<jobId> \
   -H "Authorization: Token $ITDASTREAM_USER_TOKEN" | jq
 
 # cancel
-curl -s -X DELETE http://localhost:8082/admin/streaming/jobs/<jobId> \
+curl -s -X DELETE http://localhost:8080/admin/streaming/jobs/<jobId> \
   -H "Authorization: Token $ITDASTREAM_USER_TOKEN"
 ```
 
@@ -153,7 +153,7 @@ Or use the **SDK handle** instead of plain REST:
 ```java
 var handle = session.streamSource(...). ... .submit();  // returns a handle
 System.out.println(handle.status());
-handle.cancel();
+handle.stop();   // stop and delete the job (DELETE /admin/streaming/jobs/{id})
 ```
 
 The job also appears in the Admin UI's streaming view, and the Iceberg table `analytics.purchases` starts receiving rows on the first commit (every `commitInterval`). Query it from any Iceberg-compatible engine (Trino, Spark, …) pointed at the same catalog.
@@ -226,7 +226,7 @@ The distribution ships `bin/submit.sh`, a `curl`/`jq` CLI that does the same upl
 
 ```bash
 bin/submit.sh \
-  --master localhost:8082 \
+  --master localhost:8080 \
   --spec   job.json \
   --jars   build/libs/my-transforms-all.jar \
   --token  "$ITDASTREAM_USER_TOKEN" \

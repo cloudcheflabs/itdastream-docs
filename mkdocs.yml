@@ -62,6 +62,8 @@ nav:
       - "Flexible Configuration System": features/configuration.md
       - "Crash Recovery with Staging Store": features/staging-store.md
       - "Backup & Restore": features/backup.md
+      - "NIC Silent-Fail Safety": features/nic-fail-safety.md
+      - "Schema Registry": features/schema-registry.md
 
 
 extra:
@@ -93,4 +95,4 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 copyright: |
-  © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>      - "NIC Silent-Fail Safety": features/nic-fail-safety.md
+  © <script>document.write(new Date().getFullYear())</script> Cloud Chef Labs, Inc. All rights reserved. <a href="mailto:admin@cloudchef-labs.com">admin@cloudchef-labs.com</a>

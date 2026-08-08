@@ -46,7 +46,7 @@ to that branch; `main` is untouched until you publish.
 Submit it like any other streaming job:
 
 ```bash
-curl -X POST http://broker:8082/admin/streaming/jobs \
+curl -X POST http://broker:8080/admin/streaming/jobs \
   -H "Authorization: Bearer $JWT" -H 'Content-Type: application/json' \
   -d @wap-demo.json
 ```
@@ -94,7 +94,7 @@ Once the audit branch passes, publish it onto `main`. The endpoint supports two 
 Move `main` up to the tip of the audit branch (the common case — append-only staging).
 
 ```bash
-curl -X POST http://broker:8082/admin/iceberg/publish \
+curl -X POST http://broker:8080/admin/iceberg/publish \
   -H "Authorization: Bearer $JWT" -H 'Content-Type: application/json' \
   -d '{
     "operation":"fast_forward",
@@ -113,7 +113,7 @@ Apply a single audited snapshot onto `main` (useful when you want one specific s
 the whole branch tip):
 
 ```bash
-curl -X POST http://broker:8082/admin/iceberg/publish \
+curl -X POST http://broker:8080/admin/iceberg/publish \
   -H "Authorization: Bearer $JWT" -H 'Content-Type: application/json' \
   -d '{
     "operation":"cherrypick",
@@ -163,7 +163,7 @@ Run it:
 ```bash
 java -cp itdastream-sdk-*.jar:jackson-databind-*.jar:jackson-core-*.jar:jackson-annotations-*.jar \
      com.cloudcheflabs.itdastream.sdk.examples.IcebergWapStreamingExample \
-     http://localhost:8082 ITOK...usertoken...
+     http://localhost:8080 ITOK...usertoken...
 ```
 
 ### Python (`requests`)
@@ -175,7 +175,7 @@ empty), then publish:
 ```python
 import requests
 
-ADMIN_URL  = "http://localhost:8082"   # broker admin API
+ADMIN_URL  = "http://localhost:8080"   # broker admin API
 REST_URL   = "http://localhost:8181"   # Iceberg REST catalog
 WAP_BRANCH = "audit"
 headers    = {"Authorization": "Bearer " + token, "Content-Type": "application/json"}
@@ -213,6 +213,6 @@ The full runnable script (login, optional connection registration, record pollin
 
 ```bash
 pip install requests
-ADMIN_URL=http://localhost:8082 REST_URL=http://localhost:8181 \
+ADMIN_URL=http://localhost:8080 REST_URL=http://localhost:8181 \
   python examples/python/iceberg_wap_streaming_example.py
 ```

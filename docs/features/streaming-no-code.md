@@ -48,7 +48,7 @@ jobs never inline secrets. In the Admin UI open **Connections → New Connection
 The same form is available over REST:
 
 ```bash
-curl -X POST http://broker:8082/admin/connections \
+curl -X POST http://broker:8080/admin/connections \
   -H "Authorization: Bearer $JWT" -H 'Content-Type: application/json' \
   -d '{"connectionId":"prod-iceberg","type":"ICEBERG","properties":{
         "catalog.rest.uri":"http://iceberg-rest:8181","catalog.rest.flavor":"rest",
