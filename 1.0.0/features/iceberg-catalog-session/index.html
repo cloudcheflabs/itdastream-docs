@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/iceberg-catalog-session/">
       
       
-        <link rel="prev" href="../../installation/installation/">
+        <link rel="prev" href="../iceberg-wap/">
       
       
-        <link rel="next" href="../streaming-no-code/">
+        <link rel="next" href="../streaming-operations/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Overview - ItdaStream</title>
+        <title>Iceberg Catalog Sessions & Token Renewal - ItdaStream</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#streaming-kafka-iceberg-multi-sink" class="md-skip">
+        <a href="#iceberg-catalog-sessions-and-oauth2-token-renewal" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              Iceberg Catalog Sessions & Token Renewal
             
           </span>
         </div>
@@ -257,7 +257,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+        <a href="../streaming/" class="md-tabs__link">
           
   
   
@@ -498,37 +498,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../streaming/" class="md-nav__link">
         
   
   
@@ -544,120 +517,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#key-properties" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key properties
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#architecture" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Architecture
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Architecture">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#job-lifecycle" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Job lifecycle
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#exactly-once" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Exactly-once
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-two-ways-to-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The two ways to run
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#supported-sinks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supported sinks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rest-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        REST API
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration-monitoring-and-recovery" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration, monitoring, and recovery
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -835,10 +694,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../iceberg-catalog-session/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Catalog Sessions & Token Renewal
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -854,6 +740,81 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-session-authenticates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the session authenticates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-token-is-renewed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the token is renewed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-a-single-failed-renewal-used-to-be-fatal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why a single failed renewal used to be fatal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-itdastream-recovers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How ItdaStream recovers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1502,190 +1463,161 @@
 
 
 
-<h1 id="streaming-kafka-iceberg-multi-sink">Streaming (Kafka → Iceberg / Multi-Sink)</h1>
-<p>ItdaStream includes a built-in, Flink-style streaming engine. The <strong>controller broker acts as
-the streaming master</strong> and <strong>every other broker acts as a worker</strong>, so streaming runs on the
-same cluster that stores your topics — no separate compute cluster to operate.</p>
-<p>Two ways to run a pipeline:</p>
-<ul>
-<li><strong>No-code</strong> — in the Admin UI pick a source topic, a parallelism, a format (JSON/Avro), and a
-  target (e.g. an Iceberg table referenced through a named connection); records flow continuously
-  into the sink. No job to compile or deploy. See <a href="../streaming-no-code/">No-Code Kafka → Iceberg</a>.</li>
-<li><strong>SDK</strong> — submit a Java job with <code>filter</code> / <code>select</code> / <code>map</code> / <code>flatMap</code> transforms to any of
-  the supported sinks. See the <a href="../streaming-sdk/">Streaming SDK</a>.</li>
-</ul>
-<p>Both paths produce the same job specification and run on the same engine. For configuration,
-monitoring, scaling, and recovery see <a href="../streaming-operations/">Operations &amp; Tuning</a>.</p>
+<h1 id="iceberg-catalog-sessions-and-oauth2-token-renewal">Iceberg Catalog Sessions and OAuth2 Token Renewal</h1>
+<p>Every Iceberg sink and every Iceberg read in ItdaStream talks to an <strong>Iceberg REST catalog</strong> —
+Apache Polaris, a vanilla <code>iceberg-rest</code>/Nessie server, or the AWS Glue Iceberg REST endpoint.
+That connection is long-lived: a streaming job stays up for weeks, while the OAuth2 token it
+authenticates with typically lasts an hour. This page explains how the session authenticates,
+how the token is renewed, what happens when a renewal fails, and how ItdaStream recovers.</p>
+<p>It matters because the failure it prevents is silent and total: a catalog session that loses
+its ability to renew keeps working until the current token expires, then fails <strong>every</strong>
+catalog call from that moment on.</p>
 <hr />
-<h2 id="key-properties">Key properties</h2>
-<ul>
-<li><strong>Exactly-once to transactional sinks</strong> (Iceberg, JDBC): the sink commit and the Kafka offset
-  commit are aligned at a checkpoint barrier, so a failure never loses or double-writes records.
-  Non-transactional sinks (Kafka, Elasticsearch, HTTP, console) are at-least-once.</li>
-<li><strong>Parallelism = consumer-group size</strong>: a job runs N consumer threads, spread across the worker
-  brokers, all in the consumer group <code>stream-&lt;jobId&gt;</code>. ItdaStream's existing group coordinator
-  distributes the topic partitions across them and rebalances on membership change.</li>
-<li><strong>Durable checkpoints on S3</strong>: each checkpoint snapshots the Kafka offsets to S3 (the
-  ExchangeManager), KMS-encrypted, so a job reassigned to a different broker resumes exactly
-  where it left off.</li>
-<li><strong>Connection registry</strong>: credentials (S3, Iceberg catalog, Kafka, Elasticsearch, JDBC,
-  NeorunBase) are registered once and referenced by <code>connectionId</code> — jobs never inline secrets.
-  See <a href="../connections/">Connections</a>.</li>
-</ul>
+<h2 id="how-the-session-authenticates">How the session authenticates</h2>
+<p>The read path (<code>IcebergConnector</code>) and the write path (<code>IcebergConnectorSink</code>) build their
+catalog properties from one shared builder, so the two can never drift apart — a mismatch
+between them shows up as <code>createTable</code>/append hitting credential-vending 403s that a read-only
+query never surfaces.</p>
+<p>Two authentication flavors are supported, selected by <code>catalog.rest.flavor</code> on the connection:</p>
+<p>=== "Polaris / OAuth2 (default)"</p>
+<div class="highlight"><pre><span></span><code>The connection&#39;s client id and secret are combined into Iceberg&#39;s `credential` property and
+exchanged for a bearer token at the catalog&#39;s token endpoint using the OAuth2
+**client-credentials** grant:
+
+| Connection key | Iceberg property | Notes |
+|---|---|---|
+| `catalog.rest.client_id` + `catalog.rest.client_secret` | `credential` | Combined as `id:secret`. `catalog.rest.credential` also accepted. |
+| `catalog.rest.token` | `token` | A static, pre-issued token instead of a credential — see the warning below. |
+| `catalog.rest.scope` | `scope` | Defaults to `itdastream.iceberg.polaris.default.scope` (`PRINCIPAL_ROLE:ALL`) for the `polaris` flavor. |
+| `catalog.rest.oauth2.server.uri` | `oauth2-server-uri` | The token endpoint. Set it explicitly; the client&#39;s automatic fallback is deprecated upstream. |
+| `catalog.rest.prefix` | `prefix` | Defaults to the catalog name for `polaris`. Not sent for the `rest` flavor. |
+</code></pre></div>
+<p>=== "AWS Glue / SigV4"</p>
+<div class="highlight"><pre><span></span><code>No OAuth2 at all: every catalog request is signed with AWS SigV4 through Iceberg&#39;s
+`RESTSigV4Signer`. Nothing on this page about token renewal applies — there is no token.
+
+| Connection key | Iceberg property |
+|---|---|
+| `catalog.rest.signing.name` | `rest.signing-name` (default `glue`) |
+| `catalog.rest.signing.region` | `rest.signing-region` |
+| `catalog.rest.aws.accessKey` / `.secretKey` / `.sessionToken` | `rest.access-key-id` / `rest.secret-access-key` / `rest.session-token` |
+
+When the AWS keys are omitted they fall back to the connection&#39;s `s3.*` keys, and when those
+are absent too, Iceberg uses the default AWS credentials provider chain (instance profile,
+environment, SSO) — the usual case under an IAM role.
+</code></pre></div>
 <hr />
-<h2 id="architecture">Architecture</h2>
-<p>Every broker runs the same <code>StreamingService</code>, which plays one or both roles:</p>
-<ul>
-<li>
-<p><strong>Master (the controller broker).</strong> Watches <code>/streaming/jobs</code>, computes a per-broker thread
-  assignment — a <code>{brokerId: threadCount}</code> map — and writes it to <code>/streaming/assignments/&lt;jobId&gt;</code>.
-  It also runs one <code>CheckpointCoordinator</code> per job, triggering checkpoint barriers to the workers
-  over the internal NIO channel.</p>
-</li>
-<li>
-<p><strong>Worker (every broker).</strong> Reconciles the set of running executor threads to match this broker's
-  assignment. Each thread is a <code>StreamingJobExecutor</code>: a Kafka consumer in the group
-  <code>stream-&lt;jobId&gt;</code> that deserializes (JSON/Avro), applies <code>filter</code> / <code>select</code> / <code>map</code> / <code>flatMap</code>,
-  and writes to the sink (Iceberg, Kafka, …).</p>
-</li>
-</ul>
-<p>The data flows topic → executor threads → sink; in parallel, each executor snapshots its Kafka
-offsets to the S3 ExchangeManager and commits the sink at every checkpoint. So the <strong>control
-plane</strong> (assignments) travels through ZooKeeper, the <strong>checkpoint barriers</strong> through internal NIO,
-and the <strong>data plane</strong> is the consumer group reading partitions and writing to the sink.</p>
-<p>The control plane is <strong>ZooKeeper-declarative</strong>: the master writes the desired per-broker thread
-count, and each worker is a level-triggered reconciler that converges its running executor
-threads to its assignment (and heals any missed watch on a periodic tick). The runtime
-<strong>checkpoint barriers</strong> travel over the internal NIO channel, which now runs on every broker.</p>
-<h3 id="job-lifecycle">Job lifecycle</h3>
-<ol>
-<li>A job spec is written to <code>/streaming/jobs/&lt;jobId&gt;</code> (by the Admin UI or the SDK, through the
-   admin API).</li>
-<li>The controller's reconciler computes an assignment and writes
-   <code>/streaming/assignments/&lt;jobId&gt;</code> (a single <code>{brokerId: threadCount}</code> map).</li>
-<li>Each worker starts/stops <code>StreamingJobExecutor</code> threads to match its assignment. Each thread
-   is one consumer in the group <code>stream-&lt;jobId&gt;</code>.</li>
-<li>The controller's <code>CheckpointCoordinator</code> triggers checkpoint barriers on an interval; each
-   executor also runs a time-based self-checkpoint as a fallback.</li>
-<li>Deleting the job removes the spec; the reconcilers stop the executors.</li>
-</ol>
-<hr />
-<h2 id="exactly-once">Exactly-once</h2>
-<p>For a transactional sink the poll loop <strong>never advances Kafka offsets</strong>. At each checkpoint the
-executor performs, in order:</p>
-<ol>
-<li><strong>commit the sink</strong> — for Iceberg, the data files written since the last checkpoint are
-   committed as one snapshot; for JDBC, the transaction is committed;</li>
-<li><strong>snapshot the Kafka offsets</strong> to the S3 ExchangeManager under the checkpoint id;</li>
-<li><strong>commit the Kafka offsets</strong> (the commit point);</li>
-<li><strong>acknowledge</strong> the controller's coordinator.</li>
-</ol>
-<p>Because the offset only advances after the sink commit and the durable offset snapshot, a crash
-either replays from the last committed checkpoint (sink not yet committed) or resumes cleanly
-(sink committed, offsets advanced) — exactly-once. On startup the executor restores the last
-completed checkpoint's offsets from S3 and seeks the consumer there.</p>
-<p>For idempotent updates, set <strong>upsert keys</strong> on the Iceberg sink: each commit writes the data plus
-an equality-delete on the keys, so re-processed rows collapse to the latest value.</p>
-<hr />
-<h2 id="the-two-ways-to-run">The two ways to run</h2>
-<ul>
-<li><strong><a href="../streaming-no-code/">No-Code Kafka → Iceberg</a></strong> — a step-by-step walkthrough of configuring
-  a topic-to-Iceberg pipeline entirely in the Admin UI.</li>
-<li><strong><a href="../streaming-sdk/">Streaming SDK</a></strong> — submit richer Java jobs with transforms and any sink.</li>
-</ul>
-<p>Both reference credentials through the <a href="../connections/">Connection Registry</a> and run on the same
-engine; both produce the same job spec (see the REST API below).</p>
-<hr />
-<h2 id="supported-sinks">Supported sinks</h2>
+<h2 id="how-the-token-is-renewed">How the token is renewed</h2>
+<p>The Iceberg client schedules a background refresh at roughly 90% of the token's lifetime, and
+renews with one of two OAuth2 grants:</p>
 <table>
 <thead>
 <tr>
-<th>Sink</th>
-<th>Type</th>
-<th>Semantics</th>
-<th>Notes</th>
+<th>Grant</th>
+<th>When it is used</th>
+<th>What it needs</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Iceberg</td>
-<td><code>table</code></td>
-<td>exactly-once</td>
-<td>append or equality-delete upsert; REST catalog (Polaris / vanilla REST / Glue)</td>
+<td>RFC 8693 <strong>token exchange</strong></td>
+<td>The default (<code>token-exchange-enabled=true</code>)</td>
+<td>The current token as the subject token</td>
 </tr>
 <tr>
-<td>JDBC</td>
-<td><code>jdbc</code></td>
-<td>exactly-once</td>
-<td>transactional; PostgreSQL driver bundled, others added to the classpath</td>
-</tr>
-<tr>
-<td>Kafka</td>
-<td><code>kafka</code></td>
-<td>at-least-once</td>
-<td>produce to another topic/cluster</td>
-</tr>
-<tr>
-<td>Elasticsearch</td>
-<td><code>elasticsearch</code></td>
-<td>at-least-once</td>
-<td>bulk index</td>
-</tr>
-<tr>
-<td>HTTP</td>
-<td><code>http</code></td>
-<td>at-least-once</td>
-<td>webhook POST</td>
-</tr>
-<tr>
-<td>Console</td>
-<td><code>console</code></td>
-<td>at-least-once</td>
-<td>debug</td>
-</tr>
-<tr>
-<td>NeorunBase</td>
-<td><code>neorunbase</code></td>
-<td>at-least-once</td>
-<td>REST or JDBC mode</td>
+<td><strong>client_credentials</strong></td>
+<td>When the exchange is disabled, and as the fallback for an already-expired token</td>
+<td>The configured <code>credential</code></td>
 </tr>
 </tbody>
 </table>
+<p>Both are exposed as switches, cluster-wide in <code>conf/itdastream.properties</code> and per connection:</p>
+<table>
+<thead>
+<tr>
+<th>Cluster-wide</th>
+<th>Per connection</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>itdastream.iceberg.catalog.oauth2.token.refresh.enabled</code></td>
+<td><code>catalog.rest.oauth2.token-refresh-enabled</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>itdastream.iceberg.catalog.oauth2.token.exchange.enabled</code></td>
+<td><code>catalog.rest.oauth2.token-exchange-enabled</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table>
+<p>Trino separates the same two switches, and for the same reason: RFC 8693 is optional, and an
+identity provider that does not implement it fails every exchange while <code>client_credentials</code>
+would have worked. <strong>Turning the exchange off is the fix for that case, and only that case.</strong></p>
+<div class="admonition info">
+<p class="admonition-title">Measured against Apache Polaris 1.4.1</p>
+<p>Polaris implements the token-exchange grant. It accepts the exchange with either Bearer or
+Basic authentication, accepts it even when the subject token has already expired, and
+issuing a new token does not invalidate the old one. Both switches therefore keep the
+Iceberg client's own defaults on ItdaStream — there is nothing to gain by deviating.
+Do not change them expecting to cure a token-expiry problem; the cause is below.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">A static token with no credential cannot be recovered</p>
+<p>A connection configured with <code>catalog.rest.token</code> but no client id/secret has nothing to
+re-authenticate with: Iceberg's expired-token path gives up immediately without a
+credential, and neither can ItdaStream sign in again. Once that token expires, every
+catalog call fails until the broker is restarted with a fresh one. The broker logs a
+warning about this at connection setup rather than letting you discover it an hour later.
+Configure <code>catalog.rest.client_id</code> / <code>catalog.rest.client_secret</code> instead.</p>
+</div>
 <hr />
-<h2 id="rest-api">REST API</h2>
-<p>Job management is exposed under the admin API (JWT or IAM user-token auth; the admin endpoint
-forwards mutations to the controller, so any broker works):</p>
-<ul>
-<li><code>POST /admin/streaming/jobs</code> — submit a job spec, returns <code>{jobId}</code></li>
-<li><code>GET  /admin/streaming/jobs</code> — list job specs</li>
-<li><code>GET  /admin/streaming/jobs/{id}</code> — spec + per-broker status</li>
-<li><code>DELETE /admin/streaming/jobs/{id}</code> — stop and delete</li>
-</ul>
-<p>Example job spec:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;purchases-to-iceberg&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;parallelism&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;kafka&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;topic&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;events&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;json&quot;</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">&quot;operations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;FILTER&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;event_type = &#39;purchase&#39;&quot;</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SELECT&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;id,name,amount&quot;</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="nt">&quot;sink&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;table&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="nt">&quot;connectionId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;prod-iceberg&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;analytics.purchases&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="nt">&quot;upsertKeys&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="nt">&quot;commitIntervalMs&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="nt">&quot;checkpointIntervalMs&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="p">}</span>
+<h2 id="why-a-single-failed-renewal-used-to-be-fatal">Why a single failed renewal used to be fatal</h2>
+<p>The Iceberg client re-arms the background refresh <strong>only after a successful one</strong>: its refresh
+returns nothing on failure, and the scheduler re-schedules only on a non-empty result.</p>
+<p>The consequence is out of proportion to the cause. One transient failure — the identity
+provider restarting, a single 5xx, a network blip at the exact moment the refresh fires — ends
+renewal permanently. Nothing retries it. The session keeps working with the token it already
+holds, so nothing looks wrong, and then that token expires and every catalog call fails with
+<em>"Not authorized"</em> until the process is restarted. No configuration prevents this, and no
+choice of grant avoids it.</p>
+<h2 id="how-itdastream-recovers">How ItdaStream recovers</h2>
+<p>Catalog calls go through a session wrapper that treats an unauthorized response as a signal to
+<strong>sign in again and retry the call once</strong>:</p>
+<ol>
+<li>A catalog call comes back unauthorized.</li>
+<li>The session re-authenticates — one token request against the catalog's token endpoint, using
+   the connection's client credential.</li>
+<li>Anything bound to the dead session is dropped, and the old session is closed.</li>
+<li>The original call is retried exactly once against the new session.</li>
+</ol>
+<p>The properties are what the session is rebuilt from, so re-authentication costs a single token
+request and rebuilds nothing else: the S3 FileIO, open Parquet writers and buffered rows are
+untouched, and an in-flight streaming checkpoint is not disturbed. Concurrent callers share one
+sign-in rather than stampeding the token endpoint — the first thread to notice performs it and
+the rest observe that it has already happened. If the freshly authenticated session is rejected
+too, the rejection is real and propagates rather than looping.</p>
+<p>Recovery is applied at the funnels every operation passes through — loading a table, checking
+existence, listing tables and listing namespaces — which covers scans, DML (<code>UPDATE</code>, <code>DELETE</code>,
+<code>MERGE</code>), table maintenance, WAP publishes and streaming commits alike, since all of them load
+the table first.</p>
+<p>You will see this in the broker log as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>WARN  IcebergCatalogSession - Iceberg catalog session was rejected while loading db.events
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>      (Not authorized); signing in again and retrying
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>INFO  IcebergCatalogSession - Iceberg catalog &#39;prod-iceberg&#39; session re-authenticated (generation 1)
 </code></pre></div>
+<p>A rising <code>generation</code> on a healthy cluster is worth investigating — it means renewals are
+failing repeatedly at the identity provider — but the job keeps running either way.</p>
 <hr />
-<h2 id="configuration-monitoring-and-recovery">Configuration, monitoring, and recovery</h2>
-<p>Broker-level defaults (commit/checkpoint cadence, reconcile interval, exchange prefix, …) live in
-<code>itdastream.properties</code> and are overridden per job. For the full property reference, the status
-API, scaling/rebalance behavior, failure recovery, and troubleshooting, see
-<a href="../streaming-operations/">Operations &amp; Tuning</a>.</p>
+<h2 id="related">Related</h2>
+<ul>
+<li><a href="../connections/">Connection Registry</a> — where the catalog credentials are stored</li>
+<li><a href="../iceberg-wap/">Iceberg Write-Audit-Publish</a> — branch-staged writes and publishing</li>
+<li><a href="../configuration/#iceberg-connector-settings">Flexible Configuration System</a> — the cluster-wide defaults</li>
+<li><a href="../streaming-operations/">Streaming Operations &amp; Tuning</a></li>
+</ul>
 
 
 

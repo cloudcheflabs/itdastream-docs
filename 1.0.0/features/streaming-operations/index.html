@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/streaming-operations/">
       
       
-        <link rel="prev" href="../iceberg-wap/">
+        <link rel="prev" href="../iceberg-catalog-session/">
       
       
         <link rel="next" href="../kafka-compatible/">
@@ -677,6 +677,34 @@
     
   
     Iceberg Write-Audit-Publish (WAP)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iceberg-catalog-session/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Catalog Sessions & Token Renewal
   
 
     
@@ -1467,7 +1495,9 @@
 <p>How to run, observe, scale, and troubleshoot streaming jobs in production.</p>
 <hr />
 <h2 id="configuration">Configuration</h2>
-<p>Broker-level defaults live in <code>itdastream.properties</code>; a per-job spec (from the Admin UI or the
+<p>Broker-level defaults live in <code>itdastream.properties</code> (every key is described in
+<a href="../configuration/#streaming-engine-settings">Configuration → Streaming Engine Settings</a>);
+a per-job spec (from the Admin UI or the
 SDK) overrides any value it sets explicitly. See
 <a href="../configuration/">Flexible Configuration System</a> for the resolution order (system property &gt;
 environment variable &gt; file &gt; default).</p>
@@ -1668,6 +1698,14 @@ restart all brokers → produce more yields the exact row count, no duplicates, 
 <tr>
 <td><code>InaccessibleObjectException</code> when a job starts</td>
 <td>The Arrow <code>--add-opens</code> JVM flag is missing from the launcher (see the note above).</td>
+</tr>
+<tr>
+<td>A long-running job starts failing every Iceberg call with <em>"Not authorized"</em></td>
+<td>The catalog session's token expired. The broker re-authenticates and retries once on its own (<code>IcebergCatalogSession</code>), so a job that stays broken means it has nothing to sign in with — a connection configured with a static <code>catalog.rest.token</code> and no <code>catalog.rest.client_id</code>/<code>client_secret</code>. Add the client credential. See <a href="../iceberg-catalog-session/">Iceberg Catalog Sessions</a>.</td>
+</tr>
+<tr>
+<td>Iceberg <strong>commits</strong> fail with a vended-credential / unreachable-endpoint error, while reads work</td>
+<td>The sink connection is missing <code>catalog.type=rest</code>, so the write path did not install the direct S3 FileIO that bypasses credential vending.</td>
 </tr>
 <tr>
 <td>JDBC / NeorunBase(jdbc) sink fails with <em>"No suitable driver"</em></td>

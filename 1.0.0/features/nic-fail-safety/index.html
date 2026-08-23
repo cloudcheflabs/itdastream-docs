@@ -692,6 +692,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../iceberg-catalog-session/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iceberg Catalog Sessions & Token Renewal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../streaming-operations/" class="md-nav__link">
         
   
@@ -1448,7 +1476,7 @@
 
 <h1 id="nic-silent-fail-safety">NIC Silent-Fail Safety</h1>
 <p>ItdaStream's internal NIO plane survives the trickiest failure mode in distributed systems: <strong>a peer whose NIC dies after the socket was opened, but ZooKeeper hasn't expired the session yet</strong>. From ZooKeeper's POV the node is alive. From every neighbour's POV its TCP connection is also alive — the kernel does not surface a half-open peer for tens of seconds, sometimes minutes, while it exhausts its retransmit budget. RPCs that route to that peer hang. Membership-driven failover doesn't fire because membership is still healthy.</p>
-<p>The 1.0.0 release closes this gap on <strong>both ends</strong> of every internal RPC — <code>InternalNioClient</code> (used by every broker → broker and broker → broker call) and <code>InternalNioServer</code> (the response side).</p>
+<p>The 1.0.0 release closes this gap on <strong>both ends</strong> of every internal RPC — <code>InternalNioClient</code> (used by every broker → broker call — controller polls, KMS/IAM sync, metrics collection, internal data forwarding) and <code>InternalNioServer</code> (the response side).</p>
 <h2 id="why-the-legacy-nio-loop-is-dangerous">Why the legacy NIO loop is dangerous</h2>
 <p>A blocking <code>SocketChannel</code>-based loop in three places hangs on a silently-dead peer:</p>
 <ol>
@@ -1458,27 +1486,36 @@
 </ol>
 <p>A single hung writer takes its calling thread out of service. If that thread is the master's heartbeat-sweep loop or a worker's coordinator-pull, the entire cluster appears wedged from outside even though only one peer is sick.</p>
 <h2 id="what-changed-in-the-client">What changed in the client</h2>
-<p><code>com.cloudcheflabs.itdastream.protocol.internal.InternalNioClient</code>:</p>
+<p><code>com.cloudcheflabs.itdastream.broker.network.internal.InternalNioClient</code> opens one short-lived
+<code>SocketChannel</code> per request on a daemon thread pool (<code>internal-nio-client</code>) and closes it when
+the response has been read. Every one of the three phases is bounded:</p>
 <ul>
-<li><strong>Non-blocking for its lifetime.</strong> <code>connect()</code> opens the channel in non-blocking mode, registers <code>OP_CONNECT</code> on a per-call <code>Selector</code>, and waits for completion bounded by a 10s deadline. Then the channel <strong>stays</strong> non-blocking — no <code>configureBlocking(true)</code> flip on return, which used to race the reader thread.</li>
-<li><strong>Selector-driven reader.</strong> <code>readLoop()</code> waits on <code>OP_READ</code> with a 200ms tick so an externally-set <code>connected=false</code> propagates within a tick. No more blocking <code>channel.read()</code> calls that the test harness can't shut down.</li>
-<li><strong>Bounded <code>sendRequest</code>.</strong> Writers serialise under a <code>writeLock</code>, open a per-call <code>Selector</code>, register <code>OP_WRITE</code>, and bound the write with a 10s deadline. On timeout, <code>connected.set(false)</code> flips so the pool re-mints the next time around. The same channel can sit in the reader's selector (<code>OP_READ</code>) while a per-call writer selector (<code>OP_WRITE</code>) is active — Java NIO supports multiple selector registrations per channel as long as each selector sees it at most once.</li>
-<li><strong>SO_KEEPALIVE + TCP_NODELAY</strong> enabled on every new socket so the OS itself eventually flags long-dead peers, independent of any application protocol.</li>
+<li><strong>Bounded connect.</strong> <code>socket().connect(address, connectTimeoutMs)</code> fails at the deadline
+  instead of parking inside the TCP three-way handshake for the OS SYN budget. Default 5s,
+  from <code>itdastream.internal.nio.connect.timeout.ms</code>.</li>
+<li><strong>Bounded write.</strong> This is the phase the OS gives you no help with. <code>writeBounded()</code> flips
+  the channel to non-blocking, registers <code>OP_WRITE</code> on a per-call <code>Selector</code>, and loops with a
+  deadline: on a peer that has stopped draining, <code>write()</code> returns 0 and <code>select(remaining)</code>
+  returns at the deadline, at which point a <code>SocketTimeoutException</code> is raised and the calling
+  thread is freed. A plain blocking <code>write()</code> would instead have parked for the retransmit
+  budget. The deadline is a fixed <strong>10 seconds</strong>.</li>
+<li><strong>Bounded read.</strong> <code>setSoTimeout(readTimeoutMs)</code> gives the response read an
+  application-visible deadline. Default 30s, from <code>itdastream.internal.nio.read.timeout.ms</code>.</li>
 </ul>
-<p>Both deadlines are overridable per JVM:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>-Ditdastream.protocol.internal.connect.timeout.seconds=10
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>-Ditdastream.protocol.internal.write.timeout.seconds=10
-</code></pre></div>
+<p>Frames larger than <code>itdastream.internal.nio.max.frame.bytes</code> (10 MiB) are rejected outright, so
+a corrupt length prefix cannot make the reader wait for data that will never arrive.</p>
 <h2 id="what-changed-in-the-server">What changed in the server</h2>
-<p><code>com.cloudcheflabs.itdastream.protocol.internal.InternalNioServer</code>:</p>
+<p><code>com.cloudcheflabs.itdastream.broker.network.internal.InternalNioServer</code>:</p>
 <ul>
 <li>The accept path already left client channels non-blocking — the server uses a Selector reactor.</li>
 <li>The <strong>response write</strong> path previously did a bare <code>while (buf.hasRemaining()) channel.write(buf);</code> under a <code>synchronized(channel)</code> block. In non-blocking mode <code>channel.write()</code> returns 0 the moment the send buffer is full — the old loop <strong>busy-spun forever</strong> on a wedged peer because there was no <code>Selector</code> to wait on writability.</li>
-<li>The new path factors response and error-response into a single <code>writeBoundedResponse()</code> helper that opens a per-call <code>Selector(OP_WRITE)</code> and bounds the loop with the same 10s deadline as the client. On timeout it throws <code>IOException</code> and the worker thread frees up.</li>
+<li>The new path switches the channel to non-blocking, opens a per-call <code>Selector</code> registered for
+  <code>OP_WRITE</code>, and bounds the loop with a deadline. On timeout it throws <code>IOException</code>, the
+  worker thread frees up, and the connection is closed in the <code>finally</code> block.</li>
 </ul>
-<p>Same override:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>-Ditdastream.protocol.internal.write.timeout.seconds=10
-</code></pre></div>
+<p>The server's deadline is <code>itdastream.internal.nio.socket.timeout.ms</code> (default 30s) — the same
+value it uses for <code>setSoTimeout</code> on the request read. Worker-pool size is
+<code>itdastream.internal.nio.worker.threads</code> (default 32).</p>
 <h2 id="failure-handling-invariants">Failure-handling invariants</h2>
 <table>
 <thead>
@@ -1492,38 +1529,76 @@
 <tr>
 <td>Peer NIC dies mid-handshake</td>
 <td><code>connect()</code> hangs for OS SYN budget (~60–130s)</td>
-<td><code>SocketTimeoutException</code> raised at 10s</td>
+<td><code>SocketTimeoutException</code> at the connect deadline (default 5s)</td>
 </tr>
 <tr>
 <td>Peer NIC dies after socket established, mid-write</td>
 <td><code>channel.write()</code> hangs for OS retransmit budget (5–15 min)</td>
-<td><code>SocketTimeoutException</code> raised at 10s; caller sees a fast failure and can fall back</td>
+<td><code>SocketTimeoutException</code> at the 10s write deadline; caller sees a fast failure and can fall back</td>
 </tr>
 <tr>
 <td>Peer process paused (kernel still ACKs but app doesn't drain)</td>
 <td>Same as above — kernel send buffer fills, then writer blocks indefinitely</td>
-<td><code>Selector.select()</code> wakes on the 10s deadline; writer fails out cleanly</td>
+<td><code>Selector.select()</code> wakes at the write deadline; writer fails out cleanly</td>
 </tr>
 <tr>
-<td>Reader thread in a long blocking <code>read()</code> during shutdown</td>
-<td>Reader could not be interrupted cleanly</td>
-<td>200ms select tick — next loop iteration sees <code>connected=false</code> and exits</td>
+<td>Response never arrives from a wedged peer</td>
+<td>Blocking <code>read()</code> with no application deadline</td>
+<td><code>SO_TIMEOUT</code> fires at <code>itdastream.internal.nio.read.timeout.ms</code> (default 30s)</td>
 </tr>
 </tbody>
 </table>
 <h2 id="verifying-it-on-your-stack">Verifying it on your stack</h2>
 <p><code>tests/test-nic-failure-channel-health.sh</code> (shipped with the 1.0.0 release) drives the failure on a 2-node compose:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>tests/docker-compose-itdastream.yml<span class="w"> </span>up<span class="w"> </span>-d
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>docker<span class="w"> </span>pause<span class="w"> </span>itdastream-worker-2<span class="w">          </span><span class="c1"># silent NIC sim</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>./tests/test-nic-failure-channel-health.sh<span class="w">    </span><span class="c1"># expect PASS</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>docker<span class="w"> </span>unpause<span class="w"> </span>itdastream-worker-2
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>tests/docker-compose-itdastream.yml<span class="w"> </span>up<span class="w"> </span>-d
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>./tests/test-nic-failure-channel-health.sh<span class="w">    </span><span class="c1"># expect PASS</span>
 </code></pre></div>
-<p>The test hammers the surviving master's admin endpoint while one peer is paused. With the fix the master returns <code>200 OK</code> for every call within sub-second latencies; without it the master would block, often for minutes, on the dead peer's internal RPC.</p>
+<p>The script does the pausing itself: it <code>docker pause</code>s <code>itda-broker-2</code> to simulate a silent NIC
+death, hammers the surviving <code>itda-broker-1</code> admin endpoint while the peer is frozen, then
+unpauses it and checks that it recovers (an <code>EXIT</code> trap unpauses the peer even on failure). With
+the fix, broker-1 answers <code>200 OK</code> for every call throughout; without it, it would block — often
+for minutes — on the dead peer's internal RPC.</p>
 <h2 id="operational-notes">Operational notes</h2>
 <ul>
-<li><strong>Defaults are conservative</strong>. 10 seconds is far below any realistic peer-to-peer round trip on a healthy cluster but above the worst-case TCP retransmit on a busy network. If you run with very low-latency expectations, tighten the deadlines via the JVM flags above.</li>
-<li><strong>No backwards-compatible setting reverts to the old blocking behaviour</strong>. There is no safe value here — the old behaviour was always a hang.</li>
-<li>The fix changes only the <em>internal</em> broker-to-broker RPC plane (<code>itdastream.nio.port</code>). External-facing transports — the Kafka wire-protocol listener and the admin HTTP server — keep their existing transport-specific timeouts, as does the S3 object-storage client.</li>
+<li>
+<p><strong>The deadlines are conservative</strong>, and three of the four are tunable — see
+  <a href="../configuration/#internal-nio-broker-to-broker">Configuration → Internal NIO</a>:</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Property</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connect</td>
+<td><code>itdastream.internal.nio.connect.timeout.ms</code></td>
+<td><code>5000</code></td>
+</tr>
+<tr>
+<td>Response read (client)</td>
+<td><code>itdastream.internal.nio.read.timeout.ms</code></td>
+<td><code>30000</code></td>
+</tr>
+<tr>
+<td>Request read + response write (server)</td>
+<td><code>itdastream.internal.nio.socket.timeout.ms</code></td>
+<td><code>30000</code></td>
+</tr>
+<tr>
+<td>Request write (client)</td>
+<td><em>fixed in code</em></td>
+<td>10s</td>
+</tr>
+</tbody>
+</table>
+<p>Each is far below any realistic peer-to-peer round trip on a healthy cluster but above the
+worst-case TCP retransmit on a busy network.
+- <strong>No backwards-compatible setting reverts to the old blocking behaviour</strong>. There is no safe value here — the old behaviour was always a hang.
+- The fix changes only the <em>internal</em> broker-to-broker RPC plane (<code>itdastream.nio.port</code>). External-facing transports — the Kafka wire-protocol listener and the admin HTTP server — keep their existing transport-specific timeouts, as does the S3 object-storage client.</p>
+</li>
 </ul>
 
 
