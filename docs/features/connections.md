@@ -46,19 +46,75 @@ Managed on the Admin UI **Connections** page, or via the REST API.
 
 === "Iceberg"
 
+    An Iceberg connection describes **two** things: how to reach the REST catalog, and how to
+    reach the object store holding the data. Both halves are required — ItdaStream reads and
+    writes S3 directly with the connection's own keys rather than with credentials the catalog
+    vends (see [Iceberg Catalog Sessions](iceberg-catalog-session.md)).
+
+    **Catalog, all flavors**
+
+    | Key | Example | Notes |
+    |---|---|---|
+    | `catalog.rest.uri` | `http://polaris:8181/api/catalog` | REST catalog endpoint |
+    | `catalog.rest.flavor` | `polaris` (default), `rest`, `glue` | Selects the auth model below |
+    | `catalog.warehouse` | `regdemo_catalog` or `s3://warehouse/` | Polaris: the **catalog name**; vanilla REST: the warehouse path |
+    | `catalog.name` | `prod` | Catalog name; defaults to the warehouse value |
+    | `catalog.type` | `rest` | **Set this.** See the warning below |
+    | `catalog.rest.auth` | `sigv4` | Only `sigv4` is meaningful — it forces Glue/SigV4 signing on any REST endpoint. Any other value (including `none`/`oauth2`) leaves the flavor to decide |
+    | `catalog.rest.prefix` | `prod` | URL prefix. Defaults to the catalog name for `polaris`, unset for `rest` |
+
+    **Polaris / OAuth2 flavor**
+
     | Key | Example |
     |---|---|
-    | `catalog.rest.uri` | `http://iceberg-rest:8181` |
-    | `catalog.rest.flavor` | `polaris` (default), `rest` (vanilla iceberg-rest / Nessie), or `glue` |
-    | `catalog.warehouse` | `s3://warehouse/` |
-    | `catalog.rest.auth` | `none` / `oauth2` / `sigv4` |
-    | `s3.endpoint`, `s3.region`, `s3.accessKey`, `s3.secretKey`, `s3.pathStyle` | S3 FileIO credentials |
+    | `catalog.rest.client_id` | `root` |
+    | `catalog.rest.client_secret` | … (masked) |
+    | `catalog.rest.scope` | `PRINCIPAL_ROLE:ALL` (default) |
+    | `catalog.rest.oauth2.server.uri` | `http://polaris:8181/api/catalog/v1/oauth/tokens` |
+    | `catalog.rest.token` | a pre-issued token *instead of* id/secret — cannot be renewed, see below |
+    | `catalog.rest.oauth2.token-refresh-enabled` / `catalog.rest.oauth2.token-exchange-enabled` | per-connection override of the [token-renewal switches](iceberg-catalog-session.md#how-the-token-is-renewed) |
+
+    **AWS Glue flavor** (`catalog.rest.flavor=glue`, or `catalog.rest.auth=sigv4`)
+
+    | Key | Example |
+    |---|---|
+    | `catalog.rest.signing.name` | `glue` (default) |
+    | `catalog.rest.signing.region` | `us-east-1` — falls back to `s3.region` |
+    | `catalog.rest.aws.accessKey` / `.secretKey` / `.sessionToken` | optional; fall back to the `s3.*` keys, then to the AWS provider chain (IAM role / env / SSO) |
+
+    `catalog.warehouse` for Glue is the AWS account id, or
+    `<account-id>:s3tablescatalog/<bucket>` for S3 Tables. No `prefix` is sent — the endpoint
+    derives the catalog path from `warehouse` in its `GET /v1/config` response.
+
+    **Object store (all flavors)**
+
+    | Key | Example |
+    |---|---|
+    | `s3.endpoint` | `http://minio:9000` |
+    | `s3.region` | `us-east-1` |
+    | `s3.accessKey` | … |
+    | `s3.secretKey` | … (masked) |
+    | `s3.pathStyle` | `true` |
+
+    Bare (`accessKey`, `secretKey`, `endpoint`, `region`, `pathStyle`) and `s3.`-prefixed
+    spellings are interchangeable: each missing spelling is filled in from its counterpart, so
+    an S3 connection reused by id (which stores the bare keys) and an inline `s3.*` block behave
+    the same.
 
     !!! warning "REST catalog flavor"
         For a vanilla Iceberg REST catalog (the `iceberg-rest` image, Nessie, …) set
         `catalog.rest.flavor=rest`. The default `polaris` flavor addresses catalogs by a URL
         prefix (`/v1/{prefix}/namespaces/...`); a vanilla catalog serves `/v1/namespaces/...`
         and a forced prefix yields *"No route for request"*.
+
+    !!! warning "Set `catalog.type=rest` on connections used as a sink"
+        On the **write** path the direct S3 FileIO that bypasses catalog credential vending is
+        only installed when the connection carries `catalog.type=rest` (the internal default is
+        the legacy `hadoop`). Without it, commits fall back to whatever FileIO the catalog
+        returns — which under Polaris means vended credentials pointing at the catalog's own
+        view of the S3 endpoint, typically unreachable from the broker. The **read** path
+        installs it whenever `s3.accessKey` is present, so a connection missing this key can
+        read perfectly well and still fail on the first commit.
 
 === "Kafka"
 
@@ -107,9 +163,32 @@ curl -X POST http://broker:8080/admin/connections \
     "properties":{
       "catalog.rest.uri":"http://iceberg-rest:8181",
       "catalog.rest.flavor":"rest",
+      "catalog.type":"rest",
       "catalog.warehouse":"s3://warehouse/",
-      "catalog.rest.auth":"none",
       "s3.endpoint":"http://minio:9000","s3.region":"us-east-1",
       "s3.accessKey":"...","s3.secretKey":"...","s3.pathStyle":"true"
     }}'
 ```
+
+A Polaris connection, where the catalog name is both the warehouse and the URL prefix:
+
+```bash
+curl -X POST http://broker:8080/admin/connections \
+  -H "Authorization: Bearer $JWT" -H 'Content-Type: application/json' \
+  -d '{
+    "connectionId":"prod-polaris","type":"ICEBERG",
+    "properties":{
+      "catalog.rest.uri":"http://polaris:8181/api/catalog",
+      "catalog.rest.flavor":"polaris",
+      "catalog.type":"rest",
+      "catalog.warehouse":"prod_catalog",
+      "catalog.rest.client_id":"...","catalog.rest.client_secret":"...",
+      "catalog.rest.scope":"PRINCIPAL_ROLE:ALL",
+      "catalog.rest.oauth2.server.uri":"http://polaris:8181/api/catalog/v1/oauth/tokens",
+      "s3.endpoint":"http://minio:9000","s3.region":"us-east-1",
+      "s3.accessKey":"...","s3.secretKey":"...","s3.pathStyle":"true"
+    }}'
+```
+
+The client id and secret are what lets the session renew its token — and re-authenticate if a
+renewal ever fails. See [Iceberg Catalog Sessions and OAuth2 Token Renewal](iceberg-catalog-session.md).

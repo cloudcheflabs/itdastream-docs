@@ -6,7 +6,9 @@ How to run, observe, scale, and troubleshoot streaming jobs in production.
 
 ## Configuration
 
-Broker-level defaults live in `itdastream.properties`; a per-job spec (from the Admin UI or the
+Broker-level defaults live in `itdastream.properties` (every key is described in
+[Configuration → Streaming Engine Settings](configuration.md#streaming-engine-settings));
+a per-job spec (from the Admin UI or the
 SDK) overrides any value it sets explicitly. See
 [Flexible Configuration System](configuration.md) for the resolution order (system property >
 environment variable > file > default).
@@ -134,6 +136,8 @@ For change streams, set **upsert keys** so any boundary replays collapse to the 
 | Job runs, consumer lag drains, but the Iceberg table stays empty | The sink commits on the checkpoint interval — wait at least one `commitIntervalMs`. Also confirm the target **namespace** exists (the table is auto-created, the namespace is not). |
 | `Connection not found: <id>` | The job references a `connectionId` that is not registered (or not yet synced to the worker). Create it in the Connection Registry; it syncs to all brokers. |
 | `InaccessibleObjectException` when a job starts | The Arrow `--add-opens` JVM flag is missing from the launcher (see the note above). |
+| A long-running job starts failing every Iceberg call with *"Not authorized"* | The catalog session's token expired. The broker re-authenticates and retries once on its own (`IcebergCatalogSession`), so a job that stays broken means it has nothing to sign in with — a connection configured with a static `catalog.rest.token` and no `catalog.rest.client_id`/`client_secret`. Add the client credential. See [Iceberg Catalog Sessions](iceberg-catalog-session.md). |
+| Iceberg **commits** fail with a vended-credential / unreachable-endpoint error, while reads work | The sink connection is missing `catalog.type=rest`, so the write path did not install the direct S3 FileIO that bypasses credential vending. |
 | JDBC / NeorunBase(jdbc) sink fails with *"No suitable driver"* | The driver is not on the broker classpath. PostgreSQL is bundled; add other JDBC drivers to `lib/`. |
 | `map`/`flatMap` job fails to start | The referenced `MapFunction`/`FlatMapFunction` class is not on the broker classpath or lacks a public no-arg constructor. |
 

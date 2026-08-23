@@ -264,6 +264,86 @@ HTTP client timeouts for the S3 object-storage client.
 
 ---
 
+## Streaming Engine Settings
+
+Broker-level **defaults** for streaming jobs (Kafka → Iceberg / multi-sink). A per-job
+spec — submitted through the Admin UI or the [SDK](streaming-sdk.md) — overrides any
+value it sets explicitly. See [Streaming Overview](streaming.md) and
+[Operations & Tuning](streaming-operations.md).
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `itdastream.streaming.reconcile.interval.ms` | `5000` | How often (ms) the streaming reconciler runs on each broker: the controller recomputes per-broker thread assignments and every broker converges its running executor threads to its assignment. Lower reacts faster to job/membership changes at the cost of more ZooKeeper reads. |
+| `itdastream.streaming.exchange.prefix` | `streaming/exchange` | S3 key prefix under the broker's storage bucket where streaming checkpoint state (Kafka offset snapshots) is persisted by the ExchangeManager. Layout: `<prefix>/<jobId>/cp/<checkpointId>/…`. A reassigned worker restores from here. |
+| `itdastream.streaming.commit.interval.ms` | `10000` | Default sink commit interval (ms). For transactional sinks (Iceberg/JDBC) this is the exactly-once checkpoint cadence: the sink commit and the Kafka offset commit are aligned at this interval. Lower means lower latency but more, smaller Iceberg snapshots. |
+| `itdastream.streaming.checkpoint.interval.ms` | `10000` | Default checkpoint barrier interval (ms) used by the controller's checkpoint coordinator and by the executor's self-checkpoint fallback. Usually equal to the commit interval. |
+| `itdastream.streaming.commit.row.threshold` | `10000` | Row-count threshold that also triggers an Iceberg commit, in addition to the time-based interval. Bounds the number of rows buffered per commit. Unit: rows. |
+| `itdastream.streaming.source.poll.timeout.ms` | `100` | Kafka consumer poll timeout (ms) inside the streaming poll loop. Short polls keep the loop responsive to checkpoint barriers. |
+| `itdastream.streaming.progress.log.interval.ms` | `30000` | How often (ms) a running streaming executor logs progress (records processed). |
+
+### Single-Committer for Append-Only Iceberg Sinks
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `itdastream.streaming.iceberg.coordinated.commit.enabled` | `true` | When `true`, an append-only Iceberg sink (no upsert keys) runs in **coordinated** mode: each broker only writes and drains its Parquet data files at the checkpoint barrier, and the controller performs **one** atomic Iceberg commit aggregating every broker's files for that checkpoint. Because only the controller commits a given table, parallelism > 1 never triggers a concurrent-writer `CommitFailedException`. Set `false` to fall back to per-broker self-commit (each broker commits its own files, which can conflict at high parallelism). Upsert sinks always use the per-broker path. |
+
+### No-Code Auto-Sink Ingestion-Time Column
+
+Applies **only** to the no-code auto-sink path — a job that sinks a topic straight into an
+Iceberg table with no MAP/FLATMAP user code (see
+[No-Code Kafka to Iceberg](streaming-no-code.md)). On that path the incoming JSON/Avro
+records usually carry no event-time column, so the broker synthesises one (ingestion time)
+and the auto-created table can be hidden-partitioned by time. Custom jobs with transforms
+are never touched — their schema follows the user code exactly.
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `itdastream.streaming.autosink.ingest.ts.enabled` | `true` | When `true`, the no-code auto-sink injects the synthetic ingestion-time column and hidden-partitions the auto-created table by it. Set `false` to write the data columns as-is, with no added column and an unpartitioned table. |
+| `itdastream.streaming.autosink.ingest.ts.column` | `_ingest_ts` | Name of the synthetic ingestion-time column. Chosen not to collide with user fields. Type: Iceberg `timestamptz` (microseconds, UTC), stamped once per micro-batch at write time. |
+| `itdastream.streaming.autosink.ingest.ts.partition` | `hour` | Iceberg partition transform applied to that column when the table is auto-created: `hour`, `day`, `month` or `year`. The hidden partition column is then named `<column>_<transform>` (e.g. `_ingest_ts_hour`). |
+
+### Per-Job Streaming Logs
+
+Each broker buffers the log lines of every streaming job it runs in memory and periodically
+flushes them to the object store under `<prefix>/<jobId>/broker-<brokerId>.log`. The Admin UI
+tails one job by merging every broker's flushed file (history, survives restarts) with the
+serving broker's live in-memory buffer. Applies to both user-submitted jobs and no-code
+auto-sink jobs — see [Job Logs, Kill & Iceberg Sinks](streaming-job-logs.md).
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `itdastream.streaming.joblogs.enabled` | `true` | When `true`, capture and flush per-job logs. Set `false` to disable the job log viewer entirely; jobs still log to the broker's main log file. |
+| `itdastream.streaming.joblogs.prefix` | `jobLogs` | Object-store key prefix under which per-job log files are flushed. |
+| `itdastream.streaming.joblogs.flush.interval.ms` | `3000` | How often (ms) each broker flushes its in-memory per-job log buffers to the object store. Lower means fresher logs from remote brokers in the viewer, at the cost of more object-store writes. The serving broker's own lines are always live, with no lag. |
+| `itdastream.streaming.joblogs.max.lines` | `5000` | Maximum log lines retained in memory per job per broker (ring buffer). Also bounds the viewer window. |
+
+---
+
+## Iceberg Connector Settings
+
+Cluster-level policy for the Iceberg connector, applied to **every** Iceberg connection
+unless that connection overrides it in its own properties (Admin UI → **Connections**).
+Per-connection settings always win. Full background in
+[Iceberg Catalog Sessions](iceberg-catalog-session.md).
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `itdastream.iceberg.default.region` | `us-east-1` | AWS region used whenever one is not otherwise specified — for S3 data access and Glue SigV4 signing alike. The AWS SDK refuses to build a client without a region, so this is the last-resort value. |
+| `itdastream.iceberg.default.format.version` | `2` | Iceberg table format version for tables the sink **creates**. `2` gives row-level deletes (DELETE/UPDATE/MERGE write delete files instead of rewriting whole files); `3` adds deletion vectors, row lineage and the variant type. Existing tables keep the version they were created with; the library reads and writes every version regardless. |
+| `itdastream.iceberg.rest.credential.vending.bypass` | `true` | Suppress catalog credential vending — send `X-Iceberg-Access-Delegation: ""` and read/write S3 with the connection's own static keys instead of the short-lived credentials the catalog would vend. Default `true`, and the only tested path: vended credentials carry the *catalog's* view of the S3 endpoint (often a container-internal hostname), which is routinely unreachable from the broker. |
+| `itdastream.iceberg.polaris.default.scope` | `PRINCIPAL_ROLE:ALL` | OAuth2 scope requested from a Polaris-flavored REST catalog when the connection does not name one. `PRINCIPAL_ROLE:ALL` is Polaris's "every role this principal holds" scope. |
+| `itdastream.iceberg.glue.signing.name` | `glue` | SigV4 service name used when signing requests to an AWS Glue Iceberg REST endpoint. Iceberg's own default is `execute-api`, which Glue rejects. |
+| `itdastream.iceberg.catalog.oauth2.token.refresh.enabled` | `true` | Whether the REST session keeps renewing its OAuth2 token in the background. A streaming sink outlives its token many times over, so leaving this on is the norm. |
+| `itdastream.iceberg.catalog.oauth2.token.exchange.enabled` | `true` | Whether that renewal uses the RFC 8693 **token-exchange** grant (the Iceberg and Trino default) rather than a plain `client_credentials` fetch. Apache Polaris 1.4.1 accepts either — that was measured, not assumed — so the client default is kept. Turn it off only for an identity provider that does not implement RFC 8693, where every exchange fails and the `client_credentials` fallback is the only renewal that works. |
+
+!!! note "`itdastream.iceberg.wap.branch` is per job, not broker-wide"
+    The Write-Audit-Publish branch is selected in the **sink config of a job spec** (or the
+    Admin UI *Iceberg WAP branch* field). The key appears in `itdastream.properties` for
+    reference only; there is no broker-wide default. See
+    [Iceberg Write-Audit-Publish](iceberg-wap.md).
+
+---
+
 ## Misc Operational Tuning
 
 | Property | Default | Description |

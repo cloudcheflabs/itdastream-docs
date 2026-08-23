@@ -43,6 +43,7 @@ nav:
       - "Tutorial: Submit a Job (Token + Uber-JAR)": features/streaming-job-tutorial.md
       - "Job Logs, Kill & Iceberg Sinks": features/streaming-job-logs.md
       - "Iceberg Write-Audit-Publish (WAP)": features/iceberg-wap.md
+      - "Iceberg Catalog Sessions & Token Renewal": features/iceberg-catalog-session.md
       - "Operations & Tuning": features/streaming-operations.md
   - "Features":
       - "Full Kafka Protocol Compatibility": features/kafka-compatible.md
