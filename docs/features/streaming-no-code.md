@@ -33,8 +33,8 @@ jobs never inline secrets. In the Admin UI open **Connections → New Connection
 | Connection ID | `prod-iceberg` | referenced by jobs |
 | `catalog.rest.uri` | `http://iceberg-rest:8181` | REST catalog endpoint |
 | `catalog.rest.flavor` | `rest` | `polaris` (default), `rest` (vanilla iceberg-rest / Nessie), or `glue` |
-| `catalog.warehouse` | `s3://warehouse/` | Iceberg warehouse |
-| `catalog.rest.auth` | `none` | or `oauth2` / `sigv4` |
+| `catalog.warehouse` | `s3://warehouse/` | Iceberg warehouse (for `polaris`, the catalog **name**) |
+| `catalog.type` | `rest` | required on a sink connection — see the warning below |
 | `s3.endpoint` / `s3.region` | `http://minio:9000` / `us-east-1` | S3 FileIO |
 | `s3.accessKey` / `s3.secretKey` | … | masked after save |
 | `s3.pathStyle` | `true` | for MinIO and most S3-compatible stores |
@@ -45,6 +45,17 @@ jobs never inline secrets. In the Admin UI open **Connections → New Connection
     addresses catalogs by a URL prefix (`/v1/{prefix}/namespaces/...`); using it against a
     vanilla catalog yields *"No route for request"*.
 
+!!! warning "`catalog.type=rest` on a sink connection"
+    The direct S3 FileIO that bypasses catalog credential vending is installed on the **write**
+    path only when the connection carries `catalog.type=rest`. Without it the sink commits with
+    whatever FileIO the catalog returns — under Polaris, vended credentials aimed at the
+    catalog's own view of the S3 endpoint. Reads are unaffected, so the symptom is a job that
+    reads fine and fails at its first commit.
+
+For a Polaris catalog, add the OAuth2 client id/secret as well; those are also what let the
+session renew its token and re-authenticate if a renewal fails — see
+[Iceberg Catalog Sessions](iceberg-catalog-session.md).
+
 The same form is available over REST:
 
 ```bash
@@ -52,7 +63,7 @@ curl -X POST http://broker:8080/admin/connections \
   -H "Authorization: Bearer $JWT" -H 'Content-Type: application/json' \
   -d '{"connectionId":"prod-iceberg","type":"ICEBERG","properties":{
         "catalog.rest.uri":"http://iceberg-rest:8181","catalog.rest.flavor":"rest",
-        "catalog.warehouse":"s3://warehouse/","catalog.rest.auth":"none",
+        "catalog.warehouse":"s3://warehouse/","catalog.type":"rest",
         "s3.endpoint":"http://minio:9000","s3.region":"us-east-1",
         "s3.accessKey":"...","s3.secretKey":"...","s3.pathStyle":"true"}}'
 ```
