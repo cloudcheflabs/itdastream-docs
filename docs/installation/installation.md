@@ -174,6 +174,28 @@ controller, and clients are automatically routed to partition leaders. No
 broker carries a persistent identity &mdash; a broker ID is derived from its
 IP and port.
 
+Partition leadership is **assigned, not elected**: every metadata response
+spreads a topic's partitions across the brokers that are currently serving. A
+broker that joins takes a share on the next refresh, with no data to copy
+first, because the log it would have copied is already in object storage.
+
+### Taking a broker out
+
+Scaling in is not the mirror image of scaling out. Stopping a broker outright
+fails whatever requests were already on the way to it, so take it out of
+rotation first:
+
+```bash
+curl -sf -X POST http://<any-broker>:8080/admin/maintenance/drain \
+    -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+    -d '{"brokerId":<id>,"draining":true}'
+```
+
+The broker disappears from the metadata every other broker hands clients while
+still answering the requests it receives, so traffic moves off it before it
+stops. `bin/stop-broker.sh` does this on its own too &mdash; see
+[Broker Drain](../features/broker-drain.md).
+
 ## Installing with Docker
 
 A container image can be built from the source repository's `Dockerfile`.
@@ -189,6 +211,14 @@ Stop the broker and ZooKeeper when finished.
 bin/stop-broker.sh
 bin/stop-zk.sh
 ```
+
+Stopping a broker is not abrupt. It announces that it is draining so the rest of
+the cluster stops advertising it, keeps serving for
+`itdastream.broker.drain.pause.ms` while clients re-route, waits up to
+`itdastream.broker.shutdown.grace.ms` for requests already in flight, and only
+then flushes its write buffers to object storage and closes. On a single-broker
+setup the pause has nobody to re-route to and simply costs a few seconds &mdash;
+set `itdastream.broker.drain.pause.ms=0` for a development box if that matters.
 
 ## Next Steps
 

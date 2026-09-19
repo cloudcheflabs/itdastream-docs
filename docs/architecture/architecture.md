@@ -31,14 +31,16 @@ A custom-built distributed log engine that manages the lifecycle of a message.
 
 * Write Path: Messages are first written to a Memory Write Buffer and persisted to a local RocksDB instance for immediate durability.
 * S3 Flush: Background workers aggregate memory segments into immutable objects and flush them to S3 once they reach a size threshold or time limit.
-* Read Path: Optimized for "Tail Reads" (reading recent data from memory) and "Historical Reads" (streaming objects directly from S3).
+* Read Path: every read is served from **flushed segments**, with an in-memory segment cache in front of the object store so repeated tail reads rarely pay for a round trip. Records still sitting in a write buffer are not yet readable — they become visible at the next flush, bounded by `itdastream.storage.write.flush.interval.ms` (default 5s). A consumer at the very tail of a partition therefore trails the producer by at most one flush interval.
 
 
 #### Metadata & Coordination
 ItdaStream uses Apache ZooKeeper for cluster coordination and RocksDB for local metadata caching.
 
-* Leader Election: Manages partition leadership and broker registration.
-* Controller Model: A designated controller node handles administrative tasks like topic creation and partition rebalancing.
+* Broker Registration: each broker writes an ephemeral node under `/brokers/ids`. It disappears the moment the process does, which is what makes a broker's departure observable without a heartbeat protocol.
+* Controller Election: one broker wins a Curator leader election and records itself at `/controller`. The controller owns work that must happen exactly once — topic creation, streaming job assignment, checkpoint coordination.
+* Partition Leadership is **assigned, not elected.** Every metadata response spreads the topic's partitions across the brokers that are currently serving, by position in the sorted broker list. There is no per-partition election and no leadership znode, because there is nothing to elect over: the log lives in object storage, so any broker can serve any partition. Leadership here is load spreading, not ownership.
+* Draining: a broker that is shutting down marks itself draining in its own registration, and every broker leaves it out of the metadata it hands clients. See [Broker Drain](../features/broker-drain.md).
 * KMS Integration: Manages data encryption keys (DEK) derived from a Master Key, ensuring every topic can have its own encryption lifecycle.
 
 

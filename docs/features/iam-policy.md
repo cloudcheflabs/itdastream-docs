@@ -104,6 +104,7 @@ All actions live under the `kafka:` namespace. Wildcards work at any depth: `kaf
 | `kafka:UpdateTopic` | `arn:stream:kafka:cluster:<cluster-id>` |
 | `kafka:Rebalance` | `arn:stream:kafka:cluster:<cluster-id>` |
 | `kafka:Cleanup` | `arn:stream:kafka:cluster:<cluster-id>` |
+| `kafka:Drain` | `arn:stream:kafka:cluster:<cluster-id>` |
 
 ### Control plane — IAM
 
@@ -230,7 +231,7 @@ This is the only way to bootstrap; rotate the password immediately after first l
         "kafka:CreateGroup", "kafka:DeleteGroup",
         "kafka:CreatePolicy", "kafka:DeletePolicy", "kafka:UpdateIAM",
         "kafka:CreateKey", "kafka:RotateKey",
-        "kafka:Rebalance", "kafka:Cleanup"
+        "kafka:Rebalance", "kafka:Cleanup", "kafka:Drain"
       ],
       "Resource": "*"
     }
