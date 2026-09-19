@@ -849,6 +849,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaggregated Compute-Storage Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -865,6 +883,36 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-statelessness-actually-buys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What statelessness actually buys
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1270,6 +1318,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../broker-drain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Broker Drain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../backup/" class="md-nav__link">
         
   
@@ -1378,6 +1454,14 @@
 <li><strong>S3 compatibility</strong>: Works with AWS S3, MinIO, ShannonStore, and any S3-compatible object storage</li>
 <li><strong>Flush triggers</strong>: Buffer full (16MB) or time-based flush (5s interval, 5min max latency)</li>
 </ul>
+<h2 id="what-statelessness-actually-buys">What statelessness actually buys</h2>
+<p>The point of keeping the log in object storage is not storage cost. It is that <strong>a broker owns nothing</strong>, so removing one is not a handover.</p>
+<ul>
+<li><strong>Scaling out</strong> is starting a process. It registers, and the next metadata response spreads partitions across it. There is no data to copy first.</li>
+<li><strong>Scaling in</strong> is stopping a process, and <a href="../broker-drain/">draining</a> makes it invisible to clients before it stops rather than after.</li>
+<li><strong>Losing a broker</strong> costs whatever was in its write buffer and not yet flushed — which its <a href="../staging-store/">staging store</a> replays when it comes back.</li>
+</ul>
+<p>The cost is on the read path: reads are served from flushed segments, so a record is acknowledged before it is readable. A consumer at the very tail trails the producer by at most one flush interval (<code>itdastream.storage.write.flush.interval.ms</code>, default 5s). That is the trade the design makes — durability and broker-independence at the cost of a few seconds of read visibility.</p>
 
 
 

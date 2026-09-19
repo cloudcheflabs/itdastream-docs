@@ -14,7 +14,7 @@
         <link rel="prev" href="../configuration/">
       
       
-        <link rel="next" href="../backup/">
+        <link rel="next" href="../broker-drain/">
       
       
         
@@ -1241,6 +1241,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crash Recovery with Staging Store
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1258,6 +1276,97 @@
 
       </a>
       
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-write-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The write path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recovery-on-restart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recovery on restart
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shutdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shutdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../broker-drain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Broker Drain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1372,11 +1481,44 @@
 
 
 <h1 id="crash-recovery-with-staging-store">Crash Recovery with Staging Store</h1>
-<p>ItdaStream's staging store provides write durability guarantees before S3 upload, enabling automatic recovery from broker crashes.</p>
+<p>A produce request is acknowledged as soon as the record is in memory and in the local staging store. It has not reached object storage yet — that happens in the background, in batches, because uploading one object per record would make the write path as slow as the object store.</p>
+<p>The staging store is what makes that acknowledgement honest. It is a local RocksDB write-ahead log holding every record that has been acked but not yet flushed, and on restart the broker replays it.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>   produce ──► WriteBuffer (memory) ──────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>          └──► staging store (RocksDB)            │  background flush
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                      ▲                           ▼
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                      │                    ┌─────────────┐
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                 replayed on restart       │ object store│
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                      │                    └─────────────┘
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                      └── entry deleted after the flush succeeds
+</code></pre></div>
+<h2 id="the-write-path">The write path</h2>
+<ol>
+<li>The record is appended to the partition's in-memory <code>WriteBuffer</code> and written to the staging store under <code>&lt;topic&gt;-&lt;partition&gt;/&lt;offset&gt;</code>.</li>
+<li>The produce request is acknowledged.</li>
+<li>A background worker flushes the buffer to object storage when it reaches a size or time threshold.</li>
+<li>Staging entries for the flushed range are deleted <strong>asynchronously</strong>, so cleanup I/O never blocks a producer.</li>
+</ol>
+<p>Records are enveloped with AES-256-GCM before they land in RocksDB when encryption is enabled, using the same DEK machinery as the object store — see <a href="../kms/">KMS</a>. The staging store is on the broker's local disk, so leaving records in the clear there would undo the encryption everywhere else.</p>
+<h2 id="recovery-on-restart">Recovery on restart</h2>
+<p>When the log store starts, it replays the staging store before accepting traffic:</p>
 <ul>
-<li><strong>Staging</strong>: All records are persisted to local RocksDB before S3 upload, with optional envelope encryption (AES-256-GCM)</li>
-<li><strong>Recovery</strong>: On broker restart, unflushed records are decrypted, re-uploaded to S3, and registered in metadata store</li>
-<li><strong>Async cleanup</strong>: Staging entries are removed asynchronously after successful S3 upload, avoiding I/O blocking on the produce path</li>
+<li>Entries are grouped by partition and replayed <strong>in numeric offset order</strong>. RocksDB sorts keys as bytes, which would otherwise give offsets 1, 10, 100, 2 — and replaying out of order would corrupt the partition.</li>
+<li>Each record's <strong>original offset</strong> is preserved. Re-appending at a fresh offset would renumber records a producer already holds acknowledgements for.</li>
+<li>Records at or below the partition's current <code>nextOffset</code> are <strong>skipped</strong> — they made it to object storage before the crash, and their staging entries were simply not cleaned up yet.</li>
+<li>Every partition touched by the replay is flushed synchronously before startup continues, so the recovered data is durable before the broker takes a single request.</li>
+</ul>
+<p>Nothing about this depends on which broker crashed. The staging store is local, but the log it feeds is shared: a replayed record lands in the same object store every other broker reads from.</p>
+<div class="admonition warning">
+<p class="admonition-title">The staging directory is not disposable</p>
+<p><code>itdastream.storage.s3.staging.path</code> holds the only copy of records that have been acknowledged but not yet flushed. Wiping it between restarts — a fresh volume, a cleared container, a <code>rm -rf</code> during troubleshooting — discards exactly the records recovery exists to save. Give it a persistent volume.</p>
+</div>
+<h2 id="shutdown">Shutdown</h2>
+<p>A clean shutdown flushes rather than relying on replay: it drains in-flight requests, then flushes every write buffer to object storage. Replay is the backstop for the unclean case — a kill, a crash, a lost node. See <a href="../broker-drain/">Broker Drain</a> for the shutdown sequence.</p>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="../broker-drain/">Broker Drain</a> — the clean path, where nothing needs replaying.</li>
+<li><a href="../kms/">Envelope Encryption and KMS</a> — how staged records are enveloped.</li>
+<li><a href="../disaggre-architecture/">Disaggregated Compute-Storage Architecture</a> — why the log store is shared and the staging store is not.</li>
 </ul>
 
 

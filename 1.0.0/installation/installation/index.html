@@ -573,6 +573,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Running a Multi-Broker Cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#taking-a-broker-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Taking a broker out
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1434,6 +1451,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../features/broker-drain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Broker Drain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../features/backup/" class="md-nav__link">
         
   
@@ -1711,6 +1756,22 @@ path are all working.</p>
 controller, and clients are automatically routed to partition leaders. No
 broker carries a persistent identity &mdash; a broker ID is derived from its
 IP and port.</p>
+<p>Partition leadership is <strong>assigned, not elected</strong>: every metadata response
+spreads a topic's partitions across the brokers that are currently serving. A
+broker that joins takes a share on the next refresh, with no data to copy
+first, because the log it would have copied is already in object storage.</p>
+<h3 id="taking-a-broker-out">Taking a broker out</h3>
+<p>Scaling in is not the mirror image of scaling out. Stopping a broker outright
+fails whatever requests were already on the way to it, so take it out of
+rotation first:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl<span class="w"> </span>-sf<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://&lt;any-broker&gt;:8080/admin/maintenance/drain<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;brokerId&quot;:&lt;id&gt;,&quot;draining&quot;:true}&#39;</span>
+</code></pre></div>
+<p>The broker disappears from the metadata every other broker hands clients while
+still answering the requests it receives, so traffic moves off it before it
+stops. <code>bin/stop-broker.sh</code> does this on its own too &mdash; see
+<a href="../../features/broker-drain/">Broker Drain</a>.</p>
 <h2 id="installing-with-docker">Installing with Docker</h2>
 <p>A container image can be built from the source repository's <code>Dockerfile</code>.
 Run the container with the same <code>ITDASTREAM_*</code> environment variables, and
@@ -1718,9 +1779,16 @@ publish the Kafka port (<code>9092</code>) and the admin port (<code>8080</code>
 ZooKeeper and S3 endpoint are still required.</p>
 <h2 id="stopping-the-servers">Stopping the Servers</h2>
 <p>Stop the broker and ZooKeeper when finished.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>bin/stop-broker.sh
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>bin/stop-zk.sh
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>bin/stop-broker.sh
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>bin/stop-zk.sh
 </code></pre></div>
+<p>Stopping a broker is not abrupt. It announces that it is draining so the rest of
+the cluster stops advertising it, keeps serving for
+<code>itdastream.broker.drain.pause.ms</code> while clients re-route, waits up to
+<code>itdastream.broker.shutdown.grace.ms</code> for requests already in flight, and only
+then flushes its write buffers to object storage and closes. On a single-broker
+setup the pause has nobody to re-route to and simply costs a few seconds &mdash;
+set <code>itdastream.broker.drain.pause.ms=0</code> for a development box if that matters.</p>
 <h2 id="next-steps">Next Steps</h2>
 <ul>
 <li>Set up your first pipeline with <a href="../../features/streaming-no-code/">No-Code Kafka to Iceberg</a>.</li>

@@ -1529,6 +1529,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../broker-drain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Broker Drain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../backup/" class="md-nav__link">
         
   
@@ -1833,6 +1861,10 @@
 <td><code>kafka:Cleanup</code></td>
 <td><code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code></td>
 </tr>
+<tr>
+<td><code>kafka:Drain</code></td>
+<td><code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code></td>
+</tr>
 </tbody>
 </table>
 <h3 id="control-plane-iam">Control plane — IAM</h3>
@@ -2002,7 +2034,7 @@
 <a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">        </span><span class="s2">&quot;kafka:CreateGroup&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;kafka:DeleteGroup&quot;</span><span class="p">,</span>
 <a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">        </span><span class="s2">&quot;kafka:CreatePolicy&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;kafka:DeletePolicy&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;kafka:UpdateIAM&quot;</span><span class="p">,</span>
 <a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">        </span><span class="s2">&quot;kafka:CreateKey&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;kafka:RotateKey&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">        </span><span class="s2">&quot;kafka:Rebalance&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;kafka:Cleanup&quot;</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">        </span><span class="s2">&quot;kafka:Rebalance&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;kafka:Cleanup&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;kafka:Drain&quot;</span>
 <a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">      </span><span class="p">],</span>
 <a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">      </span><span class="nt">&quot;Resource&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
 <a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">    </span><span class="p">}</span>

@@ -1623,6 +1623,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../broker-drain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Broker Drain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../backup/" class="md-nav__link">
         
   
@@ -2697,6 +2725,16 @@ reference only; there is no broker-wide default. See
 <td><code>itdastream.broker.id.stateless.max</code></td>
 <td><code>1000000</code></td>
 <td>Stateless broker ID modulus. When <code>itdastream.broker.id.stateless=true</code>, the broker ID is <code>hash(host:port) % this value</code>. Caps the ID space.</td>
+</tr>
+<tr>
+<td><code>itdastream.broker.drain.pause.ms</code></td>
+<td><code>15000</code></td>
+<td>How long a broker keeps serving after announcing that it is draining, during a shutdown. Announcing removes it from the metadata every other broker hands to clients, but a client that fetched metadata a moment earlier still believes it is serving — this is the time it gets to notice. Set it to at least the clients' metadata refresh interval. See <a href="../broker-drain/">Broker Drain</a>.</td>
+</tr>
+<tr>
+<td><code>itdastream.broker.shutdown.grace.ms</code></td>
+<td><code>30000</code></td>
+<td>How long shutdown waits for requests already being handled to finish before interrupting the handler threads. Interrupting mid-produce can abort a batch after it reached the staging store but before the write buffer took it, leaving a producer holding an acknowledgement for a record the log does not have. Bounded so a wedged handler cannot stop the broker stopping.</td>
 </tr>
 <tr>
 <td><code>itdastream.executor.shutdown.await.seconds</code></td>
