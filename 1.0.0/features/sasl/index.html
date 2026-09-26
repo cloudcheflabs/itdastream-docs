@@ -14,7 +14,7 @@
         <link rel="prev" href="../admin-password-recovery/">
       
       
-        <link rel="next" href="../network/">
+        <link rel="next" href="../sso/">
       
       
         
@@ -1045,6 +1045,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SASL Authentication and TLS Encryption
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1062,6 +1080,97 @@
 
       </a>
       
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mechanisms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mechanisms
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authorization-is-separate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authorization is separate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TLS
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Sign-On (OIDC/SAML/LDAP)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1400,11 +1509,87 @@
 
 
 <h1 id="sasl-authentication-and-tls-encryption">SASL Authentication and TLS Encryption</h1>
-<p>ItdaStream supports SASL/PLAIN authentication and SSL/TLS encryption, enabling SASL_PLAINTEXT and SASL_SSL security protocols for Kafka clients.</p>
+<p>ItdaStream authenticates Kafka clients over SASL and encrypts the listener with
+TLS, so the security protocols every Kafka client already knows —
+<code>SASL_PLAINTEXT</code>, <code>SSL</code>, <code>SASL_SSL</code> — all work unchanged.</p>
+<h2 id="mechanisms">Mechanisms</h2>
+<table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Credential</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SASL/PLAIN</strong></td>
+<td>Username = Access Key, Password = Secret Key</td>
+<td>The IAM credential pair. <code>POST /admin/iam/keys</code> issues one.</td>
+</tr>
+<tr>
+<td><strong>SASL/PLAIN</strong></td>
+<td>Username = login name, Password = directory password or OIDC ID token</td>
+<td>Single sign-on for clients that speak only PLAIN. See <a href="../sso/">Single Sign-On</a>.</td>
+</tr>
+<tr>
+<td><strong>SASL/OAUTHBEARER</strong></td>
+<td>An OIDC ID token, supplied through the client's standard token callback</td>
+<td>Single sign-on the way Kafka clients already do it. Advertised only while an identity provider is configured.</td>
+</tr>
+</tbody>
+</table>
+<p>Enable it with <code>itdastream.sasl.enabled=true</code>. With SASL off, the listener is
+unauthenticated.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Access key and secret key — the credential this cluster issues</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="na">security.protocol</span><span class="o">=</span><span class="s">SASL_PLAINTEXT</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="na">sasl.mechanism</span><span class="o">=</span><span class="s">PLAIN</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="na">sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required </span><span class="se">\</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="s">username=&quot;AKIA…&quot; password=&quot;…&quot;;</span>
+</code></pre></div>
+<p>The handshake is the standard Kafka one: <code>SaslHandshake</code> names the mechanism, then
+<code>SaslAuthenticate</code> carries the exchange. Nothing about the client is special, and
+which mechanisms a broker will accept can be read from its handshake response.</p>
+<div class="admonition note">
+<p class="admonition-title">Why OAUTHBEARER appears and disappears</p>
+<p>A Kafka client that has chosen a mechanism does not fall back, so advertising
+OAUTHBEARER with no identity provider behind it would have clients select it
+and then fail at the exchange — with nothing to say the mechanism was never
+usable there. The broker therefore offers it only while OIDC, SAML or LDAP is
+enabled.</p>
+</div>
+<h2 id="authorization-is-separate">Authorization is separate</h2>
+<p>Authenticating says who the caller is; the IAM policies attached to their groups
+decide what they may do. That is the same evaluation for an access key and for a
+federated identity — see <a href="../iam/">AWS IAM-Compatible Access Control</a> and
+<a href="../iam-policy/">IAM Policy Reference</a>.</p>
+<h2 id="tls">TLS</h2>
 <ul>
-<li><strong>SASL/PLAIN</strong>: Username = Access Key, Password = Secret Key (from IAM system); standard Kafka SASL handshake protocol</li>
-<li><strong>SSL/TLS</strong>: Non-blocking TLS via Java SSLEngine, TLSv1.3 by default, JKS keystore/truststore support</li>
-<li><strong>TransportLayer abstraction</strong>: PlaintextTransportLayer (direct I/O) and SslTransportLayer (full TLS) — transparent to upper layers</li>
+<li>Non-blocking TLS through Java's <code>SSLEngine</code>, so an encrypted connection costs no
+  thread of its own.</li>
+<li><code>TLSv1.3</code> by default; <code>itdastream.ssl.protocol</code> selects another version.</li>
+<li>JKS keystore and truststore, the latter only for mutual TLS.</li>
+<li>A <code>TransportLayer</code> abstraction keeps it invisible above the socket:
+  <code>PlaintextTransportLayer</code> does direct I/O and <code>SslTransportLayer</code> does the full
+  handshake, and nothing upstream of them knows which is in use.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="na">itdastream.ssl.enabled</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="na">itdastream.ssl.protocol</span><span class="o">=</span><span class="s">TLSv1.3</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="na">itdastream.ssl.keystore.path</span><span class="o">=</span><span class="s">/etc/itdastream/server.jks</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="na">itdastream.ssl.keystore.password</span><span class="o">=</span><span class="s">…</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="na">itdastream.ssl.key.password</span><span class="o">=</span><span class="s">…</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># Only for mutual TLS</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1">#itdastream.ssl.truststore.path=/etc/itdastream/clients.jks</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="c1">#itdastream.ssl.truststore.password=…</span>
+</code></pre></div>
+<p>Combine the two for <code>SASL_SSL</code>: <code>itdastream.sasl.enabled=true</code> plus
+<code>itdastream.ssl.enabled=true</code>. A credential sent over a plaintext listener crosses
+the network in the clear — including a directory password, which is a credential
+for systems other than this one.</p>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="../sso/">Single Sign-On</a> — OIDC, SAML and LDAP, on this plane and in the console.</li>
+<li><a href="../configuration/">Configuration</a> — every setting, with its default.</li>
 </ul>
 
 

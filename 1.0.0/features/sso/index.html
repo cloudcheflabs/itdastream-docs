@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/admin-password-recovery/">
+        <link rel="canonical" href="https://cloudcheflabs.github.io/itdastream-docs/1.0.0/features/sso/">
       
       
-        <link rel="prev" href="../iam-policy/">
+        <link rel="prev" href="../sasl/">
       
       
-        <link rel="next" href="../sasl/">
+        <link rel="next" href="../network/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Admin Password Recovery - ItdaStream</title>
+        <title>Single Sign-On (OIDC/SAML/LDAP) - ItdaStream</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#admin-password-recovery" class="md-skip">
+        <a href="#single-sign-on-oidc-saml-ldap" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Admin Password Recovery
+              Single Sign-On (OIDC/SAML/LDAP)
             
           </span>
         </div>
@@ -1005,37 +1005,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Admin Password Recovery
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../admin-password-recovery/" class="md-nav__link">
         
   
   
@@ -1051,153 +1024,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#when-to-use" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        When to use
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How it works
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick start
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#input-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Input modes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#how-the-cli-finds-the-socket" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How the CLI finds the socket
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#the-master-key-is-for-the-broker-not-the-cli" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The master key is for the broker, not the CLI
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#worked-examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Worked examples
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#security-model" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Security model
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Limitations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1235,10 +1061,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../sso/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Sign-On (OIDC/SAML/LDAP)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1254,6 +1107,170 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#sso-means-two-different-things-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SSO means two different things here
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-decides-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What decides permissions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What decides permissions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where-a-federated-session-lives-and-why-it-differs-by-plane" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where a federated session lives, and why it differs by plane
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#group-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Group mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuring-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuring it
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuring it">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openid-connect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenID Connect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saml-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SAML 2.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ldap-active-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LDAP / Active Directory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behind-a-load-balancer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Behind a load balancer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#revocation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Revocation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#password-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Password storage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1591,248 +1608,253 @@
 
 
 
-<h1 id="admin-password-recovery">Admin Password Recovery</h1>
-<p>itdastream ships with a built-in recovery channel that lets an operator
-reset the <code>admin</code> user's password <strong>without stopping the broker</strong>, even
-when no one remembers the current password.</p>
-<p>Recovery uses a local Unix domain socket — there is no HTTP back-door, no
-network endpoint, no recovery URL. Authentication is performed by the
-operating system: only a process that already shares the broker's
-filesystem identity can open the socket.</p>
-<h2 id="when-to-use">When to use</h2>
+<h1 id="single-sign-on-oidc-saml-ldap">Single Sign-On (OIDC, SAML, LDAP)</h1>
+<p>ItdaStream can hand authentication to an external identity provider, so the
+cluster stops being another place that holds passwords and becomes another thing
+your directory governs. Three providers are supported — OpenID Connect, SAML 2.0,
+and LDAP / Active Directory — and all three work on both surfaces.</p>
+<h2 id="sso-means-two-different-things-here">SSO means two different things here</h2>
+<p>This is the part most integrations get wrong, so it is worth being precise before
+any configuration.</p>
+<p><strong>The admin console is a browser.</strong> It can be redirected, so it uses the flows
+built for that: OIDC Authorization Code with PKCE, or SAML 2.0 Web Browser SSO.</p>
+<p><strong>The Kafka protocol is not a browser — but it has SASL.</strong> So SSO on the data
+plane <em>is</em> SASL, and there are two mechanisms:</p>
+<table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Credential</th>
+<th>When to use it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SASL/OAUTHBEARER</strong></td>
+<td>An OIDC ID token, supplied by the application</td>
+<td>The path to prefer. Every mainstream Kafka client already ships this mechanism for token authentication, so an SSO deployment needs configuration and no custom client code.</td>
+</tr>
+<tr>
+<td><strong>SASL/PLAIN</strong></td>
+<td>An ID token or a directory password in the password field</td>
+<td>For clients that speak only PLAIN, which is most of the older ones.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># OAUTHBEARER — the client asks the application for the token through the</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># standard callback, which is the integration point an application with an</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># identity provider already has.</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="na">security.protocol</span><span class="o">=</span><span class="s">SASL_PLAINTEXT</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="na">sasl.mechanism</span><span class="o">=</span><span class="s">OAUTHBEARER</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="na">sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="na">sasl.login.callback.handler.class</span><span class="o">=</span><span class="s">com.example.MyTokenHandler</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># PLAIN — the directory password, for a client that has no OAUTHBEARER support</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="na">security.protocol</span><span class="o">=</span><span class="s">SASL_PLAINTEXT</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="na">sasl.mechanism</span><span class="o">=</span><span class="s">PLAIN</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="na">sasl.jaas.config</span><span class="o">=</span><span class="s">org.apache.kafka.common.security.plain.PlainLoginModule required </span><span class="se">\</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="s">username=&quot;alice&quot; password=&quot;&lt;directory password, or an ID token&gt;&quot;;</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">OAUTHBEARER is advertised only when a provider is configured</p>
+<p>A Kafka client that has chosen a mechanism does not fall back, so a broker
+advertising OAUTHBEARER without an identity provider behind it would have
+clients select it and then fail at the exchange — with nothing to say the
+mechanism was never usable there. The SASL handshake therefore offers
+OAUTHBEARER only while OIDC, SAML or LDAP is enabled.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">A SAML assertion is not a Kafka credential</p>
+<p>It is refused on the Kafka plane, deliberately. An assertion may be used once
+— that is what makes replay protection possible — while a Kafka client
+authenticates on <strong>every connection it opens</strong>: one to bootstrap, and one to
+each broker it needs. So an assertion would work on the first connection and
+fail on the next, which is the worst of both. The broker says so and names
+what to use instead: OAUTHBEARER with an ID token, or directory credentials.
+The console, which authenticates once, accepts assertions normally.</p>
+</div>
+<h2 id="what-decides-permissions">What decides permissions</h2>
+<p>Nothing about the provider does. A federated identity arrives carrying group
+names; those are mapped to groups <strong>on this cluster</strong>, and the policies attached
+to those groups authorize every produce and fetch. The evaluation is the same code
+path as an access key — only where the group list came from differs.</p>
+<p>No local user account is created. A federated caller has no password and nothing
+to persist; your directory is the record. Creating an account for everyone who
+ever connected would put them all in the IAM list and in every replicated
+snapshot, and removing someone from the directory would leave the copy behind
+still authorizing them.</p>
+<h3 id="where-a-federated-session-lives-and-why-it-differs-by-plane">Where a federated session lives, and why it differs by plane</h3>
 <ul>
-<li>The admin password was forgotten or rotated out of the password manager.</li>
-<li>An automation script needs to provision a known admin password during
-  first-time setup, without going through the web UI.</li>
-<li>A new operator is onboarded and you need to hand them an admin credential.</li>
+<li><strong>A Kafka session is not replicated between brokers.</strong> Each connection
+  authenticates against the broker it lands on, so that broker is also the one
+  that authorizes it. Replicating one record per connection would put client churn
+  into the IAM broadcast for no benefit.</li>
+<li><strong>A console session is replicated</strong>, because an admin call may be proxied to the
+  leader and the leader is what resolves it.</li>
 </ul>
-<p>For day-to-day password changes (the user remembers the old password and
-wants a new one), use the Admin UI's <strong>Change Password</strong> screen instead —
-that path requires the old password and does not flag the user for forced
-rotation.</p>
-<h2 id="how-it-works">How it works</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌────────────────────┐   JSON over UDS    ┌────────────────────┐
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  itdastream-cli    │ ─────────────────▶ │  Broker (running)  │
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│  iam:reset-password│                    │   AuthManager      │
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>└────────────────────┘                    │   .adminResetPwd() │
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>         ▲                                │                    │
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>         │ stdout: new password           │  saveAndBroadcast()│
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>         │ (one-time)                     │  cluster sync push │
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                                          │  audit log append  │
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                                          └────────────────────┘
+<p>Both expire after <code>itdastream.sso.federated.session.seconds</code> (default 3600).</p>
+<h3 id="group-mapping">Group mapping</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="na">itdastream.sso.group.mappings</span><span class="o">=</span><span class="s">db-admins:itda-admins,analysts:itda-readers</span>
 </code></pre></div>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Socket path</strong></td>
-<td><code>${itdastream.base.data.dir}/admin.sock</code> by default, mode <code>600</code> — the live value is published to <code>bin/broker.socket</code></td>
-</tr>
-<tr>
-<td><strong>Authentication</strong></td>
-<td>OS file permission — same user as the broker process</td>
-</tr>
-<tr>
-<td><strong>Socket path marker</strong></td>
-<td><code>bin/broker.socket</code> — written when the socket binds, removed on shutdown</td>
-</tr>
-<tr>
-<td><strong>Network surface</strong></td>
-<td>none — Unix domain socket only</td>
-</tr>
-<tr>
-<td><strong>Downtime</strong></td>
-<td>none — applied in-process on the live broker</td>
-</tr>
-<tr>
-<td><strong>Cluster sync</strong></td>
-<td>automatic — IAM state fans out to peer brokers via the existing sync path</td>
-</tr>
-<tr>
-<td><strong>Audit log</strong></td>
-<td><code>data/iam-audit/reset.log</code> (mode <code>600</code>, append-only)</td>
-</tr>
-<tr>
-<td><strong>Post-reset state</strong></td>
-<td><code>requirePasswordChange = true</code> (forced rotation on next login)</td>
-</tr>
-</tbody>
-</table>
-<h2 id="quick-start">Quick start</h2>
-<p>The simplest invocation lets the broker generate a strong 20-character
-password and print it to stdout. The new password must be changed on the
-admin's next login (the <code>requirePasswordChange</code> flag is set automatically).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Inside the broker host or container:</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
+<p>Left empty, provider group names are used as they are — the common case where the
+directory already uses this product's group names. <strong>Once set, the mapping is
+exhaustive:</strong> a group not named in it is dropped, so creating a group at the
+provider cannot grant access here by itself.</p>
+<p>An identity whose groups all map to nothing is refused, not admitted with no
+groups. Such a session has no policies and is denied every action, so letting it
+in produces a client that connects and then fails every produce and fetch — which
+reads as a broker problem. Set <code>itdastream.sso.allow.unmapped.groups=true</code> if you
+would rather allow it.</p>
+<p>The directory login endpoint reports that case as <strong>403</strong>, separately from a wrong
+password's 401 — otherwise an operator goes and resets a password that was right.</p>
+<h2 id="configuring-it">Configuring it</h2>
+<p>Everything below can be set in the <strong>admin console under Single Sign-On</strong>, which
+stores it with the IAM state and applies it on every broker — no file edits, no
+restart. The properties file is still read for anything left unset, so a cluster
+configured by file keeps working untouched.</p>
+<p>Local passwords keep working while SSO is on. Enabling it cannot lock you out.</p>
+<h3 id="openid-connect">OpenID Connect</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="na">itdastream.sso.oidc.enabled</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="na">itdastream.sso.oidc.issuer</span><span class="o">=</span><span class="s">https://keycloak.example.com/realms/company</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="na">itdastream.sso.oidc.client.id</span><span class="o">=</span><span class="s">itdastream-console</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="na">itdastream.sso.oidc.client.secret</span><span class="o">=</span><span class="s">…</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="na">itdastream.sso.oidc.redirect.uri</span><span class="o">=</span><span class="s">https://itda.example.com/admin/auth/sso/oidc/callback</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="na">itdastream.sso.oidc.groups.claim</span><span class="o">=</span><span class="s">groups</span>
 </code></pre></div>
-<h2 id="input-modes">Input modes</h2>
-<table>
-<thead>
-<tr>
-<th>Mode</th>
-<th>Command</th>
-<th>When to use</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Broker-generated</strong></td>
-<td><code>itdastream-cli.sh iam:reset-password</code></td>
-<td>Default. Strong random password printed once on stdout.</td>
-</tr>
-<tr>
-<td><strong>Explicit</strong></td>
-<td><code>itdastream-cli.sh iam:reset-password --new-password 'My!Pass'</code></td>
-<td>Automation that knows the desired value. Beware: argv may show up in <code>ps</code>.</td>
-</tr>
-<tr>
-<td><strong>Stdin</strong></td>
-<td><code>echo 'My!Pass' \| itdastream-cli.sh iam:reset-password --new-password -</code></td>
-<td>Automation that wants to avoid argv exposure.</td>
-</tr>
-<tr>
-<td><strong>Interactive</strong></td>
-<td><code>itdastream-cli.sh iam:reset-password --interactive</code></td>
-<td>Operator at a TTY. Prompts for password twice with no echo.</td>
-</tr>
-</tbody>
-</table>
-<p>Resetting a different user is also supported:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--user<span class="w"> </span>some-user<span class="w"> </span>--new-password<span class="w"> </span><span class="s1">&#39;NewPass123&#39;</span>
-</code></pre></div>
-<h2 id="configuration">Configuration</h2>
-<p>The recovery socket is enabled by default. Every key below lives in
-<code>conf/itdastream.properties</code> and is read at broker startup:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># conf/itdastream.properties</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># Set false to remove the local recovery path entirely.</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="na">itdastream.admin.socket.enabled</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s">true</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="na">itdastream.admin.socket.path</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s">${itdastream.base.data.dir}/admin.sock</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1"># Name of the file under &lt;itdastream.home&gt;/bin that receives the socket path the</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1"># broker actually bound to (see &quot;How the CLI finds the socket&quot; below).</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="na">itdastream.admin.socket.marker.file</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">broker.socket</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1"># Append-only audit trail of socket operations.</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="na">itdastream.iam.audit.dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">${itdastream.base.data.dir}/iam-audit</span>
-</code></pre></div>
-<p>The socket follows <code>itdastream.base.data.dir</code>. If you launch the broker with
-<code>-Ditdastream.base.data.dir=/var/lib/itdastream</code> the socket moves to
-<code>/var/lib/itdastream/admin.sock</code> — you do not have to restate it.</p>
-<h3 id="how-the-cli-finds-the-socket">How the CLI finds the socket</h3>
-<p>Re-deriving the socket path from <code>conf/itdastream.properties</code> is not reliable on its own:
-<code>itdastream.base.data.dir</code> can be overridden with <code>-D</code> at launch or edited after
-startup, and the file does not record which value the live process used. So the
-broker <strong>publishes the path it actually bound to</strong> into
-<code>&lt;install dir&gt;/bin/broker.socket</code> when the socket comes up, and removes that file on
-shutdown. <code>bin/itdastream-cli.sh</code> prefers it.</p>
-<p>Full resolution order, highest priority first:</p>
+<p>Endpoints are read from the issuer's discovery document, so they are not
+configured individually. The ID token's signature is verified against the
+provider's published key set, and its issuer, audience and expiry are all checked
+— a token issued for a different application is refused even though it is genuine
+and correctly signed.</p>
+<div class="admonition note">
+<p class="admonition-title">The <code>groups</code> scope</p>
+<p><code>itdastream.sso.oidc.scopes</code> deliberately does <strong>not</strong> include <code>groups</code>. It is
+not a standard scope, and a provider that does not define it rejects the whole
+authorization request with <code>invalid_scope</code> — so asking for it by default logs
+nobody in. Group membership comes from a claim the provider is configured to
+include.</p>
+</div>
+<h3 id="saml-20">SAML 2.0</h3>
+<p>A SAML integration is an exchange of metadata, not a form-filling exercise.</p>
 <ol>
-<li><code>--socket /path/to/admin.sock</code> — read by the Java CLI, always wins.</li>
-<li><code>$ITDASTREAM_ADMIN_SOCKET</code> — if already exported in the caller's shell.</li>
-<li><code>&lt;install dir&gt;/bin/broker.socket</code> — the path published by the running broker.
-   Used only when the file exists <em>and</em> the path in it is a live socket.</li>
-<li><code>itdastream.admin.socket.path</code> from <code>conf/itdastream.properties</code>, with
-   <code>${itdastream.base.data.dir}</code> expanded. A value that still contains a
-   <code>${...}</code> placeholder is rejected rather than used literally.</li>
-<li><code>&lt;install dir&gt;/data/admin.sock</code>, then <code>/data/admin.sock</code>.</li>
+<li><strong>Download this cluster's metadata</strong> from the console (or
+   <code>GET /admin/sso/saml/metadata</code>) and give it to whoever administers your
+   identity provider.</li>
+<li><strong>Paste your provider's metadata</strong> into the console. The entity ID, sign-on URL
+   and signing certificate are read from it — which beats transcribing three
+   fields by hand, where the typos are.</li>
 </ol>
-<p>Step 3 is what makes a moved data dir work: with the socket at
-<code>/data/admin.sock</code> and the properties file still saying <code>./data</code>, only the marker
-knows where to connect.</p>
-<p>To rename the marker, change one key — both ends read it:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># conf/itdastream.properties</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>itdastream.admin.socket.marker.file<span class="w"> </span><span class="o">=</span><span class="w"> </span>itdastream-recovery.socket
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="na">itdastream.sso.saml.enabled</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="na">itdastream.sso.saml.idp.entity.id</span><span class="o">=</span><span class="s">https://idp.example.com/realms/company</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="na">itdastream.sso.saml.idp.sso.url</span><span class="o">=</span><span class="s">https://idp.example.com/protocol/saml</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="na">itdastream.sso.saml.idp.certificate</span><span class="o">=</span><span class="s">MIIC…</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="na">itdastream.sso.saml.sp.entity.id</span><span class="o">=</span><span class="s">itdastream</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="na">itdastream.sso.saml.sp.acs.url</span><span class="o">=</span><span class="s">https://itda.example.com/admin/auth/sso/saml/acs</span>
 </code></pre></div>
-<p>Restart the broker; it publishes <code>bin/itdastream-recovery.socket</code>, and the CLI
-picks the new name up from the same properties file.</p>
-<h3 id="the-master-key-is-for-the-broker-not-the-cli">The master key is for the broker, not the CLI</h3>
-<p><code>ITDASTREAM_MASTER_KEY</code> must be exported for the broker process. <code>bin/start-broker.sh</code> checks it up front and refuses to start when it is unset or shorter than 32 characters.
-The variable name itself is configurable — <code>itdastream.kms.master.key.env</code> in
-<code>conf/itdastream.properties</code> names the variable the broker reads:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ITDASTREAM_MASTER_KEY</span><span class="o">=</span><span class="s1">&#39;replace-with-a-32-char-or-longer-secret&#39;</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>bin/start-broker.sh
+<p>Every assertion is checked four ways, and each one is a real attack if skipped:</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>What it prevents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Signature, against the provider's certificate</td>
+<td>An assertion the caller wrote</td>
+</tr>
+<tr>
+<td>Audience</td>
+<td>A genuine assertion for another service logging in here</td>
+</tr>
+<tr>
+<td>Validity window</td>
+<td>A captured assertion replayed forever</td>
+</tr>
+<tr>
+<td>Issuer</td>
+<td>Any provider the caller can reach being trusted</td>
+</tr>
+</tbody>
+</table>
+<p>On top of those, an assertion already used is refused. That record is kept <strong>in
+ZooKeeper, not in one broker's memory</strong>: an assertion is a bearer document, and a
+replay arrives at whichever broker the client happens to reach — usually not the
+one that saw the original. It is also why only the leader writes IAM but any
+broker can record a use.</p>
+<p><strong>Encrypted assertions and signed requests.</strong> Several providers encrypt assertions
+or require the authentication request to be signed. Both need a service-provider
+keypair — generate one from the console, then re-import the SP metadata at your
+provider so it picks up the new certificate. An encrypted assertion must carry its
+own signature: encryption proves who the assertion was <em>for</em>, never who wrote it.</p>
+<p><strong>NameID format</strong> is left empty by default, which omits the request entirely and
+lets the provider issue whatever it is configured for. Naming one breaks more
+integrations than it fixes.</p>
+<h3 id="ldap-active-directory">LDAP / Active Directory</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="na">itdastream.sso.ldap.enabled</span><span class="o">=</span><span class="s">true</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="na">itdastream.sso.ldap.url</span><span class="o">=</span><span class="s">ldaps://ad.example.com:636</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="na">itdastream.sso.ldap.bind.dn</span><span class="o">=</span><span class="s">cn=svc-itdastream,ou=service,dc=example,dc=com</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="na">itdastream.sso.ldap.bind.password</span><span class="o">=</span><span class="s">…</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="na">itdastream.sso.ldap.user.base.dn</span><span class="o">=</span><span class="s">ou=people,dc=example,dc=com</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="na">itdastream.sso.ldap.user.filter</span><span class="o">=</span><span class="s">(sAMAccountName={0})</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="na">itdastream.sso.ldap.group.base.dn</span><span class="o">=</span><span class="s">ou=groups,dc=example,dc=com</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="na">itdastream.sso.ldap.group.filter</span><span class="o">=</span><span class="s">(member={0})</span>
 </code></pre></div>
-<p><code>bin/itdastream-cli.sh</code> does <strong>not</strong> need it. The CLI only opens the Unix socket and
-hands the request to the running broker, which already holds the unsealed key,
-so this works with the variable unset:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">unset</span><span class="w"> </span>ITDASTREAM_MASTER_KEY
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>bin/itdastream-cli.sh<span class="w"> </span>ping
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># pong</span>
-</code></pre></div>
-<p>If a CLI invocation complains about the key rather than the socket, you are
-running a start script, not the CLI.</p>
-<h3 id="worked-examples">Worked examples</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># 1. On the host, as the same OS user that runs the broker:</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">cd</span><span class="w"> </span>/opt/itdastream
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>bin/itdastream-cli.sh<span class="w"> </span>ping
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1"># 2. The broker runs as a service account and you are root:</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>sudo<span class="w"> </span>-u<span class="w"> </span>itdastream<span class="w"> </span>/opt/itdastream/bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="c1"># 3. Inside a container:</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>itdastream-broker-1<span class="w"> </span>/app/bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="c1"># 4. Data dir was relocated at launch — no extra flags needed, the CLI</span>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="c1">#    reads the published marker:</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>cat<span class="w"> </span>/opt/itdastream/bin/broker.socket
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="c1"># /var/lib/itdastream/admin.sock</span>
-<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>bin/itdastream-cli.sh<span class="w"> </span>ping
-<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>
-<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="c1"># 5. Socket in a non-standard place and no marker (the broker is stopped,</span>
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="c1">#    or you are on a host where the marker was cleaned up):</span>
-<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>bin/itdastream-cli.sh<span class="w"> </span>--socket<span class="w"> </span>/var/lib/itdastream/admin.sock<span class="w"> </span>iam:reset-password
-<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>
-<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="c1"># 6. Non-interactive automation, password from stdin so it never reaches argv:</span>
-<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;S0me!Strong!Pass&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--new-password<span class="w"> </span>-
-</code></pre></div>
-<h2 id="security-model">Security model</h2>
-<p><strong>1. The socket is OS-gated.</strong>
-At startup the broker creates <code>data/admin.sock</code> with mode <code>600</code> (owner
-read/write only). Even other unprivileged users on the same host cannot
-connect. There is no token, no shared secret, no network listener.</p>
-<p><strong>2. The audit log records every reset.</strong>
-Every successful reset appends a JSON line to <code>data/iam-audit/reset.log</code>
-(mode <code>600</code>). The plaintext password is <strong>never</strong> logged — only the first
-8 characters of its hash, the user, whether it was broker-generated, and
-the OS user that invoked the CLI.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span><span class="nt">&quot;ts&quot;</span><span class="p">:</span><span class="s2">&quot;2026-05-23T16:00:46.922Z&quot;</span><span class="p">,</span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="s2">&quot;iam.reset-password&quot;</span><span class="p">,</span><span class="nt">&quot;user&quot;</span><span class="p">:</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span><span class="nt">&quot;generated&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">&quot;hashFp&quot;</span><span class="p">:</span><span class="s2">&quot;OYV/Ojf/&quot;</span><span class="p">,</span><span class="nt">&quot;invokedAs&quot;</span><span class="p">:</span><span class="s2">&quot;root&quot;</span><span class="p">}</span>
-</code></pre></div>
-<p><strong>3. The new password is exposed exactly once.</strong>
-For broker-generated passwords, the plaintext is returned only on the
-single CLI invocation that triggered the reset. It is not retransmitted.
-Treat scrollback and shell history accordingly — or use stdin input mode
-to avoid argv exposure entirely.</p>
-<p><strong>4. Forced rotation on next login.</strong>
-After reset, the user is flagged <code>requirePasswordChange = true</code>. The next
-successful login forces the user through the change-password flow, so a
-temporary password used by the operator is immediately replaced by a
-password only the user knows.</p>
-<p><strong>5. The broker must be running.</strong>
-Because the recovery channel is in-process, the broker must be alive for
-the CLI to connect. This is intentional: RocksDB requires an exclusive
-lock, so an offline edit would either conflict with a running broker or
-need a complex stale-lock recovery. With this design, the only way to
-reset is to be on the host <em>and</em> have the broker running <em>and</em> share its
-filesystem identity.</p>
-<h2 id="limitations">Limitations</h2>
+<p>Authentication is <strong>search then bind</strong>. A service account finds the user's entry —
+their DN is something the product cannot construct, since Active Directory puts
+people under <code>CN=John Doe,OU=Staff,…</code> where neither component is the login name —
+and the password is then checked by binding as that DN.</p>
+<p>That second bind <em>is</em> the authentication. Reading a password attribute and
+comparing it would be wrong even where the directory allows it: only the server
+knows how its own hashes are salted, and account lockout, expiry and disabled
+flags are enforced on bind and nowhere else.</p>
+<p>Group membership is read <strong>both ways</strong>: from the user's <code>memberOf</code> and from a
+search of the group tree. Directories disagree about which side records it —
+OpenLDAP usually keeps it on the group, Active Directory mirrors it onto the user
+— and reading only one way silently returns no groups against half the servers in
+the field.</p>
+<p>This is also the provider that makes the Kafka plane simplest: the directory
+password goes in the SASL/PLAIN password field, so an existing client works with
+directory credentials and no token handling at all.</p>
+<div class="admonition warning">
+<p class="admonition-title">Use TLS</p>
+<p>Without <code>ldaps://</code> or <code>itdastream.sso.ldap.starttls=true</code>, the bind password
+crosses the network in the clear.</p>
+</div>
+<h2 id="behind-a-load-balancer">Behind a load balancer</h2>
+<p>Both browser flows work on any broker, regardless of which one started them. The
+login state — including the PKCE verifier — is sealed with a key every broker
+derives from <code>ITDASTREAM_MASTER_KEY</code> and carried in the <code>state</code> parameter itself
+rather than held in memory on one broker. Unsealing it is also what proves this
+cluster issued it, which is the login-CSRF check.</p>
+<p>Without that, SSO works on a single broker and fails on roughly half of all
+attempts in a cluster — and it fails looking like a problem at the identity
+provider.</p>
+<h2 id="revocation">Revocation</h2>
+<p>Disabling someone at the provider stops new logins immediately. Sessions already
+issued keep working until they expire — this cluster is not told about the change.
+<code>itdastream.sso.federated.session.seconds</code> bounds how long that gap lasts; shorter
+is safer.</p>
+<p>A federated session gets no refresh token for the same reason: renewing would keep
+someone signed in after the directory disabled them.</p>
+<h2 id="password-storage">Password storage</h2>
+<p>Independent of SSO, local passwords are stored as PBKDF2-HMAC-SHA256 hashes. They
+used to be kept as the plaintext itself; the IAM state is encrypted at rest, but
+that only moved the problem — a backup, a snapshot in transit, or anyone who could
+read the decrypted state held every password, and password reuse makes that a
+credential for other systems too.</p>
+<p>Stored plaintext still verifies and is rewritten on the owner's next successful
+login, which is the only moment the plaintext is available to hash — so nobody is
+locked out and no migration step is required. The iteration count travels with
+each stored hash, so raising
+<code>itdastream.auth.password.hash.iterations</code> (default 600000) does not invalidate
+existing passwords.</p>
+<h2 id="see-also">See also</h2>
 <ul>
-<li><strong>Broker must be running.</strong> If the broker is down, this CLI cannot help.
-  Bring the broker back up first, then run the CLI.</li>
-<li><strong>No knowledge factor.</strong> Any process that shares the broker's filesystem
-  identity can invoke the CLI. In multi-tenant or shared-shell
-  environments, restrict shell access to the broker accordingly. A future
-  enhancement may add an opt-in "recovery key" requirement for an
-  additional knowledge factor.</li>
-</ul>
-<h2 id="related">Related</h2>
-<ul>
-<li><a href="../iam/">AWS IAM-Compatible Access Control</a></li>
-<li><a href="../iam-policy/">IAM Policy Reference</a></li>
-<li><a href="../disaggre-architecture/">Disaggregated Architecture</a></li>
+<li><a href="../sasl/">SASL Authentication and TLS Encryption</a> — the mechanisms and the transport.</li>
+<li><a href="../iam/">AWS IAM-Compatible Access Control</a> — the groups and policies a federated identity maps onto.</li>
+<li><a href="../configuration/">Configuration</a> — every setting, with its default.</li>
 </ul>
 
 

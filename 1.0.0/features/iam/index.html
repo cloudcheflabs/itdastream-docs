@@ -1122,6 +1122,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Sign-On (OIDC/SAML/LDAP)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../network/" class="md-nav__link">
         
   
@@ -1456,6 +1484,12 @@
 <li><strong>User model</strong>: Users → Groups → Policies, with access key pairs and optional expiration</li>
 <li><strong>Credentials</strong>: each access key carries three values — an <strong>access key</strong>, a <strong>secret key</strong>,
   and a long-lived <strong>user token</strong> (<code>ITOK...</code>) — generated together</li>
+<li><strong>Federated identities</strong>: a caller an external identity provider vouched for — OIDC, SAML 2.0
+  or LDAP / Active Directory — carries groups from your directory instead of having an account
+  here, and the policies on the mapped groups authorize them the same way. See
+  <a href="../sso/">Single Sign-On</a>.</li>
+<li><strong>Local passwords</strong>: stored as PBKDF2-HMAC-SHA256 hashes. Values written as plaintext by an
+  earlier version still verify and are rewritten on their owner's next successful login.</li>
 </ul>
 <p>For the full policy JSON schema, ARN format, action catalog, and worked examples, see the <a href="../iam-policy/">IAM Policy Reference</a>.</p>
 <h2 id="programmatic-credentials-access-key-secret-key-user-token">Programmatic credentials (access key / secret key / user token)</h2>

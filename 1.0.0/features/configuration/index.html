@@ -1064,6 +1064,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sso/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single Sign-On (OIDC/SAML/LDAP)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../network/" class="md-nav__link">
         
   
@@ -1385,6 +1413,78 @@
   
     <nav class="md-nav" aria-label="Security &amp; Key Management Settings">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication-password-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication — Password Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#single-sign-on-oidc-saml-ldap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single Sign-On (OIDC / SAML / LDAP)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Single Sign-On (OIDC / SAML / LDAP)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#identity-mapping-all-three-providers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity mapping (all three providers)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openid-connect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenID Connect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saml-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SAML 2.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ldap-active-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LDAP / Active Directory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ssltls-keystore-properties-optional" class="md-nav__link">
@@ -2159,7 +2259,7 @@ subdirectory under <code>itdastream.base.data.dir</code>, for example:</p>
 <tr>
 <td><code>itdastream.sasl.enabled</code></td>
 <td><code>false</code></td>
-<td>When <code>true</code>, enable SASL/PLAIN authentication for Kafka clients. When <code>false</code>, the listener is unauthenticated. Combine with <code>itdastream.ssl.enabled</code> for SASL_SSL.</td>
+<td>When <code>true</code>, enable SASL authentication for Kafka clients — <code>PLAIN</code> always, and <code>OAUTHBEARER</code> as well while an identity provider is configured (see <a href="../sso/">Single Sign-On</a>). When <code>false</code>, the listener is unauthenticated. Combine with <code>itdastream.ssl.enabled</code> for SASL_SSL.</td>
 </tr>
 <tr>
 <td><code>itdastream.ssl.enabled</code></td>
@@ -2170,6 +2270,237 @@ subdirectory under <code>itdastream.base.data.dir</code>, for example:</p>
 <td><code>itdastream.ssl.protocol</code></td>
 <td><code>TLSv1.3</code></td>
 <td>TLS protocol version for the SSL listener (e.g. <code>TLSv1.3</code>, <code>TLSv1.2</code>). Only takes effect when <code>itdastream.ssl.enabled=true</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="authentication-password-storage">Authentication — Password Storage</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>itdastream.auth.password.hash.iterations</code></td>
+<td><code>600000</code></td>
+<td>PBKDF2-HMAC-SHA256 iterations used when a local password is written. Passwords used to be kept as the plaintext itself; stored plaintext still verifies and is rewritten on its owner's next successful login, so nobody is locked out. The count travels with each stored hash, so raising this does <strong>not</strong> invalidate existing passwords.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="single-sign-on-oidc-saml-ldap">Single Sign-On (OIDC / SAML / LDAP)</h3>
+<p>Every setting below can also be managed from the <strong>admin console under Single
+Sign-On</strong>, which stores it with the IAM state and applies it on every broker with
+no restart. <strong>Stored settings win over this file</strong>: the file brings a cluster up,
+and the console is how it is changed afterwards — if the file won, a console change
+would be reverted by the next restart, silently. See <a href="../sso/">Single Sign-On</a>.</p>
+<h4 id="identity-mapping-all-three-providers">Identity mapping (all three providers)</h4>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>itdastream.sso.group.mappings</code></td>
+<td>(empty)</td>
+<td><code>idpGroup:localGroup</code> pairs, comma-separated. Empty means provider group names are used as they are. <strong>Once set the mapping is exhaustive</strong> — a group not named here is dropped, so creating a group at the provider cannot grant access on this cluster by itself.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.allow.unmapped.groups</code></td>
+<td><code>false</code></td>
+<td>Whether an identity whose groups all map to nothing may still authenticate. Off deliberately: such a session has no policies and is denied every action, so admitting it produces a client that connects and then fails every produce and fetch. The directory login endpoint reports that case as <code>403</code>, separately from a wrong password's <code>401</code>.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.federated.session.seconds</code></td>
+<td><code>3600</code></td>
+<td>Lifetime of a federated session. It bounds how long access outlives a revocation at the provider, which this cluster is not told about. No refresh token is issued for a federated session for the same reason.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="openid-connect">OpenID Connect</h4>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>itdastream.sso.oidc.enabled</code></td>
+<td><code>false</code></td>
+<td>Enable the OIDC provider. Also what makes <code>OAUTHBEARER</code> appear in the SASL handshake.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.oidc.issuer</code></td>
+<td>(empty)</td>
+<td>Issuer URL. Endpoints and the signing key set are read from its discovery document, so they are not configured individually.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.oidc.client.id</code></td>
+<td>(empty)</td>
+<td>Client id registered at the provider.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.oidc.client.secret</code></td>
+<td>(empty)</td>
+<td>Client secret. Credential — never read back by the console.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.oidc.redirect.uri</code></td>
+<td><code>http://localhost:9090/admin/auth/sso/oidc/callback</code></td>
+<td>Must match the redirect URI registered at the provider exactly, and must be the address browsers reach — the load balancer's, not one broker's.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.oidc.scopes</code></td>
+<td><code>openid profile email</code></td>
+<td>Scopes requested. Deliberately excludes <code>groups</code>: it is not a standard scope, and a provider that does not define it rejects the whole authorization request with <code>invalid_scope</code>.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.oidc.username.claim</code></td>
+<td><code>preferred_username</code></td>
+<td>Claim holding the login name.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.oidc.groups.claim</code></td>
+<td><code>groups</code></td>
+<td>Claim holding group membership. The provider must be configured to include it.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.oidc.audience</code></td>
+<td>(empty)</td>
+<td>Expected audience. Empty falls back to the client id. A token issued for another application is refused even though it is genuine and correctly signed.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="saml-20">SAML 2.0</h4>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>itdastream.sso.saml.enabled</code></td>
+<td><code>false</code></td>
+<td>Enable the SAML provider, for the console. A SAML assertion is refused on the Kafka plane by design — it may be used once, and a Kafka client authenticates on every connection it opens.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.saml.idp.entity.id</code></td>
+<td>(empty)</td>
+<td>Identity provider entity ID. Read automatically when the provider's metadata is imported from the console.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.saml.idp.sso.url</code></td>
+<td>(empty)</td>
+<td>IdP single sign-on URL.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.saml.idp.certificate</code></td>
+<td>(empty)</td>
+<td>Base64 IdP signing certificate. Every assertion's signature is verified against it.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.saml.sp.entity.id</code></td>
+<td><code>itdastream</code></td>
+<td>This cluster's entity ID, as it appears in the SP metadata the provider imports.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.saml.sp.acs.url</code></td>
+<td><code>http://localhost:9090/admin/auth/sso/saml/acs</code></td>
+<td>Assertion consumer URL. As with the OIDC redirect, this must be the address browsers reach.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.saml.nameid.format</code></td>
+<td>(empty)</td>
+<td>Requested NameID format. Empty omits the request entirely and lets the provider issue what it is configured for — naming one breaks more integrations than it fixes.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.saml.sign.requests</code></td>
+<td><code>false</code></td>
+<td>Sign authentication requests. Needs an SP keypair, generated from the console; re-import the SP metadata at the provider afterwards so it picks up the certificate.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.saml.username.attribute</code></td>
+<td><code>uid</code></td>
+<td>Assertion attribute holding the login name.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.saml.groups.attribute</code></td>
+<td><code>groups</code></td>
+<td>Assertion attribute holding group membership.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="ldap-active-directory">LDAP / Active Directory</h4>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>itdastream.sso.ldap.enabled</code></td>
+<td><code>false</code></td>
+<td>Enable the directory provider. With it on, a directory password works on the console login form and in the SASL/PLAIN password field.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.ldap.url</code></td>
+<td><code>ldap://ldap.example.com:389</code></td>
+<td>Directory URL. Use <code>ldaps://</code> or enable StartTLS — otherwise the bind password crosses the network in the clear.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.ldap.bind.dn</code></td>
+<td>(empty)</td>
+<td>Service account that searches for user entries. Authentication is search then bind: the user's DN cannot be constructed, since Active Directory puts people under <code>CN=John Doe,OU=Staff,…</code> where neither component is the login name.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.ldap.bind.password</code></td>
+<td>(empty)</td>
+<td>Service account password. Credential.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.ldap.user.base.dn</code></td>
+<td>(empty)</td>
+<td>Subtree searched for user entries.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.ldap.user.filter</code></td>
+<td><code>(uid={0})</code></td>
+<td>Filter locating the user; <code>{0}</code> is the login name, escaped per RFC 4515 before substitution. Active Directory usually wants <code>(sAMAccountName={0})</code>.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.ldap.group.base.dn</code></td>
+<td>(empty)</td>
+<td>Subtree searched for groups.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.ldap.group.filter</code></td>
+<td><code>(member={0})</code></td>
+<td>Filter locating groups containing the user; <code>{0}</code> is the user's DN. Membership is read both from this search <strong>and</strong> from the user's <code>memberOf</code>, because directories disagree about which side records it.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.ldap.group.name.attribute</code></td>
+<td><code>cn</code></td>
+<td>Attribute holding the group name.</td>
+</tr>
+<tr>
+<td><code>itdastream.sso.ldap.starttls</code></td>
+<td><code>false</code></td>
+<td>Upgrade a plain <code>ldap://</code> connection with StartTLS.</td>
 </tr>
 </tbody>
 </table>
