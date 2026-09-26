@@ -8,6 +8,12 @@ ItdaStream implements an AWS IAM-compatible policy-based authorization system wi
 - **User model**: Users → Groups → Policies, with access key pairs and optional expiration
 - **Credentials**: each access key carries three values — an **access key**, a **secret key**,
   and a long-lived **user token** (`ITOK...`) — generated together
+- **Federated identities**: a caller an external identity provider vouched for — OIDC, SAML 2.0
+  or LDAP / Active Directory — carries groups from your directory instead of having an account
+  here, and the policies on the mapped groups authorize them the same way. See
+  [Single Sign-On](sso.md).
+- **Local passwords**: stored as PBKDF2-HMAC-SHA256 hashes. Values written as plaintext by an
+  earlier version still verify and are rewritten on their owner's next successful login.
 
 For the full policy JSON schema, ARN format, action catalog, and worked examples, see the [IAM Policy Reference](iam-policy.md).
 

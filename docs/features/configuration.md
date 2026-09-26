@@ -152,9 +152,75 @@ Changing `itdastream.base.data.dir` relocates every dependent path at once.
 | `itdastream.admin.socket.path` | `${itdastream.base.data.dir}/admin.sock` | Filesystem path of the recovery socket. Must be on a local filesystem that supports Unix domain sockets. Recreated on every broker start. |
 | `itdastream.admin.socket.marker.file` | `broker.socket` | Name of the file under `<itdastream.home>/bin` where the broker writes the socket path it actually bound to; `bin/itdastream-cli.sh` prefers it over re-deriving the path from this file. Removed on shutdown. |
 | `itdastream.iam.audit.dir` | `${itdastream.base.data.dir}/iam-audit` | Directory holding the append-only audit log of admin-socket operations (`reset.log`, mode `600`). |
-| `itdastream.sasl.enabled` | `false` | When `true`, enable SASL/PLAIN authentication for Kafka clients. When `false`, the listener is unauthenticated. Combine with `itdastream.ssl.enabled` for SASL_SSL. |
+| `itdastream.sasl.enabled` | `false` | When `true`, enable SASL authentication for Kafka clients — `PLAIN` always, and `OAUTHBEARER` as well while an identity provider is configured (see [Single Sign-On](sso.md)). When `false`, the listener is unauthenticated. Combine with `itdastream.ssl.enabled` for SASL_SSL. |
 | `itdastream.ssl.enabled` | `false` | When `true`, wrap the Kafka listener in TLS (clients use `security.protocol=SSL`, or SASL_SSL when combined with SASL). Requires the keystore properties below. |
 | `itdastream.ssl.protocol` | `TLSv1.3` | TLS protocol version for the SSL listener (e.g. `TLSv1.3`, `TLSv1.2`). Only takes effect when `itdastream.ssl.enabled=true`. |
+
+### Authentication — Password Storage
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `itdastream.auth.password.hash.iterations` | `600000` | PBKDF2-HMAC-SHA256 iterations used when a local password is written. Passwords used to be kept as the plaintext itself; stored plaintext still verifies and is rewritten on its owner's next successful login, so nobody is locked out. The count travels with each stored hash, so raising this does **not** invalidate existing passwords. |
+
+### Single Sign-On (OIDC / SAML / LDAP)
+
+Every setting below can also be managed from the **admin console under Single
+Sign-On**, which stores it with the IAM state and applies it on every broker with
+no restart. **Stored settings win over this file**: the file brings a cluster up,
+and the console is how it is changed afterwards — if the file won, a console change
+would be reverted by the next restart, silently. See [Single Sign-On](sso.md).
+
+#### Identity mapping (all three providers)
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `itdastream.sso.group.mappings` | (empty) | `idpGroup:localGroup` pairs, comma-separated. Empty means provider group names are used as they are. **Once set the mapping is exhaustive** — a group not named here is dropped, so creating a group at the provider cannot grant access on this cluster by itself. |
+| `itdastream.sso.allow.unmapped.groups` | `false` | Whether an identity whose groups all map to nothing may still authenticate. Off deliberately: such a session has no policies and is denied every action, so admitting it produces a client that connects and then fails every produce and fetch. The directory login endpoint reports that case as `403`, separately from a wrong password's `401`. |
+| `itdastream.sso.federated.session.seconds` | `3600` | Lifetime of a federated session. It bounds how long access outlives a revocation at the provider, which this cluster is not told about. No refresh token is issued for a federated session for the same reason. |
+
+#### OpenID Connect
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `itdastream.sso.oidc.enabled` | `false` | Enable the OIDC provider. Also what makes `OAUTHBEARER` appear in the SASL handshake. |
+| `itdastream.sso.oidc.issuer` | (empty) | Issuer URL. Endpoints and the signing key set are read from its discovery document, so they are not configured individually. |
+| `itdastream.sso.oidc.client.id` | (empty) | Client id registered at the provider. |
+| `itdastream.sso.oidc.client.secret` | (empty) | Client secret. Credential — never read back by the console. |
+| `itdastream.sso.oidc.redirect.uri` | `http://localhost:9090/admin/auth/sso/oidc/callback` | Must match the redirect URI registered at the provider exactly, and must be the address browsers reach — the load balancer's, not one broker's. |
+| `itdastream.sso.oidc.scopes` | `openid profile email` | Scopes requested. Deliberately excludes `groups`: it is not a standard scope, and a provider that does not define it rejects the whole authorization request with `invalid_scope`. |
+| `itdastream.sso.oidc.username.claim` | `preferred_username` | Claim holding the login name. |
+| `itdastream.sso.oidc.groups.claim` | `groups` | Claim holding group membership. The provider must be configured to include it. |
+| `itdastream.sso.oidc.audience` | (empty) | Expected audience. Empty falls back to the client id. A token issued for another application is refused even though it is genuine and correctly signed. |
+
+#### SAML 2.0
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `itdastream.sso.saml.enabled` | `false` | Enable the SAML provider, for the console. A SAML assertion is refused on the Kafka plane by design — it may be used once, and a Kafka client authenticates on every connection it opens. |
+| `itdastream.sso.saml.idp.entity.id` | (empty) | Identity provider entity ID. Read automatically when the provider's metadata is imported from the console. |
+| `itdastream.sso.saml.idp.sso.url` | (empty) | IdP single sign-on URL. |
+| `itdastream.sso.saml.idp.certificate` | (empty) | Base64 IdP signing certificate. Every assertion's signature is verified against it. |
+| `itdastream.sso.saml.sp.entity.id` | `itdastream` | This cluster's entity ID, as it appears in the SP metadata the provider imports. |
+| `itdastream.sso.saml.sp.acs.url` | `http://localhost:9090/admin/auth/sso/saml/acs` | Assertion consumer URL. As with the OIDC redirect, this must be the address browsers reach. |
+| `itdastream.sso.saml.nameid.format` | (empty) | Requested NameID format. Empty omits the request entirely and lets the provider issue what it is configured for — naming one breaks more integrations than it fixes. |
+| `itdastream.sso.saml.sign.requests` | `false` | Sign authentication requests. Needs an SP keypair, generated from the console; re-import the SP metadata at the provider afterwards so it picks up the certificate. |
+| `itdastream.sso.saml.username.attribute` | `uid` | Assertion attribute holding the login name. |
+| `itdastream.sso.saml.groups.attribute` | `groups` | Assertion attribute holding group membership. |
+
+#### LDAP / Active Directory
+
+| Property | Default | Description |
+| --- | --- | --- |
+| `itdastream.sso.ldap.enabled` | `false` | Enable the directory provider. With it on, a directory password works on the console login form and in the SASL/PLAIN password field. |
+| `itdastream.sso.ldap.url` | `ldap://ldap.example.com:389` | Directory URL. Use `ldaps://` or enable StartTLS — otherwise the bind password crosses the network in the clear. |
+| `itdastream.sso.ldap.bind.dn` | (empty) | Service account that searches for user entries. Authentication is search then bind: the user's DN cannot be constructed, since Active Directory puts people under `CN=John Doe,OU=Staff,…` where neither component is the login name. |
+| `itdastream.sso.ldap.bind.password` | (empty) | Service account password. Credential. |
+| `itdastream.sso.ldap.user.base.dn` | (empty) | Subtree searched for user entries. |
+| `itdastream.sso.ldap.user.filter` | `(uid={0})` | Filter locating the user; `{0}` is the login name, escaped per RFC 4515 before substitution. Active Directory usually wants `(sAMAccountName={0})`. |
+| `itdastream.sso.ldap.group.base.dn` | (empty) | Subtree searched for groups. |
+| `itdastream.sso.ldap.group.filter` | `(member={0})` | Filter locating groups containing the user; `{0}` is the user's DN. Membership is read both from this search **and** from the user's `memberOf`, because directories disagree about which side records it. |
+| `itdastream.sso.ldap.group.name.attribute` | `cn` | Attribute holding the group name. |
+| `itdastream.sso.ldap.starttls` | `false` | Upgrade a plain `ldap://` connection with StartTLS. |
 
 ### SSL/TLS Keystore Properties (optional)
 
