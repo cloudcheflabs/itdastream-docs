@@ -6,9 +6,6 @@ storage by using S3-compatible object storage as its primary persistence layer, 
 
 ## ItdaStream Architecture
 
-<img width="600" src="../../images/architecture/itdastream-architecture.png" align="center"/>
-
-
 ### Core Philosophy
 
 * API Compatibility: Full support for the Kafka Wire Protocol, allowing existing applications to migrate without code changes.
