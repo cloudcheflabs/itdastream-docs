@@ -63,6 +63,7 @@ nav:
       - "Network Compression": features/compression.md
       - "Flexible Configuration System": features/configuration.md
       - "Crash Recovery with Staging Store": features/staging-store.md
+      - "Cluster Topology": features/cluster-topology.md
       - "Broker Drain": features/broker-drain.md
       - "Backup & Restore": features/backup.md
       - "NIC Silent-Fail Safety": features/nic-fail-safety.md
