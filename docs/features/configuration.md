@@ -138,6 +138,7 @@ Changing `itdastream.base.data.dir` relocates every dependent path at once.
 | `itdastream.zookeeper.connection.timeout.ms` | `10000` | Max time (ms) to wait when establishing the initial TCP connection to ZooKeeper before failing. |
 | `itdastream.zookeeper.retry.base.sleep.ms` | `1000` | Initial backoff (ms) between retries in the Curator exponential-backoff retry policy. |
 | `itdastream.zookeeper.retry.max.retries` | `3` | Number of times a ZooKeeper operation is retried before giving up. |
+| `itdastream.zookeeper.status.probe.timeout.ms` | `2000` | Timeout (ms) for one ZooKeeper server's `srvr` status probe on the admin console's [Cluster Topology](cluster-topology.md) page. A server that does not answer in time is shown Down. Keep `srvr` in the ensemble's `4lw.commands.whitelist` (it is there by default). |
 
 ---
 
