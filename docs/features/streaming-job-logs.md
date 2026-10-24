@@ -64,8 +64,11 @@ the object store, not ZooKeeper), so a dashboard or script can fetch a finished 
 
 ## Kill a job
 
-Killing a job stops its executors on every broker and removes it from the cluster. The job's **log
-history is retained** in the object store.
+Killing a job stops its executors on every broker and removes it from the cluster. The kill call
+returns once every broker has stopped the job's threads (`{"status":"ok","stopped":true}`; it waits up
+to `itdastream.admin.streaming.kill.wait.ms`, default 15 s), so records produced after the kill are not
+processed. The job's **log history is retained** in the object store. Killing needs
+`kafka:KillStreamingJob`; submitting needs `kafka:SubmitStreamingJob`.
 
 **Admin UI** — the trash icon on the job (admin only); confirm the dialog (uncommitted records since
 the last checkpoint may be lost).
