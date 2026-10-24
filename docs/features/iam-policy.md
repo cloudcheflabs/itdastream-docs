@@ -106,6 +106,22 @@ All actions live under the `kafka:` namespace. Wildcards work at any depth: `kaf
 | `kafka:Cleanup` | `arn:stream:kafka:cluster:<cluster-id>` |
 | `kafka:Drain` | `arn:stream:kafka:cluster:<cluster-id>` |
 
+### Control plane — Cluster operations (Admin HTTP API)
+
+| Action | Resource form | Guards |
+|--------|---------------|--------|
+| `kafka:ManageConnections` | `arn:stream:kafka:cluster:<cluster-id>` | create / update / delete / test a connection |
+| `kafka:SubmitStreamingJob` | `arn:stream:kafka:cluster:<cluster-id>` | `POST /admin/streaming/jobs` (also `bin/submit.sh`) |
+| `kafka:KillStreamingJob` | `arn:stream:kafka:cluster:<cluster-id>` | `DELETE /admin/streaming/jobs/{id}` |
+| `kafka:UploadDependency` | `arn:stream:kafka:cluster:<cluster-id>` | `POST /admin/deps` |
+| `kafka:PublishIceberg` | `arn:stream:kafka:cluster:<cluster-id>` | `POST /admin/iceberg/publish` |
+| `kafka:RegisterSchema` | `arn:stream:kafka:cluster:<cluster-id>` | `POST /admin/schemas/subjects/{subject}/versions` |
+| `kafka:ReadBrokerLogs` | `arn:stream:kafka:cluster:<cluster-id>` | `GET /admin/logs/tail` (broker logs) |
+| `kafka:BrowseStorage` | `arn:stream:kafka:cluster:<cluster-id>` | `GET /admin/browser/*` (Log Storage page) |
+| `kafka:ManageBackup` | `arn:stream:kafka:cluster:<cluster-id>` | every `/admin/api/backup/*` route |
+
+Read-only listings (topics, nodes, connections with masked secrets, streaming jobs, job logs, IAM listings) only need a valid session. See the [Admin REST API](admin-rest-api.md) for the full mapping.
+
 ### Control plane — IAM
 
 | Action | Resource form |
@@ -118,12 +134,14 @@ All actions live under the `kafka:` namespace. Wildcards work at any depth: `kaf
 | `kafka:CreatePolicy` | `arn:stream:kafka:iam:*` |
 | `kafka:DeletePolicy` | `arn:stream:kafka:iam:*` |
 | `kafka:UpdateIAM` | `arn:stream:kafka:iam:*` |
+| `kafka:CreateKey` | `arn:stream:kafka:iam:*` (issue an access key / ITOK token; download another user's key) |
+| `kafka:ManageSso` | `arn:stream:kafka:iam:*` (change SSO settings, test providers, SAML keypair / metadata import) |
 
 ### Control plane — KMS
 
 | Action | Resource form |
 |--------|---------------|
-| `kafka:ListKms` | `arn:stream:kafka:kms:*` |
+| `kafka:ListKms` | `arn:stream:kafka:kms:*` (key list and key status) |
 | `kafka:CreateKey` | `arn:stream:kafka:kms:*` |
 | `kafka:RotateKey` | `arn:stream:kafka:kms:*` |
 
@@ -164,6 +182,8 @@ On first startup of a fresh cluster the leader broker seeds:
 | User | `admin` (password `admin`, must change on first login) — member of `admin-group` |
 
 This is the only way to bootstrap; rotate the password immediately after first login.
+
+Names are unique: creating a user, group or policy that already exists is refused (`400`) instead of replacing it, so `admin` or `admin-group` cannot be reset by accident. `AdministratorAccess` cannot be deleted, and you cannot delete the account you are signed in with. Deleting a user revokes its access keys, ITOK tokens and console sessions on every broker.
 
 ---
 

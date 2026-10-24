@@ -37,7 +37,11 @@ A backup id is a millisecond timestamp + short UUID — so the visible list sort
 
 The available-backups list shows every backup id present at the configured prefix, newest first. **Restore** is destructive — it overwrites the live KMS and IAM stores with whichever snapshot the chosen backup id points to (possibly an older backup id, per the incremental layout). The admin UI confirms before proceeding.
 
-Restore is leader-only — followers see the broadcast KMS/IAM state through the existing sync protocols.
+Restore is leader-only: the leader imports the snapshot, persists it and broadcasts it, so every follower serves the restored KMS keys and IAM state right away (and the leader keeps it across a restart). The backup configuration in force at restore time is kept — restoring an old snapshot does not point future backups at an old bucket or old credentials.
+
+## Where the configuration lives
+
+The configuration (including the S3 secret) is stored in the replicated IAM snapshot, which is encrypted at rest with the master key and reaches every broker. Any broker therefore shows the same configuration, and a newly elected leader keeps backing up after a failover. A configuration saved by an older version in the per-broker `backup-config.json` file is read once and moved into the replicated store at the next save (the plaintext file is then removed).
 
 ## REST Endpoints
 
@@ -50,6 +54,6 @@ Restore is leader-only — followers see the broadcast KMS/IAM state through the
 | `GET`  | `/admin/api/backup/list`     | Backup ids in S3, newest first |
 | `POST` | `/admin/api/backup/restore`  | Restore from `{backupId}` |
 
-All mutating routes (`POST` config / run / restore) are leader-only and return 401/403 without an admin token.
+Every route needs `kafka:ManageBackup` on `arn:stream:kafka:cluster:<cluster-id>` (administrators); without it the API answers `403`. The run history (including the error of a failed run, shown under its status in the Admin UI) is kept on the leader.
 
-You can send them to **any** broker, though: a mutating backup request that lands on a follower is transparently proxied to the current leader (controller), executed there, and the leader's response is relayed back. So an admin UI pointed at a follower still triggers the backup on the leader rather than failing. Read routes (`GET` config / history / list) are served locally on whichever broker receives them.
+You can send them to **any** broker, though: a mutating backup request that lands on a follower is transparently proxied to the current leader (controller), executed there, and the leader's response is relayed back. So an admin UI pointed at a follower still triggers the backup on the leader rather than failing. Read routes (`GET` config / history / list) are forwarded to the leader as well, so every broker shows the same configuration, history and backup list.

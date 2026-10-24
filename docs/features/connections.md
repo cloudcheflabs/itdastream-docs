@@ -7,7 +7,11 @@ connection or a Kafka Connect config provider.
 
 - **Per-broker, leader-authoritative**: the controller is the source of truth; credentials are
   stored KMS-encrypted in RocksDB and synced to every broker, so a job running on any worker can
-  resolve them.
+  resolve them. The sync mirrors the leader exactly: a connection deleted on the leader is removed
+  from every follower too. A change made through a follower is forwarded to the leader, and that
+  follower catches up before it answers, so the next listing already shows the change.
+- **Administrators manage them**: creating, editing, testing and deleting a connection needs
+  `kafka:ManageConnections`; listing (with secrets masked) only needs a session.
 - **Encrypted at rest and in transit**: connection values are envelope-encrypted with the
   cluster KMS key (see [Envelope Encryption and KMS](kms.md)); the leader→follower sync ships a
   KMS-encrypted snapshot over the internal NIO channel.

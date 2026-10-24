@@ -35,6 +35,9 @@ nav:
   - "Architecture":
       - "itdastream Architecture": architecture/architecture.md
   - "Installation": installation/installation.md
+  - "Admin UI":
+      - "Admin UI Guide": admin-ui/admin-ui-guide.md
+      - "Admin REST API": features/admin-rest-api.md
   - "Streaming":
       - "Overview": features/streaming.md
       - "No-Code Kafka to Iceberg": features/streaming-no-code.md

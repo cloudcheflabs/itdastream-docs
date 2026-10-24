@@ -45,6 +45,8 @@ Being ephemeral gives that last part for free. A broker that dies mid-drain leav
 
 From the Admin UI: **Cluster Topology → Drain** on the broker's row. Its status changes to *Draining*, a banner appears while any broker is draining, and the button becomes **Resume**. The last serving broker's Drain button is disabled.
 
+When a drained broker **resumes**, it leads its partitions again. Before serving one, it catches its write position up with the segments the other brokers flushed meanwhile, so records written during the drain stay readable through it and new writes continue the offsets instead of reusing them. Consumer groups it coordinated before the drain move back the same way (clients are told `NOT_COORDINATOR` and look the coordinator up again).
+
 Or over REST, against **any** broker's admin port:
 
 ```bash
