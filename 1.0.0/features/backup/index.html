@@ -255,6 +255,26 @@
     
     
       <li class="md-tabs__item">
+        <a href="../../admin-ui/admin-ui-guide/" class="md-tabs__link">
+          
+  
+  
+  Admin UI
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
         <a href="../streaming/" class="md-tabs__link">
           
   
@@ -467,7 +487,7 @@
   <span class="md-ellipsis">
     
   
-    Streaming
+    Admin UI
   
 
     
@@ -480,6 +500,121 @@
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Admin UI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../admin-ui/admin-ui-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin UI Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../admin-rest-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin REST API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Streaming
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -773,10 +908,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -794,8 +929,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1454,6 +1589,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#where-the-configuration-lives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where the configuration lives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#rest-endpoints" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1580,7 +1726,9 @@
 <p>A backup id is a millisecond timestamp + short UUID — so the visible list sorts newest-first by string compare.</p>
 <h2 id="restore">Restore</h2>
 <p>The available-backups list shows every backup id present at the configured prefix, newest first. <strong>Restore</strong> is destructive — it overwrites the live KMS and IAM stores with whichever snapshot the chosen backup id points to (possibly an older backup id, per the incremental layout). The admin UI confirms before proceeding.</p>
-<p>Restore is leader-only — followers see the broadcast KMS/IAM state through the existing sync protocols.</p>
+<p>Restore is leader-only: the leader imports the snapshot, persists it and broadcasts it, so every follower serves the restored KMS keys and IAM state right away (and the leader keeps it across a restart). The backup configuration in force at restore time is kept — restoring an old snapshot does not point future backups at an old bucket or old credentials.</p>
+<h2 id="where-the-configuration-lives">Where the configuration lives</h2>
+<p>The configuration (including the S3 secret) is stored in the replicated IAM snapshot, which is encrypted at rest with the master key and reaches every broker. Any broker therefore shows the same configuration, and a newly elected leader keeps backing up after a failover. A configuration saved by an older version in the per-broker <code>backup-config.json</code> file is read once and moved into the replicated store at the next save (the plaintext file is then removed).</p>
 <h2 id="rest-endpoints">REST Endpoints</h2>
 <table>
 <thead>
@@ -1623,8 +1771,8 @@
 </tr>
 </tbody>
 </table>
-<p>All mutating routes (<code>POST</code> config / run / restore) are leader-only and return 401/403 without an admin token.</p>
-<p>You can send them to <strong>any</strong> broker, though: a mutating backup request that lands on a follower is transparently proxied to the current leader (controller), executed there, and the leader's response is relayed back. So an admin UI pointed at a follower still triggers the backup on the leader rather than failing. Read routes (<code>GET</code> config / history / list) are served locally on whichever broker receives them.</p>
+<p>Every route needs <code>kafka:ManageBackup</code> on <code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code> (administrators); without it the API answers <code>403</code>. The run history (including the error of a failed run, shown under its status in the Admin UI) is kept on the leader.</p>
+<p>You can send them to <strong>any</strong> broker, though: a mutating backup request that lands on a follower is transparently proxied to the current leader (controller), executed there, and the leader's response is relayed back. So an admin UI pointed at a follower still triggers the backup on the leader rather than failing. Read routes (<code>GET</code> config / history / list) are forwarded to the leader as well, so every broker shows the same configuration, history and backup list.</p>
 
 
 

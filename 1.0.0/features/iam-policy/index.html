@@ -255,6 +255,26 @@
     
     
       <li class="md-tabs__item">
+        <a href="../../admin-ui/admin-ui-guide/" class="md-tabs__link">
+          
+  
+  
+  Admin UI
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
         <a href="../streaming/" class="md-tabs__link">
           
   
@@ -467,7 +487,7 @@
   <span class="md-ellipsis">
     
   
-    Streaming
+    Admin UI
   
 
     
@@ -480,6 +500,121 @@
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Admin UI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../admin-ui/admin-ui-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin UI Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../admin-rest-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin REST API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Streaming
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -773,10 +908,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -794,8 +929,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1106,6 +1241,17 @@
     <span class="md-ellipsis">
       
         Control plane — Topics (Admin HTTP API, port 8080)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#control-plane-cluster-operations-admin-http-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Control plane — Cluster operations (Admin HTTP API)
       
     </span>
   </a>
@@ -1923,6 +2069,64 @@
 </tr>
 </tbody>
 </table>
+<h3 id="control-plane-cluster-operations-admin-http-api">Control plane — Cluster operations (Admin HTTP API)</h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Resource form</th>
+<th>Guards</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kafka:ManageConnections</code></td>
+<td><code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code></td>
+<td>create / update / delete / test a connection</td>
+</tr>
+<tr>
+<td><code>kafka:SubmitStreamingJob</code></td>
+<td><code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code></td>
+<td><code>POST /admin/streaming/jobs</code> (also <code>bin/submit.sh</code>)</td>
+</tr>
+<tr>
+<td><code>kafka:KillStreamingJob</code></td>
+<td><code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code></td>
+<td><code>DELETE /admin/streaming/jobs/{id}</code></td>
+</tr>
+<tr>
+<td><code>kafka:UploadDependency</code></td>
+<td><code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code></td>
+<td><code>POST /admin/deps</code></td>
+</tr>
+<tr>
+<td><code>kafka:PublishIceberg</code></td>
+<td><code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code></td>
+<td><code>POST /admin/iceberg/publish</code></td>
+</tr>
+<tr>
+<td><code>kafka:RegisterSchema</code></td>
+<td><code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code></td>
+<td><code>POST /admin/schemas/subjects/{subject}/versions</code></td>
+</tr>
+<tr>
+<td><code>kafka:ReadBrokerLogs</code></td>
+<td><code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code></td>
+<td><code>GET /admin/logs/tail</code> (broker logs)</td>
+</tr>
+<tr>
+<td><code>kafka:BrowseStorage</code></td>
+<td><code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code></td>
+<td><code>GET /admin/browser/*</code> (Log Storage page)</td>
+</tr>
+<tr>
+<td><code>kafka:ManageBackup</code></td>
+<td><code>arn:stream:kafka:cluster:&lt;cluster-id&gt;</code></td>
+<td>every <code>/admin/api/backup/*</code> route</td>
+</tr>
+</tbody>
+</table>
+<p>Read-only listings (topics, nodes, connections with masked secrets, streaming jobs, job logs, IAM listings) only need a valid session. See the <a href="../admin-rest-api/">Admin REST API</a> for the full mapping.</p>
 <h3 id="control-plane-iam">Control plane — IAM</h3>
 <table>
 <thead>
@@ -1964,6 +2168,14 @@
 <td><code>kafka:UpdateIAM</code></td>
 <td><code>arn:stream:kafka:iam:*</code></td>
 </tr>
+<tr>
+<td><code>kafka:CreateKey</code></td>
+<td><code>arn:stream:kafka:iam:*</code> (issue an access key / ITOK token; download another user's key)</td>
+</tr>
+<tr>
+<td><code>kafka:ManageSso</code></td>
+<td><code>arn:stream:kafka:iam:*</code> (change SSO settings, test providers, SAML keypair / metadata import)</td>
+</tr>
 </tbody>
 </table>
 <h3 id="control-plane-kms">Control plane — KMS</h3>
@@ -1977,7 +2189,7 @@
 <tbody>
 <tr>
 <td><code>kafka:ListKms</code></td>
-<td><code>arn:stream:kafka:kms:*</code></td>
+<td><code>arn:stream:kafka:kms:*</code> (key list and key status)</td>
 </tr>
 <tr>
 <td><code>kafka:CreateKey</code></td>
@@ -2034,6 +2246,7 @@
 </tbody>
 </table>
 <p>This is the only way to bootstrap; rotate the password immediately after first login.</p>
+<p>Names are unique: creating a user, group or policy that already exists is refused (<code>400</code>) instead of replacing it, so <code>admin</code> or <code>admin-group</code> cannot be reset by accident. <code>AdministratorAccess</code> cannot be deleted, and you cannot delete the account you are signed in with. Deleting a user revokes its access keys, ITOK tokens and console sessions on every broker.</p>
 <hr />
 <h2 id="worked-examples">Worked Examples</h2>
 <h3 id="full-producer-access-to-a-single-topic">Full producer access to a single topic</h3>
