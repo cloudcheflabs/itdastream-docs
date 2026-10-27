@@ -212,6 +212,8 @@ bin/stop-broker.sh
 bin/stop-zk.sh
 ```
 
+With no argument, `bin/stop-broker.sh` stops the broker running from this installation. The start script names the PID file after the instance's port (`bin/broker-<port>.pid`, the Kafka port), and the stop script looks there. When several brokers run from the same installation it does not guess: it lists their ports and exits 1, and you pass the port of the one to stop, e.g. `bin/stop-broker.sh 9092`. It reports "not running" only when no broker from this installation is running.
+
 Stopping a broker is not abrupt. It announces that it is draining so the rest of
 the cluster stops advertising it, keeps serving for
 `itdastream.broker.drain.pause.ms` while clients re-route, waits up to
