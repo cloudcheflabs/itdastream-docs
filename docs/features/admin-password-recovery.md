@@ -42,7 +42,7 @@ rotation.
 | **Socket path marker** | `bin/broker.socket` — written when the socket binds, removed on shutdown |
 | **Network surface** | none — Unix domain socket only |
 | **Downtime** | none — applied in-process on the live broker |
-| **Cluster sync** | automatic — IAM state fans out to peer brokers via the existing sync path |
+| **Cluster sync** | automatic — run on a follower, the reset is forwarded to the leader, which applies it and signals every broker (see [Running it on a follower](#running-it-on-a-follower)) |
 | **Audit log** | `data/iam-audit/reset.log` (mode `600`, append-only) |
 | **Post-reset state** | `requirePasswordChange = true` (forced rotation on next login) |
 
@@ -56,6 +56,56 @@ admin's next login (the `requirePasswordChange` flag is set automatically).
 # Inside the broker host or container:
 bin/itdastream-cli.sh iam:reset-password
 ```
+
+## Running it on a follower
+
+IAM is owned by the elected leader broker: the leader applies a change, writes it
+to its RocksDB and signals every broker to pull the new state. You can run the CLI
+on **any** broker — the one you have a shell on — and it does the right thing:
+
+| Where you run it | What happens | Exit code |
+|---|---|---|
+| The leader | Applied there, persisted, and every follower pulls it. | `0` |
+| A follower, leader reachable | Forwarded to the leader over the internal protocol (encrypted with the cluster KMS key); the leader applies and persists it; the follower then checks that its own copy has the new password (pulling from the leader if needed). A note on stderr says where it was applied. | `0` |
+| A follower, no leader elected | Nothing is changed. The error says no leader is elected and that the password was **NOT** changed. | `1` |
+| A follower, leader does not answer (paused, killed, partitioned) | Nothing is changed. The error names the leader and says the password was **NOT** changed. | `1` |
+
+```bash
+$ bin/itdastream-cli.sh ping
+pong (follower broker-2; leader: broker-1 (itda-broker-1:9000))
+
+$ bin/itdastream-cli.sh iam:reset-password --new-password 'N3w!Passw0rd'
+note: this broker is a follower; the reset was applied on the leader broker-1 (itda-broker-1:9000) and replicated to the cluster.
+
+# Leader frozen:
+$ bin/itdastream-cli.sh iam:reset-password --new-password 'N3w!Passw0rd'
+error: this broker (broker-2) is a follower and the leader broker-1 (itda-broker-1:9000) did not apply
+the reset (no answer within 15000 ms); the password was NOT changed. ...
+$ echo $?
+1
+```
+
+**A late request is discarded, not applied.** A frozen leader (GC pause,
+`docker pause`, network partition) can receive the forwarded request and process
+it only when it comes back — after the CLI already reported failure. To make the
+failure message true, every forwarded reset carries a deadline of one third of
+the wait; the leader refuses a request that reaches it later, and logs that it
+discarded it. Keep the brokers' clocks in sync (NTP).
+
+```properties
+# conf/itdastream.properties
+# How long a follower waits for the leader's answer (the leader discards a
+# forwarded reset that arrives after a third of this).
+itdastream.admin.socket.forward.timeout.ms = 15000
+```
+
+!!! note "Before this fix"
+    On a follower the reset used to change only that broker's memory — not its
+    disk and not the leader — while the CLI exited `0`. The old password came back
+    at the next sync from the leader or the next restart. The same silent drop
+    affected any IAM change that reached a follower (for example an Admin UI
+    write while no leader was elected); such writes now fail with
+    `503 Service Unavailable` and "the change was NOT applied" instead.
 
 ## Input modes
 
@@ -188,13 +238,21 @@ connect. There is no token, no shared secret, no network listener.
 
 **2. The audit log records every reset.**
 Every successful reset appends a JSON line to `data/iam-audit/reset.log`
-(mode `600`). The plaintext password is **never** logged — only the first
-8 characters of its hash, the user, whether it was broker-generated, and
-the OS user that invoked the CLI.
+(mode `600`). The plaintext password is **never** logged. The `hashFp`
+fingerprint is the first 12 hex characters of SHA-256 over the **stored,
+salted** password hash — not over the password — so it cannot be checked
+offline against a list of candidate passwords, and setting the same password
+twice gives two different fingerprints. The line also records the user,
+whether the password was broker-generated, the OS user that invoked the CLI,
+and, for a reset run on a follower, the route (`forwardedTo=<leader>` on the
+follower, `forwardedFrom=<follower>` on the leader).
 
 ```json
-{"ts":"2026-05-23T16:00:46.922Z","event":"iam.reset-password","user":"admin","generated":true,"hashFp":"OYV/Ojf/","invokedAs":"root"}
+{"ts":"2026-10-27T11:02:41.118Z","event":"iam.reset-password","user":"admin","generated":false,"hashFp":"3f9c0a71d2be","invokedAs":"root","route":"forwardedFrom=broker-2"}
 ```
+
+Two brokers whose stored hash has the same fingerprint hold the same password,
+which is how a follower confirms its own copy caught up after a forwarded reset.
 
 **3. The new password is exposed exactly once.**
 For broker-generated passwords, the plaintext is returned only on the
