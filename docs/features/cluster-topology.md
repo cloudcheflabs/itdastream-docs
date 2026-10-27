@@ -22,6 +22,10 @@ One row per broker registered under `/brokers/ids` in ZooKeeper:
 
 Each row has **Drain / Resume** and **Log View**. The header counts the brokers that are serving.
 
+A broker can stall longer than its ZooKeeper session timeout, for example during a long GC pause, a frozen VM or a network partition. It then loses its registration, and with it its row in this table and its place in the metadata that clients receive. When it reconnects, it registers again and keeps its drain state. A follower also pulls KMS, IAM and connections from the leader to catch up. Its log records `Re-registered … the previous session expired`. A leader that stalls this long hands leadership to another broker and returns as a follower. The new leader re-creates the cluster-ready marker, so brokers restarted afterwards become healthy right away and do not wait out the 120-second ready timeout.
+
+A password change sent to a follower broker is answered with success only once that broker accepts the new password. Otherwise the answer is `502`.
+
 ## ZooKeeper ensemble
 
 One row per server of `itdastream.zookeeper.server.list`, in the order it is configured:
