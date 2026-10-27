@@ -1973,6 +1973,7 @@ ZooKeeper and S3 endpoint are still required.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>bin/stop-broker.sh
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>bin/stop-zk.sh
 </code></pre></div>
+<p>With no argument, <code>bin/stop-broker.sh</code> stops the broker running from this installation. The start script names the PID file after the instance's port (<code>bin/broker-&lt;port&gt;.pid</code>, the Kafka port), and the stop script looks there. When several brokers run from the same installation it does not guess: it lists their ports and exits 1, and you pass the port of the one to stop, e.g. <code>bin/stop-broker.sh 9092</code>. It reports "not running" only when no broker from this installation is running.</p>
 <p>Stopping a broker is not abrupt. It announces that it is draining so the rest of
 the cluster stops advertising it, keeps serving for
 <code>itdastream.broker.drain.pause.ms</code> while clients re-route, waits up to
