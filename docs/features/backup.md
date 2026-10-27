@@ -27,9 +27,23 @@ The two automatic rules are independent and share the same tick loop on the lead
 
 The first sighting after the cron is set, or after a leader handoff, **arms from "now"** — ItdaStream does not back-fire missed cron times on startup. An invalid cron is rejected with HTTP 400 at config-save time.
 
+## Backups Are Encrypted
+
+The IAM snapshot holds every access key's secret key and `ITOK` token, the password hashes and the SSO secrets (OIDC client secret, LDAP bind password, SAML SP private key). It is therefore never written in the clear:
+
+| Object | Contents | Protection |
+|---|---|---|
+| `kms.bin` | KMS keystore | Wrapped with the cluster master key (`ITDASTREAM_MASTER_KEY`) |
+| `iam.bin` | IAM snapshot (users, groups, policies, access keys, SSO settings) | KMS envelope encryption with the default KMS key (`itdastream.kms.default.key.id`); the blob starts with the marker `ITDSBAK1` and the manifest entry says `"format": "kms-envelope-v1"` |
+| `manifest.json` | Backup id, store hashes, which backup id holds each blob | No secrets |
+
+The **backup configuration is not part of the backup** — it holds the backup bucket's own secret key, which must never be written into the bucket it protects.
+
+A backup needs an initialized KMS: without one the run is refused (status `ERROR`, "KMS is not initialized") instead of writing the IAM state unencrypted. To restore a backup on a rebuilt cluster you need the same master key the backed-up cluster used, because `kms.bin` — and through it `iam.bin` — can only be opened with it.
+
 ## Incremental by Design
 
-Each backup writes a `manifest.json` under `s3://<bucket>/<prefix>/<backupId>/`, plus a content-addressed blob per snapshotted store. SHA-256 of the bytes is the key: if a store's hash matches the previous run, the manifest entry points at the prior backup id and no PUT happens for that store. A re-run with no cluster activity uploads only the new manifest.
+Each backup writes a `manifest.json` under `s3://<bucket>/<prefix>/<backupId>/`, plus a content-addressed blob per snapshotted store. SHA-256 of the store's plaintext is the key (the encrypted bytes differ on every run): if a store's hash matches the previous run, the manifest entry points at the prior backup id and no PUT happens for that store. A re-run with no cluster activity uploads only the new manifest.
 
 A backup id is a millisecond timestamp + short UUID — so the visible list sorts newest-first by string compare.
 
@@ -37,11 +51,21 @@ A backup id is a millisecond timestamp + short UUID — so the visible list sort
 
 The available-backups list shows every backup id present at the configured prefix, newest first. **Restore** is destructive — it overwrites the live KMS and IAM stores with whichever snapshot the chosen backup id points to (possibly an older backup id, per the incremental layout). The admin UI confirms before proceeding.
 
-Restore is leader-only: the leader imports the snapshot, persists it and broadcasts it, so every follower serves the restored KMS keys and IAM state right away (and the leader keeps it across a restart). The backup configuration in force at restore time is kept — restoring an old snapshot does not point future backups at an old bucket or old credentials.
+The KMS keystore is restored first, then the IAM snapshot is decrypted with it. Restore is leader-only: the leader imports the snapshot, persists it and broadcasts it, so every follower serves the restored KMS keys and IAM state right away (and the leader keeps it across a restart). The backup configuration in force at restore time is kept — restoring an old snapshot does not point future backups at an old bucket or old credentials.
+
+### Backups from older versions
+
+Before this change `iam.bin` was written as **plaintext JSON**, and it also carried the backup configuration. Restore still accepts such a backup (bytes starting with `{`) and logs a warning, so existing backups keep working. But anyone who could read the backup bucket could read those objects, so if you have backups taken by an older version:
+
+1. **Rotate the access keys and `ITOK` tokens** of every IAM user (create a new key, switch clients over, delete the old one).
+2. **Rotate the SSO secrets** — the OIDC client secret at the identity provider, the LDAP bind password, and the SAML SP key pair — and save the new values in the Admin UI.
+3. **Rotate the backup bucket's access key / secret key** at the object store and save the new pair on the Backup & Restore page.
+4. Users' passwords were only stored as PBKDF2 hashes, but consider asking administrators to change theirs.
+5. Take a new backup (**Backup Now**), check that the new `iam.bin` starts with `ITDSBAK1`, then **delete the old `iam.bin` objects** (and the backup ids that point at them) from the bucket.
 
 ## Where the configuration lives
 
-The configuration (including the S3 secret) is stored in the replicated IAM snapshot, which is encrypted at rest with the master key and reaches every broker. Any broker therefore shows the same configuration, and a newly elected leader keeps backing up after a failover. A configuration saved by an older version in the per-broker `backup-config.json` file is read once and moved into the replicated store at the next save (the plaintext file is then removed).
+The configuration (including the S3 secret) is stored in the replicated IAM snapshot, which is encrypted at rest with the master key and reaches every broker. Any broker therefore shows the same configuration, and a newly elected leader keeps backing up after a failover. A configuration saved by an older version in the per-broker plaintext `backup-config.json` file is moved into the replicated store by the leader and the file is deleted; once the replicated configuration exists, every broker deletes its own leftover copy within a minute. The file is never written again.
 
 ## REST Endpoints
 

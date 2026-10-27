@@ -171,7 +171,7 @@ Administrators only (`kafka:ListKms` to view).
 
 ## Backup & Restore
 
-Operators only (`kafka:ManageBackup`). Snapshots the KMS keystore and IAM state to S3. See [Backup & Restore](../features/backup.md).
+Operators only (`kafka:ManageBackup`). Snapshots the KMS keystore and IAM state to S3, the IAM state KMS-encrypted (a backup is refused while the KMS is not initialized). See [Backup & Restore](../features/backup.md).
 
 - **Configuration** — *Enable backup feature*, S3 endpoint / region / bucket / prefix / access key / secret key, interval (minutes), retention (days), cron (5-field, optional; an invalid expression is refused) and path-style addressing (required for ShannonStore / MinIO). The secret is stored but never shown again: the field reads *(unchanged — paste to overwrite)*. The configuration is stored cluster-wide, encrypted, so every broker shows it and a new leader keeps it.
 - **Save** stores the configuration; **Backup Now** (enabled only when backups are enabled) runs a backup on the leader.
