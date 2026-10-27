@@ -1753,6 +1753,8 @@ the role and health of each server.</p>
 </tbody>
 </table>
 <p>Each row has <strong>Drain / Resume</strong> and <strong>Log View</strong>. The header counts the brokers that are serving.</p>
+<p>A broker can stall longer than its ZooKeeper session timeout, for example during a long GC pause, a frozen VM or a network partition. It then loses its registration, and with it its row in this table and its place in the metadata that clients receive. When it reconnects, it registers again and keeps its drain state. A follower also pulls KMS, IAM and connections from the leader to catch up. Its log records <code>Re-registered … the previous session expired</code>. A leader that stalls this long hands leadership to another broker and returns as a follower. The new leader re-creates the cluster-ready marker, so brokers restarted afterwards become healthy right away and do not wait out the 120-second ready timeout.</p>
+<p>A password change sent to a follower broker is answered with success only once that broker accepts the new password. Otherwise the answer is <code>502</code>.</p>
 <h2 id="zookeeper-ensemble">ZooKeeper ensemble</h2>
 <p>One row per server of <code>itdastream.zookeeper.server.list</code>, in the order it is configured:</p>
 <table>
