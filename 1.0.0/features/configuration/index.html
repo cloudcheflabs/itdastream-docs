@@ -2110,7 +2110,12 @@ subdirectory under <code>itdastream.base.data.dir</code>, for example:</p>
 <tr>
 <td><code>itdastream.broker.id.stateless</code></td>
 <td><code>true</code></td>
-<td>When <code>true</code>, the broker derives its numeric ID automatically from <code>hash(host:port)</code>; when <code>false</code>, the fixed <code>itdastream.broker.id</code> is used.</td>
+<td>When <code>true</code>, the broker derives its numeric ID from <code>hash(localIp:port)</code> on its <strong>first</strong> start and records it in <code>itdastream.broker.id.file</code>; later starts reuse the recorded ID even if the IP changed (every local store — IAM, KMS, metadata — is keyed by the ID). When <code>false</code>, the fixed <code>itdastream.broker.id</code> is used.</td>
+</tr>
+<tr>
+<td><code>itdastream.broker.id.file</code></td>
+<td><code>${itdastream.base.data.dir}/broker-id</code></td>
+<td>Where a stateless broker records its generated ID. Keep it with the data directory; deleting it makes the next start derive a new ID and stop using the stores of the old one.</td>
 </tr>
 <tr>
 <td><code>itdastream.broker.id</code></td>
@@ -2423,6 +2428,11 @@ subdirectory under <code>itdastream.base.data.dir</code>, for example:</p>
 <td><code>itdastream.iam.audit.dir</code></td>
 <td><code>${itdastream.base.data.dir}/iam-audit</code></td>
 <td>Directory holding the append-only audit log of admin-socket operations (<code>reset.log</code>, mode <code>600</code>).</td>
+</tr>
+<tr>
+<td><code>itdastream.admin.socket.forward.timeout.ms</code></td>
+<td><code>15000</code></td>
+<td>How long a follower waits for the leader to apply a CLI password reset it forwarded. On timeout the CLI exits <code>1</code> and says the password was NOT changed; the leader discards a forwarded reset that reaches it after a third of this.</td>
 </tr>
 <tr>
 <td><code>itdastream.sasl.enabled</code></td>
