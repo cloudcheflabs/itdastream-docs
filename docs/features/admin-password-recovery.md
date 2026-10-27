@@ -57,6 +57,33 @@ admin's next login (the `requirePasswordChange` flag is set automatically).
 bin/itdastream-cli.sh iam:reset-password
 ```
 
+### Change the password once before using the API
+
+Until the reset password is changed, the admin API refuses every call but login and change-password
+with `403 Password change required`. The console asks for the change at the first login; scripts must
+do it themselves. The CLI prints the same reminder on stderr after every reset (stdout stays just the
+generated password, so `PW=$(bin/itdastream-cli.sh iam:reset-password)` still works):
+
+```bash
+# No token needed: the old (reset) password authenticates the change.
+curl -s -X POST http://<broker>:<admin-port>/admin/change-password -H 'Content-Type: application/json' \
+  -d '{"username":"admin","oldPassword":"<reset password>","newPassword":"<new password>"}'
+# Until then, POST /admin/login answers requirePasswordChange without a token.
+```
+
+### Which Java the CLI uses
+
+`bin/itdastream-cli.sh` and every `start-*.sh` run `$JAVA_HOME/bin/java` when `JAVA_HOME` is set, otherwise
+`java` from `PATH`. On hosts where the JDK is installed outside `PATH`, set `JAVA_HOME` first:
+
+```bash
+export JAVA_HOME=/opt/openlogic-openjdk-17.0.7+7-linux-x64
+bin/itdastream-cli.sh iam:reset-password
+```
+
+A `JAVA_HOME` without an executable `bin/java` is refused with a message naming it (exit 1). Earlier
+builds checked `JAVA_HOME` but then ran a bare `java`, failing with `exec: java: not found` (exit 127).
+
 ## Running it on a follower
 
 IAM is owned by the elected leader broker: the leader applies a change, writes it
