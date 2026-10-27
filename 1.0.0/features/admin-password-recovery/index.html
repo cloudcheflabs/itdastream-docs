@@ -1233,6 +1233,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Quick start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#change-the-password-once-before-using-the-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change the password once before using the API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#which-java-the-cli-uses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which Java the CLI uses
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1844,6 +1872,24 @@ admin's next login (the <code>requirePasswordChange</code> flag is set automatic
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Inside the broker host or container:</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
 </code></pre></div>
+<h3 id="change-the-password-once-before-using-the-api">Change the password once before using the API</h3>
+<p>Until the reset password is changed, the admin API refuses every call but login and change-password
+with <code>403 Password change required</code>. The console asks for the change at the first login; scripts must
+do it themselves. The CLI prints the same reminder on stderr after every reset (stdout stays just the
+generated password, so <code>PW=$(bin/itdastream-cli.sh iam:reset-password)</code> still works):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># No token needed: the old (reset) password authenticates the change.</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://&lt;broker&gt;:&lt;admin-port&gt;/admin/change-password<span class="w"> </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;username&quot;:&quot;admin&quot;,&quot;oldPassword&quot;:&quot;&lt;reset password&gt;&quot;,&quot;newPassword&quot;:&quot;&lt;new password&gt;&quot;}&#39;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Until then, POST /admin/login answers requirePasswordChange without a token.</span>
+</code></pre></div>
+<h3 id="which-java-the-cli-uses">Which Java the CLI uses</h3>
+<p><code>bin/itdastream-cli.sh</code> and every <code>start-*.sh</code> run <code>$JAVA_HOME/bin/java</code> when <code>JAVA_HOME</code> is set, otherwise
+<code>java</code> from <code>PATH</code>. On hosts where the JDK is installed outside <code>PATH</code>, set <code>JAVA_HOME</code> first:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">JAVA_HOME</span><span class="o">=</span>/opt/openlogic-openjdk-17.0.7+7-linux-x64
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
+</code></pre></div>
+<p>A <code>JAVA_HOME</code> without an executable <code>bin/java</code> is refused with a message naming it (exit 1). Earlier
+builds checked <code>JAVA_HOME</code> but then ran a bare <code>java</code>, failing with <code>exec: java: not found</code> (exit 127).</p>
 <h2 id="running-it-on-a-follower">Running it on a follower</h2>
 <p>IAM is owned by the elected leader broker: the leader applies a change, writes it
 to its RocksDB and signals every broker to pull the new state. You can run the CLI
@@ -1879,18 +1925,18 @@ on <strong>any</strong> broker — the one you have a shell on — and it does t
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>bin/itdastream-cli.sh<span class="w"> </span>ping
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pong<span class="w"> </span><span class="o">(</span>follower<span class="w"> </span>broker-2<span class="p">;</span><span class="w"> </span>leader:<span class="w"> </span>broker-1<span class="w"> </span><span class="o">(</span>itda-broker-1:9000<span class="o">))</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>$<span class="w"> </span>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--new-password<span class="w"> </span><span class="s1">&#39;N3w!Passw0rd&#39;</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>note:<span class="w"> </span>this<span class="w"> </span>broker<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>follower<span class="p">;</span><span class="w"> </span>the<span class="w"> </span>reset<span class="w"> </span>was<span class="w"> </span>applied<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>leader<span class="w"> </span>broker-1<span class="w"> </span><span class="o">(</span>itda-broker-1:9000<span class="o">)</span><span class="w"> </span>and<span class="w"> </span>replicated<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>cluster.
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Leader frozen:</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>$<span class="w"> </span>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--new-password<span class="w"> </span><span class="s1">&#39;N3w!Passw0rd&#39;</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>error:<span class="w"> </span>this<span class="w"> </span>broker<span class="w"> </span><span class="o">(</span>broker-2<span class="o">)</span><span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>follower<span class="w"> </span>and<span class="w"> </span>the<span class="w"> </span>leader<span class="w"> </span>broker-1<span class="w"> </span><span class="o">(</span>itda-broker-1:9000<span class="o">)</span><span class="w"> </span>did<span class="w"> </span>not<span class="w"> </span>apply
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>the<span class="w"> </span>reset<span class="w"> </span><span class="o">(</span>no<span class="w"> </span>answer<span class="w"> </span>within<span class="w"> </span><span class="m">15000</span><span class="w"> </span>ms<span class="o">)</span><span class="p">;</span><span class="w"> </span>the<span class="w"> </span>password<span class="w"> </span>was<span class="w"> </span>NOT<span class="w"> </span>changed.<span class="w"> </span>...
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$?</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="m">1</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$<span class="w"> </span>bin/itdastream-cli.sh<span class="w"> </span>ping
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>pong<span class="w"> </span><span class="o">(</span>follower<span class="w"> </span>broker-2<span class="p">;</span><span class="w"> </span>leader:<span class="w"> </span>broker-1<span class="w"> </span><span class="o">(</span>itda-broker-1:9000<span class="o">))</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>$<span class="w"> </span>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--new-password<span class="w"> </span><span class="s1">&#39;N3w!Passw0rd&#39;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>note:<span class="w"> </span>this<span class="w"> </span>broker<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>follower<span class="p">;</span><span class="w"> </span>the<span class="w"> </span>reset<span class="w"> </span>was<span class="w"> </span>applied<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>leader<span class="w"> </span>broker-1<span class="w"> </span><span class="o">(</span>itda-broker-1:9000<span class="o">)</span><span class="w"> </span>and<span class="w"> </span>replicated<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>cluster.
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Leader frozen:</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>$<span class="w"> </span>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--new-password<span class="w"> </span><span class="s1">&#39;N3w!Passw0rd&#39;</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>error:<span class="w"> </span>this<span class="w"> </span>broker<span class="w"> </span><span class="o">(</span>broker-2<span class="o">)</span><span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>follower<span class="w"> </span>and<span class="w"> </span>the<span class="w"> </span>leader<span class="w"> </span>broker-1<span class="w"> </span><span class="o">(</span>itda-broker-1:9000<span class="o">)</span><span class="w"> </span>did<span class="w"> </span>not<span class="w"> </span>apply
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>the<span class="w"> </span>reset<span class="w"> </span><span class="o">(</span>no<span class="w"> </span>answer<span class="w"> </span>within<span class="w"> </span><span class="m">15000</span><span class="w"> </span>ms<span class="o">)</span><span class="p">;</span><span class="w"> </span>the<span class="w"> </span>password<span class="w"> </span>was<span class="w"> </span>NOT<span class="w"> </span>changed.<span class="w"> </span>...
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$?</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="m">1</span>
 </code></pre></div>
 <p><strong>A late request is discarded, not applied.</strong> A frozen leader (GC pause,
 <code>docker pause</code>, network partition) can receive the forwarded request and process
@@ -1898,10 +1944,10 @@ it only when it comes back — after the CLI already reported failure. To make t
 failure message true, every forwarded reset carries a deadline of one third of
 the wait; the leader refuses a request that reaches it later, and logs that it
 discarded it. Keep the brokers' clocks in sync (NTP).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># conf/itdastream.properties</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># How long a follower waits for the leader&#39;s answer (the leader discards a</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># forwarded reset that arrives after a third of this).</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="na">itdastream.admin.socket.forward.timeout.ms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">15000</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># conf/itdastream.properties</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1"># How long a follower waits for the leader&#39;s answer (the leader discards a</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="c1"># forwarded reset that arrives after a third of this).</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="na">itdastream.admin.socket.forward.timeout.ms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">15000</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Before this fix</p>
@@ -1945,20 +1991,20 @@ write while no leader was elected); such writes now fail with
 </tbody>
 </table>
 <p>Resetting a different user is also supported:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--user<span class="w"> </span>some-user<span class="w"> </span>--new-password<span class="w"> </span><span class="s1">&#39;NewPass123&#39;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--user<span class="w"> </span>some-user<span class="w"> </span>--new-password<span class="w"> </span><span class="s1">&#39;NewPass123&#39;</span>
 </code></pre></div>
 <h2 id="configuration">Configuration</h2>
 <p>The recovery socket is enabled by default. Every key below lives in
 <code>conf/itdastream.properties</code> and is read at broker startup:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># conf/itdastream.properties</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1"># Set false to remove the local recovery path entirely.</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="na">itdastream.admin.socket.enabled</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s">true</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="na">itdastream.admin.socket.path</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s">${itdastream.base.data.dir}/admin.sock</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1"># Name of the file under &lt;itdastream.home&gt;/bin that receives the socket path the</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="c1"># broker actually bound to (see &quot;How the CLI finds the socket&quot; below).</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="na">itdastream.admin.socket.marker.file</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">broker.socket</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="c1"># Append-only audit trail of socket operations.</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="na">itdastream.iam.audit.dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">${itdastream.base.data.dir}/iam-audit</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># conf/itdastream.properties</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># Set false to remove the local recovery path entirely.</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="na">itdastream.admin.socket.enabled</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s">true</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="na">itdastream.admin.socket.path</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s">${itdastream.base.data.dir}/admin.sock</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="c1"># Name of the file under &lt;itdastream.home&gt;/bin that receives the socket path the</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1"># broker actually bound to (see &quot;How the CLI finds the socket&quot; below).</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="na">itdastream.admin.socket.marker.file</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">broker.socket</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="c1"># Append-only audit trail of socket operations.</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="na">itdastream.iam.audit.dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">${itdastream.base.data.dir}/iam-audit</span>
 </code></pre></div>
 <p>The socket follows <code>itdastream.base.data.dir</code>. If you launch the broker with
 <code>-Ditdastream.base.data.dir=/var/lib/itdastream</code> the socket moves to
@@ -1985,8 +2031,8 @@ shutdown. <code>bin/itdastream-cli.sh</code> prefers it.</p>
 <code>/data/admin.sock</code> and the properties file still saying <code>./data</code>, only the marker
 knows where to connect.</p>
 <p>To rename the marker, change one key — both ends read it:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># conf/itdastream.properties</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>itdastream.admin.socket.marker.file<span class="w"> </span><span class="o">=</span><span class="w"> </span>itdastream-recovery.socket
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># conf/itdastream.properties</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>itdastream.admin.socket.marker.file<span class="w"> </span><span class="o">=</span><span class="w"> </span>itdastream-recovery.socket
 </code></pre></div>
 <p>Restart the broker; it publishes <code>bin/itdastream-recovery.socket</code>, and the CLI
 picks the new name up from the same properties file.</p>
@@ -1994,42 +2040,42 @@ picks the new name up from the same properties file.</p>
 <p><code>ITDASTREAM_MASTER_KEY</code> must be exported for the broker process. <code>bin/start-broker.sh</code> checks it up front and refuses to start when it is unset or shorter than 32 characters.
 The variable name itself is configurable — <code>itdastream.kms.master.key.env</code> in
 <code>conf/itdastream.properties</code> names the variable the broker reads:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ITDASTREAM_MASTER_KEY</span><span class="o">=</span><span class="s1">&#39;replace-with-a-32-char-or-longer-secret&#39;</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>bin/start-broker.sh
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ITDASTREAM_MASTER_KEY</span><span class="o">=</span><span class="s1">&#39;replace-with-a-32-char-or-longer-secret&#39;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>bin/start-broker.sh
 </code></pre></div>
 <p><code>bin/itdastream-cli.sh</code> does <strong>not</strong> need it. The CLI only opens the Unix socket and
 hands the request to the running broker, which already holds the unsealed key,
 so this works with the variable unset:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">unset</span><span class="w"> </span>ITDASTREAM_MASTER_KEY
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>bin/itdastream-cli.sh<span class="w"> </span>ping
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="c1"># pong</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">unset</span><span class="w"> </span>ITDASTREAM_MASTER_KEY
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>bin/itdastream-cli.sh<span class="w"> </span>ping
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1"># pong</span>
 </code></pre></div>
 <p>If a CLI invocation complains about the key rather than the socket, you are
 running a start script, not the CLI.</p>
 <h3 id="worked-examples">Worked examples</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># 1. On the host, as the same OS user that runs the broker:</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">cd</span><span class="w"> </span>/opt/itdastream
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>bin/itdastream-cli.sh<span class="w"> </span>ping
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="c1"># 2. The broker runs as a service account and you are root:</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>sudo<span class="w"> </span>-u<span class="w"> </span>itdastream<span class="w"> </span>/opt/itdastream/bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="c1"># 3. Inside a container:</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>itdastream-broker-1<span class="w"> </span>/app/bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="c1"># 4. Data dir was relocated at launch — no extra flags needed, the CLI</span>
-<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="c1">#    reads the published marker:</span>
-<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>cat<span class="w"> </span>/opt/itdastream/bin/broker.socket
-<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="c1"># /var/lib/itdastream/admin.sock</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>bin/itdastream-cli.sh<span class="w"> </span>ping
-<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>
-<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="c1"># 5. Socket in a non-standard place and no marker (the broker is stopped,</span>
-<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="c1">#    or you are on a host where the marker was cleaned up):</span>
-<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>bin/itdastream-cli.sh<span class="w"> </span>--socket<span class="w"> </span>/var/lib/itdastream/admin.sock<span class="w"> </span>iam:reset-password
-<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>
-<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="c1"># 6. Non-interactive automation, password from stdin so it never reaches argv:</span>
-<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;S0me!Strong!Pass&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--new-password<span class="w"> </span>-
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># 1. On the host, as the same OS user that runs the broker:</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nb">cd</span><span class="w"> </span>/opt/itdastream
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>bin/itdastream-cli.sh<span class="w"> </span>ping
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="c1"># 2. The broker runs as a service account and you are root:</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>sudo<span class="w"> </span>-u<span class="w"> </span>itdastream<span class="w"> </span>/opt/itdastream/bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="c1"># 3. Inside a container:</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>itdastream-broker-1<span class="w"> </span>/app/bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="c1"># 4. Data dir was relocated at launch — no extra flags needed, the CLI</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="c1">#    reads the published marker:</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>cat<span class="w"> </span>/opt/itdastream/bin/broker.socket
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="c1"># /var/lib/itdastream/admin.sock</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>bin/itdastream-cli.sh<span class="w"> </span>ping
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="c1"># 5. Socket in a non-standard place and no marker (the broker is stopped,</span>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="c1">#    or you are on a host where the marker was cleaned up):</span>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>bin/itdastream-cli.sh<span class="w"> </span>--socket<span class="w"> </span>/var/lib/itdastream/admin.sock<span class="w"> </span>iam:reset-password
+<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a>
+<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="c1"># 6. Non-interactive automation, password from stdin so it never reaches argv:</span>
+<a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;S0me!Strong!Pass&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>bin/itdastream-cli.sh<span class="w"> </span>iam:reset-password<span class="w"> </span>--new-password<span class="w"> </span>-
 </code></pre></div>
 <h2 id="security-model">Security model</h2>
 <p><strong>1. The socket is OS-gated.</strong>
@@ -2046,7 +2092,7 @@ twice gives two different fingerprints. The line also records the user,
 whether the password was broker-generated, the OS user that invoked the CLI,
 and, for a reset run on a follower, the route (<code>forwardedTo=&lt;leader&gt;</code> on the
 follower, <code>forwardedFrom=&lt;follower&gt;</code> on the leader).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span><span class="nt">&quot;ts&quot;</span><span class="p">:</span><span class="s2">&quot;2026-10-27T11:02:41.118Z&quot;</span><span class="p">,</span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="s2">&quot;iam.reset-password&quot;</span><span class="p">,</span><span class="nt">&quot;user&quot;</span><span class="p">:</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span><span class="nt">&quot;generated&quot;</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">&quot;hashFp&quot;</span><span class="p">:</span><span class="s2">&quot;3f9c0a71d2be&quot;</span><span class="p">,</span><span class="nt">&quot;invokedAs&quot;</span><span class="p">:</span><span class="s2">&quot;root&quot;</span><span class="p">,</span><span class="nt">&quot;route&quot;</span><span class="p">:</span><span class="s2">&quot;forwardedFrom=broker-2&quot;</span><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span><span class="nt">&quot;ts&quot;</span><span class="p">:</span><span class="s2">&quot;2026-10-27T11:02:41.118Z&quot;</span><span class="p">,</span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="s2">&quot;iam.reset-password&quot;</span><span class="p">,</span><span class="nt">&quot;user&quot;</span><span class="p">:</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span><span class="nt">&quot;generated&quot;</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">&quot;hashFp&quot;</span><span class="p">:</span><span class="s2">&quot;3f9c0a71d2be&quot;</span><span class="p">,</span><span class="nt">&quot;invokedAs&quot;</span><span class="p">:</span><span class="s2">&quot;root&quot;</span><span class="p">,</span><span class="nt">&quot;route&quot;</span><span class="p">:</span><span class="s2">&quot;forwardedFrom=broker-2&quot;</span><span class="p">}</span>
 </code></pre></div>
 <p>Two brokers whose stored hash has the same fingerprint hold the same password,
 which is how a follower confirms its own copy caught up after a forwarded reset.</p>
