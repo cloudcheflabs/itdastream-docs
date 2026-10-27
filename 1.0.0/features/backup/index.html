@@ -1567,6 +1567,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#backups-are-encrypted" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backups Are Encrypted
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#incremental-by-design" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1585,6 +1596,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Restore">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backups-from-older-versions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backups from older versions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1721,14 +1749,53 @@
 <li><strong>Cron</strong> is wall-clock based, evaluated in the leader's local time zone.</li>
 </ul>
 <p>The first sighting after the cron is set, or after a leader handoff, <strong>arms from "now"</strong> — ItdaStream does not back-fire missed cron times on startup. An invalid cron is rejected with HTTP 400 at config-save time.</p>
+<h2 id="backups-are-encrypted">Backups Are Encrypted</h2>
+<p>The IAM snapshot holds every access key's secret key and <code>ITOK</code> token, the password hashes and the SSO secrets (OIDC client secret, LDAP bind password, SAML SP private key). It is therefore never written in the clear:</p>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Contents</th>
+<th>Protection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kms.bin</code></td>
+<td>KMS keystore</td>
+<td>Wrapped with the cluster master key (<code>ITDASTREAM_MASTER_KEY</code>)</td>
+</tr>
+<tr>
+<td><code>iam.bin</code></td>
+<td>IAM snapshot (users, groups, policies, access keys, SSO settings)</td>
+<td>KMS envelope encryption with the default KMS key (<code>itdastream.kms.default.key.id</code>); the blob starts with the marker <code>ITDSBAK1</code> and the manifest entry says <code>"format": "kms-envelope-v1"</code></td>
+</tr>
+<tr>
+<td><code>manifest.json</code></td>
+<td>Backup id, store hashes, which backup id holds each blob</td>
+<td>No secrets</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>backup configuration is not part of the backup</strong> — it holds the backup bucket's own secret key, which must never be written into the bucket it protects.</p>
+<p>A backup needs an initialized KMS: without one the run is refused (status <code>ERROR</code>, "KMS is not initialized") instead of writing the IAM state unencrypted. To restore a backup on a rebuilt cluster you need the same master key the backed-up cluster used, because <code>kms.bin</code> — and through it <code>iam.bin</code> — can only be opened with it.</p>
 <h2 id="incremental-by-design">Incremental by Design</h2>
-<p>Each backup writes a <code>manifest.json</code> under <code>s3://&lt;bucket&gt;/&lt;prefix&gt;/&lt;backupId&gt;/</code>, plus a content-addressed blob per snapshotted store. SHA-256 of the bytes is the key: if a store's hash matches the previous run, the manifest entry points at the prior backup id and no PUT happens for that store. A re-run with no cluster activity uploads only the new manifest.</p>
+<p>Each backup writes a <code>manifest.json</code> under <code>s3://&lt;bucket&gt;/&lt;prefix&gt;/&lt;backupId&gt;/</code>, plus a content-addressed blob per snapshotted store. SHA-256 of the store's plaintext is the key (the encrypted bytes differ on every run): if a store's hash matches the previous run, the manifest entry points at the prior backup id and no PUT happens for that store. A re-run with no cluster activity uploads only the new manifest.</p>
 <p>A backup id is a millisecond timestamp + short UUID — so the visible list sorts newest-first by string compare.</p>
 <h2 id="restore">Restore</h2>
 <p>The available-backups list shows every backup id present at the configured prefix, newest first. <strong>Restore</strong> is destructive — it overwrites the live KMS and IAM stores with whichever snapshot the chosen backup id points to (possibly an older backup id, per the incremental layout). The admin UI confirms before proceeding.</p>
-<p>Restore is leader-only: the leader imports the snapshot, persists it and broadcasts it, so every follower serves the restored KMS keys and IAM state right away (and the leader keeps it across a restart). The backup configuration in force at restore time is kept — restoring an old snapshot does not point future backups at an old bucket or old credentials.</p>
+<p>The KMS keystore is restored first, then the IAM snapshot is decrypted with it. Restore is leader-only: the leader imports the snapshot, persists it and broadcasts it, so every follower serves the restored KMS keys and IAM state right away (and the leader keeps it across a restart). The backup configuration in force at restore time is kept — restoring an old snapshot does not point future backups at an old bucket or old credentials.</p>
+<h3 id="backups-from-older-versions">Backups from older versions</h3>
+<p>Before this change <code>iam.bin</code> was written as <strong>plaintext JSON</strong>, and it also carried the backup configuration. Restore still accepts such a backup (bytes starting with <code>{</code>) and logs a warning, so existing backups keep working. But anyone who could read the backup bucket could read those objects, so if you have backups taken by an older version:</p>
+<ol>
+<li><strong>Rotate the access keys and <code>ITOK</code> tokens</strong> of every IAM user (create a new key, switch clients over, delete the old one).</li>
+<li><strong>Rotate the SSO secrets</strong> — the OIDC client secret at the identity provider, the LDAP bind password, and the SAML SP key pair — and save the new values in the Admin UI.</li>
+<li><strong>Rotate the backup bucket's access key / secret key</strong> at the object store and save the new pair on the Backup &amp; Restore page.</li>
+<li>Users' passwords were only stored as PBKDF2 hashes, but consider asking administrators to change theirs.</li>
+<li>Take a new backup (<strong>Backup Now</strong>), check that the new <code>iam.bin</code> starts with <code>ITDSBAK1</code>, then <strong>delete the old <code>iam.bin</code> objects</strong> (and the backup ids that point at them) from the bucket.</li>
+</ol>
 <h2 id="where-the-configuration-lives">Where the configuration lives</h2>
-<p>The configuration (including the S3 secret) is stored in the replicated IAM snapshot, which is encrypted at rest with the master key and reaches every broker. Any broker therefore shows the same configuration, and a newly elected leader keeps backing up after a failover. A configuration saved by an older version in the per-broker <code>backup-config.json</code> file is read once and moved into the replicated store at the next save (the plaintext file is then removed).</p>
+<p>The configuration (including the S3 secret) is stored in the replicated IAM snapshot, which is encrypted at rest with the master key and reaches every broker. Any broker therefore shows the same configuration, and a newly elected leader keeps backing up after a failover. A configuration saved by an older version in the per-broker plaintext <code>backup-config.json</code> file is moved into the replicated store by the leader and the file is deleted; once the replicated configuration exists, every broker deletes its own leftover copy within a minute. The file is never written again.</p>
 <h2 id="rest-endpoints">REST Endpoints</h2>
 <table>
 <thead>
