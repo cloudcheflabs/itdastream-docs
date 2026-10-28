@@ -2379,7 +2379,7 @@ subdirectory under <code>itdastream.base.data.dir</code>, for example:</p>
 <tr>
 <td><code>itdastream.zookeeper.status.probe.timeout.ms</code></td>
 <td><code>2000</code></td>
-<td>Timeout (ms) for one ZooKeeper server's <code>srvr</code> status probe on the admin console's <a href="../cluster-topology/">Cluster Topology</a> page. A server that does not answer in time is shown Down. Keep <code>srvr</code> in the ensemble's <code>4lw.commands.whitelist</code> (it is there by default) and add <code>conf</code> so the page can show each server's id and warn about a duplicate <code>myid</code>.</td>
+<td>Timeout (ms) for one ZooKeeper server's <code>srvr</code> status probe on the admin console's <a href="../cluster-topology/">Cluster Topology</a> page. A server that does not answer in time is shown Down. Keep <code>srvr</code> in the ensemble's <code>4lw.commands.whitelist</code> (it is there by default) and add <code>conf</code> (then restart that ZooKeeper server — the whitelist is read only at startup) so the page can show each server's id and warn about a duplicate <code>myid</code>.</td>
 </tr>
 </tbody>
 </table>

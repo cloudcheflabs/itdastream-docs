@@ -1864,7 +1864,7 @@ was configured with (its <code>server.N=</code> lines). The <strong>Server id</s
 <td>the servers were configured with different ensembles</td>
 </tr>
 <tr>
-<td><code>ZooKeeper server id unknown on zk1:2181, zk2:2181, zk3:2181 (conf not in 4lw.commands.whitelist) — a duplicate myid cannot be ruled out</code></td>
+<td><code>ZooKeeper server id unknown on zk1:2181, zk2:2181, zk3:2181 (conf not in 4lw.commands.whitelist; add conf there and restart that ZooKeeper server) — a duplicate myid cannot be ruled out</code></td>
 <td>the id could not be read (here <code>conf</code> is not whitelisted; also <code>server is down</code>, <code>server is not serving requests</code>) — the check is never reported as passing for those servers</td>
 </tr>
 <tr>
@@ -1878,9 +1878,10 @@ was configured with (its <code>server.N=</code> lines). The <strong>Server id</s
 data directory (<code>ZOO_MY_ID</code> for the <code>zookeeper</code> Docker image) and its <code>server.N=</code> lines so that
 every server has a unique id and all of them list the same ensemble, then restart that server.</p>
 <p><code>conf</code> is <strong>not</strong> on ZooKeeper's default whitelist. Add it next to <code>srvr</code>, for example
-<code>4lw.commands.whitelist=srvr,conf</code> (<code>ZOO_4LW_COMMANDS_WHITELIST=srvr,conf</code> for the Docker image).
-Without it every server's id reads <code>server id unknown (conf not in 4lw.commands.whitelist)</code>.
-The ZooKeeper bundled with itdastream (<code>conf/zk/zoo.cfg</code>) whitelists <code>srvr,conf</code>.</p>
+<code>4lw.commands.whitelist=srvr,conf</code> (<code>ZOO_4LW_COMMANDS_WHITELIST=srvr,conf</code> for the Docker image),
+and restart that ZooKeeper server: ZooKeeper reads the whitelist only at startup.
+Without it every server's id reads <code>server id unknown (conf not in 4lw.commands.whitelist; add conf there and restart that ZooKeeper server)</code>.
+The ZooKeeper bundled with itdastream (<code>conf/zk/zoo.cfg</code>) ships with <code>4lw.commands.whitelist=srvr,conf,ruok,stat,mntr</code>.</p>
 <p><code>tests/e2e-zk-myid.sh</code> verifies all of this on a real three-server ensemble, on the API and on the
 Cluster Topology page from a non-secure origin (<code>tests/ui-e2e/45-zk-myid.mjs</code>).</p>
 <h2 id="rest-api">REST API</h2>
