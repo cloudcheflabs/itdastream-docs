@@ -100,7 +100,7 @@ Changing `itdastream.base.data.dir` relocates every dependent path at once.
 | `itdastream.storage.write.buffer.bytes` | `16777216` | Size (bytes, 16 MiB) of the in-memory write buffer that accumulates produced records before flushing toward storage. |
 | `itdastream.storage.segment.max.size` | `16777216` | Maximum size (bytes, 16 MiB) a log segment accumulates before it is closed and uploaded to S3 as an object. |
 | `itdastream.storage.read.cache.max.bytes` | `268435456` | Maximum heap (bytes, 256 MiB) used by the per-broker read cache holding recently read segment data, to serve fetches without re-downloading from S3. |
-| `itdastream.storage.s3.flush.timeout.ms` | `300000` | Maximum age (ms, 5 min) before an in-progress segment is flushed/uploaded to S3 even if it has not reached `segment.max.size`. Bounds durability lag on low-throughput topics. |
+| `itdastream.storage.s3.flush.timeout.ms` | `300000` | Maximum age (ms, 5 min) before an in-progress segment is flushed/uploaded to S3 even if it has not reached `segment.max.size`. Measured from the segment's oldest record (not the last append), so a topic receiving a steady trickle is flushed too. Bounds the `acks=1` exposure window. |
 | `itdastream.storage.write.flush.interval.ms` | `5000` | Interval (ms) at which the in-memory write buffer is flushed downstream regardless of fill level. |
 
 ### Object Storage Backend Settings (S3)
@@ -116,6 +116,12 @@ Changing `itdastream.base.data.dir` relocates every dependent path at once.
 | `itdastream.storage.s3.path.style.access` | `true` | When `true`, use path-style addressing (`http://endpoint/bucket/key`). Required for most S3-compatible stores like MinIO; usually `false` for real AWS S3. |
 | `itdastream.storage.s3.staging.path` | `${itdastream.base.data.dir}/s3-staging` | Local staging directory for segment objects before/during upload to S3. Needs enough disk to hold in-flight segments. |
 | `itdastream.storage.s3.staging.encrypt` | `true` | When `true`, data written to the local staging directory is envelope-encrypted at rest before staging, so plaintext is never persisted to local disk. |
+| `itdastream.storage.s3.staging.sync` | `true` | fsync the staging WAL before an `acks=1` produce is acknowledged, so it survives a power loss as well as a process crash. Concurrent producers share one fsync. See [Durability](durability.md). |
+| `itdastream.produce.acks.all.linger.ms` | `50` | An `acks=all` produce is acknowledged once its batch is in object storage; this is how long the flush waits to collect more batches for the partition into the same upload. |
+| `itdastream.produce.leader.check.enabled` | `true` | Answer `NOT_LEADER_OR_FOLLOWER` to a produce for a partition this broker does not lead, so two brokers never write one partition. |
+| `itdastream.metadata.storage` | `bucket` | Where the log's metadata (segment list, committed offsets, topics, schemas, job definitions) is kept. `bucket`: next to the log, so another cluster can serve the bucket ([Disaster Recovery](disaster-recovery.md)). `zookeeper`: the previous layout. |
+| `itdastream.cluster.mode` | `active` | `standby` starts a recovery cluster that serves a replica bucket read-only until it is promoted. Only seeds the cluster-wide mode on the cluster's first start. |
+| `itdastream.standby.refresh.interval.ms` | `5000` | How often a standby re-reads its replica for newly replicated topics and segments. |
 
 ---
 
@@ -123,7 +129,7 @@ Changing `itdastream.base.data.dir` relocates every dependent path at once.
 
 | Property | Default | Description |
 | --- | --- | --- |
-| `itdastream.storage.log.retention.ms` | `604800000` | How long (ms, 7 days) partition log data is retained before being eligible for deletion by the cleanup task. |
+| `itdastream.storage.log.retention.ms` | `604800000` | How long (ms, 7 days) partition log data is retained before being eligible for deletion by the cleanup task. `-1` (or any value ≤ 0) keeps it forever. |
 | `itdastream.storage.cleanup.interval.ms` | `3600000` | How often (ms, 1 hour) the background retention/cleanup task runs to find and delete logs older than the retention window. |
 | `itdastream.storage.cleanup.history.retention.ms` | `15552000000` | How long (ms, ~180 days) entries in the cleanup-history store are kept before being purged. |
 
