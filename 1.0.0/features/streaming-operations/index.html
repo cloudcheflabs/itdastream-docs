@@ -1525,6 +1525,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../durability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Durability (acks, staging, leader moves)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../staging-store/" class="md-nav__link">
         
   
@@ -1533,6 +1561,34 @@
     
   
     Crash Recovery with Staging Store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../disaster-recovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster Recovery
   
 
     
@@ -1755,6 +1811,11 @@ environment variable &gt; file &gt; default).</p>
 <td>rows that also trigger a commit (bounds buffered rows)</td>
 </tr>
 <tr>
+<td><code>itdastream.streaming.shutdown.wait.ms</code></td>
+<td><code>10000</code></td>
+<td>on broker shutdown, how long to wait for its executors to drop their uncommitted rows, release their partitions and leave the consumer group (so the rest of the job takes over at once)</td>
+</tr>
+<tr>
 <td><code>itdastream.streaming.source.poll.timeout.ms</code></td>
 <td><code>100</code></td>
 <td>Kafka poll timeout inside the loop</td>
@@ -1830,6 +1891,20 @@ given table, concurrent writers can never collide — there is no
   rather than double-applied. Each source restores its offsets from the latest committed snapshot and
   seeks there, so it never re-reads already-committed records. The Iceberg commit is therefore the
   single source of truth for both <em>what data is committed</em> and <em>how far the source was consumed</em>.</li>
+<li><strong>Partition ownership (exactly-once while partitions move).</strong> The job's executors are members of
+  the consumer group <code>stream-&lt;jobId&gt;</code>, and every member join or leave (job start, a broker restart,
+  a crash) makes the group revoke and re-assign partitions. Before an executor reads a partition it
+  <strong>acquires</strong> it from the controller's checkpoint coordinator, which answers with that partition's
+  <strong>committed offset</strong> (the one stamped in the table) and <strong>fences</strong> the partition's previous owner:
+  everything that owner reported but the controller has not committed yet is dropped, and its later
+  acknowledgements are ignored. When a partition is revoked from an executor, the executor <strong>rolls
+  back</strong>: it drops every row it read but has not had committed, takes a new task id, and acquires the
+  partitions it keeps again. So a record is committed by exactly one owner, from exactly the committed
+  position — rows read before a rebalance are never committed twice (before this, a job started at
+  parallelism 2 while records were waiting committed them twice: 30 records became 60 rows), and none
+  are lost. A rollback costs at most one checkpoint interval of re-reading.</li>
+<li>The consumer group's committed offsets follow the <strong>committed</strong> position (sent with each checkpoint
+  barrier), so consumer lag shows what is durable in the table, never rows still in flight.</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Arrow off-heap (required)</p>
@@ -1862,7 +1937,11 @@ boots fine but a streaming job fails at first Arrow allocation with <code>Inacce
    threads to its share. On broker join/leave the controller recomputes the assignment.</li>
 <li><strong>Partition assignment (data plane).</strong> All of a job's threads are consumers in the group
    <code>stream-&lt;jobId&gt;</code>, so ItdaStream's group coordinator distributes the topic partitions across
-   them and rebalances on membership change.</li>
+   them and rebalances on membership change. For a coordinated Iceberg sink every rebalance is
+   exactly-once: each thread acquires its new partitions at the committed offsets and rolls back
+   whatever it had read but not committed (see <a href="#single-committer-append-only-iceberg">partition ownership</a>).
+   A member that dies without leaving the group (crash, <code>kill -9</code>) is removed after its consumer
+   session timeout (45 s by default), and the rebalance then completes without it.</li>
 </ol>
 <p>To change parallelism, edit the job (or resubmit with a new <code>parallelism</code>); the controller
 re-spreads the threads. Keep <code>parallelism ≤ partitions</code> so every thread owns at least one
@@ -1877,20 +1956,25 @@ restores its offsets from the latest snapshot. For other (standalone) sinks, the
 snapshots the Kafka offsets to S3 (the ExchangeManager, under <code>streaming/exchange/&lt;jobId&gt;/</code>,
 KMS-encrypted) and commits the consumer-group offset after the sink commit.</p>
 <ul>
-<li><strong>Worker broker dies</strong> → its partitions rebalance to other workers' consumers, which resume
-  from the committed position; the controller re-spreads thread assignments after a short
-  stabilization. No rows are lost; the committed watermark keeps the Iceberg commit idempotent so a
-  replayed checkpoint is never double-applied.</li>
+<li><strong>Worker broker dies</strong> → its partitions rebalance to other workers' consumers, which acquire them
+  at the committed offsets; the dead task is fenced, so the rows it read but never had committed are
+  read again exactly once by the new owner. The controller re-spreads thread assignments after a
+  short stabilization. A graceful stop releases the task and leaves the group at once
+  (<code>itdastream.streaming.shutdown.wait.ms</code>); a crash is noticed after the consumer session timeout.</li>
 <li><strong>Controller dies</strong> → a new controller is elected, re-reads <code>/streaming/jobs</code>, re-publishes
-  assignments, and <strong>re-seeds the checkpoint coordinator from the committed watermark</strong>, resuming
-  commits exactly past the last durable checkpoint. The data plane keeps running independently of
-  who is controller.</li>
-<li><strong>Job reassigned to a fresh broker</strong> → for coordinated Iceberg sinks the source restores its
-  offsets from the latest committed Iceberg snapshot and seeks there; for standalone sinks it
-  restores from the S3 exchange. Either way it picks up exactly where it left off.</li>
+  assignments, <strong>re-seeds the checkpoint coordinator from the committed watermark</strong> and loads the
+  committed offsets from the table. The old controller's not-yet-committed checkpoints died with it,
+  so every executor that sees the new coordinator's first barrier rolls back to the committed offsets
+  and acquires its partitions again. A broker that loses controllership stops its coordinators, and
+  only the controller commits.</li>
+<li><strong>Job reassigned to a fresh broker</strong> → for coordinated Iceberg sinks the executor acquires its
+  partitions and seeks to the offsets of the latest committed Iceberg snapshot; for standalone sinks
+  it restores from the S3 exchange. Either way it picks up exactly where it left off.</li>
 </ul>
-<p>This holds across a rolling restart of the whole cluster (verified end-to-end: produce → commit →
-restart all brokers → produce more yields the exact row count, no duplicates, no loss).</p>
+<p>This holds across restarts of every broker (verified end-to-end by <code>tests/streaming-exactly-once-e2e.sh</code>:
+records waiting before the job starts, parallelism 1, 2 and 3, a custom MAP job, a rolling restart of
+all three brokers — the controller included — and a <code>kill -9</code> of one broker while rows are in flight;
+each time the table holds exactly the produced keys, no duplicates, no loss).</p>
 <p>For change streams, set <strong>upsert keys</strong> so any boundary replays collapse to the latest value.</p>
 <hr />
 <h2 id="troubleshooting">Troubleshooting</h2>

@@ -1562,6 +1562,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../features/durability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Durability (acks, staging, leader moves)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../features/staging-store/" class="md-nav__link">
         
   
@@ -1570,6 +1598,34 @@
     
   
     Crash Recovery with Staging Store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/disaster-recovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster Recovery
   
 
     
@@ -1768,12 +1824,12 @@ storage by using S3-compatible object storage as its primary persistence layer, 
 <h4 id="log-store">Log Store</h4>
 <p>A custom-built distributed log engine that manages the lifecycle of a message.</p>
 <ul>
-<li>Write Path: Messages are first written to a Memory Write Buffer and persisted to a local RocksDB instance for immediate durability.</li>
+<li>Write Path: Messages are first written to a Memory Write Buffer and persisted to a local RocksDB instance (WAL fsynced). The acknowledgement follows the producer's <code>acks</code>: <code>acks=1</code> after the local write, <code>acks=all</code> after the batch is in object storage — see <a href="../../features/durability/">Durability</a>.</li>
 <li>S3 Flush: Background workers aggregate memory segments into immutable objects and flush them to S3 once they reach a size threshold or time limit.</li>
 <li>Read Path: every read is served from <strong>flushed segments</strong>, with an in-memory segment cache in front of the object store so repeated tail reads rarely pay for a round trip. Records still sitting in a write buffer are not yet readable — they become visible at the next flush, bounded by <code>itdastream.storage.write.flush.interval.ms</code> (default 5s). A consumer at the very tail of a partition therefore trails the producer by at most one flush interval.</li>
 </ul>
 <h4 id="metadata-coordination">Metadata &amp; Coordination</h4>
-<p>ItdaStream uses Apache ZooKeeper for cluster coordination and RocksDB for local metadata caching.</p>
+<p>The metadata needed to read the log — the segment list, topics, committed consumer offsets, schemas and streaming job definitions — is kept in the bucket next to the log, so the bucket alone can be served by another cluster (<a href="../../features/disaster-recovery/">Disaster Recovery</a>). Apache ZooKeeper is used for coordination only, and RocksDB for local caching.</p>
 <ul>
 <li>Broker Registration: each broker writes an ephemeral node under <code>/brokers/ids</code>. It disappears the moment the process does, which is what makes a broker's departure observable without a heartbeat protocol.</li>
 <li>Controller Election: one broker wins a Curator leader election and records itself at <code>/controller</code>. The controller owns work that must happen exactly once — topic creation, streaming job assignment, checkpoint coordination.</li>
@@ -1798,7 +1854,7 @@ storage by using S3-compatible object storage as its primary persistence layer, 
 <li>Client Request: A Kafka Producer sends messages to the Broker.</li>
 <li>Validation: The Broker validates the request.</li>
 <li>Local Append: Data is appended to the active Write Buffer.</li>
-<li>Local Durability: The segment is indexed in the local RocksDB. An ACK is returned to the producer as soon as the data is safe in the local node.</li>
+<li>Local Durability: The batch is staged in the local RocksDB and the WAL fsynced. With <code>acks=1</code> the ACK is returned here; with <code>acks=all</code> it is returned after the background upload below.</li>
 <li>Background Upload: Once the segment is full (e.g., 16MB), it is encrypted and uploaded to S3.</li>
 </ul>
 <p>The Read Path (Fetch)</p>

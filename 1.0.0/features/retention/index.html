@@ -1405,6 +1405,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../durability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Durability (acks, staging, leader moves)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../staging-store/" class="md-nav__link">
         
   
@@ -1413,6 +1441,34 @@
     
   
     Crash Recovery with Staging Store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../disaster-recovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster Recovery
   
 
     
@@ -1593,8 +1649,10 @@
 <h1 id="log-retention-and-lifecycle-management">Log Retention and Lifecycle Management</h1>
 <p>ItdaStream provides configurable time-based log retention with automatic cleanup of expired segments from S3 storage.</p>
 <ul>
-<li><strong>Defaults</strong>: 7-day retention, 1-hour cleanup interval, 180-day cleanup history</li>
-<li><strong>Cleanup process</strong>: Controller-only; deletes expired segments (.seg/.idx) from S3 and removes metadata from ZooKeeper</li>
+<li><strong>Defaults</strong>: 7-day retention (<code>itdastream.storage.log.retention.ms</code>, cluster-wide), 1-hour cleanup interval, 180-day cleanup history</li>
+<li><strong>Unlimited</strong>: <code>-1</code> (or any value ≤ 0) keeps data forever. Earlier versions treated it as "now + 1 ms" and deleted every segment</li>
+<li><strong>Standby clusters</strong> do not run retention: their bucket is a replica (<a href="../disaster-recovery/">Disaster Recovery</a>)</li>
+<li><strong>Cleanup process</strong>: Controller-only; deletes expired segments (.seg/.idx) and their entries in the bucket's segment list</li>
 <li><strong>Operations</strong>: Manual trigger via Admin API (<code>POST /admin/maintenance/cleanup/trigger</code>), cleanup history viewer (<code>GET /admin/maintenance/cleanup/history</code>)</li>
 </ul>
 

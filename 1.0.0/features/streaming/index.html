@@ -1536,6 +1536,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../durability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Durability (acks, staging, leader moves)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../staging-store/" class="md-nav__link">
         
   
@@ -1544,6 +1572,34 @@
     
   
     Crash Recovery with Staging Store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../disaster-recovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster Recovery
   
 
     
@@ -1803,6 +1859,10 @@ executor performs, in order:</p>
 either replays from the last committed checkpoint (sink not yet committed) or resumes cleanly
 (sink committed, offsets advanced) — exactly-once. On startup the executor restores the last
 completed checkpoint's offsets from S3 and seeks the consumer there.</p>
+<p>An append-only Iceberg sink of a distributed job goes further: the controller is its single
+committer, and every partition is read from the offset stamped in the table by whichever executor
+currently owns it — consumer-group rebalances and broker restarts included. See
+<a href="../streaming-operations/#single-committer-append-only-iceberg">single-committer and partition ownership</a>.</p>
 <p>For idempotent updates, set <strong>upsert keys</strong> on the Iceberg sink: each commit writes the data plus
 an equality-delete on the keys, so re-processed rows collapse to the latest value.</p>
 <hr />
