@@ -26,13 +26,13 @@ The Broker is the entry point for Kafka clients. It implements the Kafka request
 #### Log Store
 A custom-built distributed log engine that manages the lifecycle of a message.
 
-* Write Path: Messages are first written to a Memory Write Buffer and persisted to a local RocksDB instance for immediate durability.
+* Write Path: Messages are first written to a Memory Write Buffer and persisted to a local RocksDB instance (WAL fsynced). The acknowledgement follows the producer's `acks`: `acks=1` after the local write, `acks=all` after the batch is in object storage — see [Durability](../features/durability.md).
 * S3 Flush: Background workers aggregate memory segments into immutable objects and flush them to S3 once they reach a size threshold or time limit.
 * Read Path: every read is served from **flushed segments**, with an in-memory segment cache in front of the object store so repeated tail reads rarely pay for a round trip. Records still sitting in a write buffer are not yet readable — they become visible at the next flush, bounded by `itdastream.storage.write.flush.interval.ms` (default 5s). A consumer at the very tail of a partition therefore trails the producer by at most one flush interval.
 
 
 #### Metadata & Coordination
-ItdaStream uses Apache ZooKeeper for cluster coordination and RocksDB for local metadata caching.
+The metadata needed to read the log — the segment list, topics, committed consumer offsets, schemas and streaming job definitions — is kept in the bucket next to the log, so the bucket alone can be served by another cluster ([Disaster Recovery](../features/disaster-recovery.md)). Apache ZooKeeper is used for coordination only, and RocksDB for local caching.
 
 * Broker Registration: each broker writes an ephemeral node under `/brokers/ids`. It disappears the moment the process does, which is what makes a broker's departure observable without a heartbeat protocol.
 * Controller Election: one broker wins a Curator leader election and records itself at `/controller`. The controller owns work that must happen exactly once — topic creation, streaming job assignment, checkpoint coordination.
@@ -62,7 +62,7 @@ The Write Path (Produce)
 * Client Request: A Kafka Producer sends messages to the Broker.
 * Validation: The Broker validates the request.
 * Local Append: Data is appended to the active Write Buffer.
-* Local Durability: The segment is indexed in the local RocksDB. An ACK is returned to the producer as soon as the data is safe in the local node.
+* Local Durability: The batch is staged in the local RocksDB and the WAL fsynced. With `acks=1` the ACK is returned here; with `acks=all` it is returned after the background upload below.
 * Background Upload: Once the segment is full (e.g., 16MB), it is encrypted and uploaded to S3.
 
 

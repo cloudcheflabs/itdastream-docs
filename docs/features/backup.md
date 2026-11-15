@@ -2,7 +2,7 @@
 
 ItdaStream can periodically ship its irreplaceable cluster state — the **KMS keystore** and the **IAM** snapshot — to an S3-compatible target. Backups are leader-only, incremental, opt-in, and run on either a fixed interval, a 5-field UNIX cron expression, or both at once.
 
-The Kafka log data itself is **not** in scope here: it already lives in the configured S3 backing store (whichever bucket the broker uses for segments), so it is a target for the same `aws s3 sync`-style data export tools you would use against any object store. What this feature backs up is the *control-plane* state without which a restored broker has no users, no encryption keys, and no audit history.
+The Kafka log data itself is **not** in scope here: the log *and the metadata needed to read it* (segment list, topics, committed offsets, schemas, job definitions) already live in the configured bucket, so the bucket is protected with the object store's own replication — see [Disaster Recovery](disaster-recovery.md). What this feature backs up is the *control-plane* state without which a restored broker has no users, no encryption keys, and no audit history.
 
 ## Configuration
 

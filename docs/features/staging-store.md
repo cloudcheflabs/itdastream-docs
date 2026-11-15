@@ -1,6 +1,6 @@
 # Crash Recovery with Staging Store
 
-A produce request is acknowledged as soon as the record is in memory and in the local staging store. It has not reached object storage yet — that happens in the background, in batches, because uploading one object per record would make the write path as slow as the object store.
+With `acks=1`, a produce request is acknowledged once the record is in memory and in the local staging store, with the store's WAL fsynced. It has not reached object storage yet — that happens in the background, in batches, because uploading one object per record would make the write path as slow as the object store. (With `acks=all` the acknowledgement waits for the upload; see [Durability](durability.md).)
 
 The staging store is what makes that acknowledgement honest. It is a local RocksDB write-ahead log holding every record that has been acked but not yet flushed, and on restart the broker replays it.
 
@@ -16,8 +16,8 @@ The staging store is what makes that acknowledgement honest. It is a local Rocks
 
 ## The write path
 
-1. The record is appended to the partition's in-memory `WriteBuffer` and written to the staging store under `<topic>-<partition>/<offset>`.
-2. The produce request is acknowledged.
+1. The record is assigned its offsets and written to the staging store under `<topic>-<partition>:<offset>`, then appended to the partition's in-memory `WriteBuffer` — both under the partition's lock, so two concurrent produces can never stage under the same key. If staging fails, the produce is answered with an error instead.
+2. The staging WAL is fsynced (concurrent producers share one fsync) and the produce request is acknowledged.
 3. A background worker flushes the buffer to object storage when it reaches a size or time threshold.
 4. Staging entries for the flushed range are deleted **asynchronously**, so cleanup I/O never blocks a producer.
 
@@ -29,7 +29,7 @@ When the log store starts, it replays the staging store before accepting traffic
 
 - Entries are grouped by partition and replayed **in numeric offset order**. RocksDB sorts keys as bytes, which would otherwise give offsets 1, 10, 100, 2 — and replaying out of order would corrupt the partition.
 - Each record's **original offset** is preserved. Re-appending at a fresh offset would renumber records a producer already holds acknowledgements for.
-- Records at or below the partition's current `nextOffset` are **skipped** — they made it to object storage before the crash, and their staging entries were simply not cleaned up yet.
+- Records at or below the partition's current `nextOffset` are one of two things, told apart by a "flushed through" marker the broker writes on every flush: records **this broker** flushed before the crash (their staging entries were simply not cleaned up yet) are skipped; records it never flushed, whose offsets **another broker** has since written (it led the partition meanwhile), were still acknowledged — they are appended again after that broker's records, with new offsets, rather than dropped.
 - Every partition touched by the replay is flushed synchronously before startup continues, so the recovered data is durable before the broker takes a single request.
 
 Nothing about this depends on which broker crashed. The staging store is local, but the log it feeds is shared: a replayed record lands in the same object store every other broker reads from.

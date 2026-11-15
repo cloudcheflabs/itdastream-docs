@@ -88,6 +88,11 @@ either replays from the last committed checkpoint (sink not yet committed) or re
 (sink committed, offsets advanced) — exactly-once. On startup the executor restores the last
 completed checkpoint's offsets from S3 and seeks the consumer there.
 
+An append-only Iceberg sink of a distributed job goes further: the controller is its single
+committer, and every partition is read from the offset stamped in the table by whichever executor
+currently owns it — consumer-group rebalances and broker restarts included. See
+[single-committer and partition ownership](streaming-operations.md#single-committer-append-only-iceberg).
+
 For idempotent updates, set **upsert keys** on the Iceberg sink: each commit writes the data plus
 an equality-delete on the keys, so re-processed rows collapse to the latest value.
 
